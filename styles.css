@@ -1,0 +1,44 @@
+body {
+    font-family: Helvetica, Arial, sans-serif;
+    background-color: #faf6c3;
+    color: black;
+
+}
+
+h1 {
+    font-size:xx-large;
+    color: #e43d12
+
+}
+
+h2 {
+    font-size: x-large;
+    color: #a6643c;
+    
+}
+
+p {
+
+}
+
+a:link, a:visited {
+    color: #e43d12;
+    border: 2px solid #e43d12;
+    border-radius: 5px;
+    padding: 10px 20px;
+    text-align: center;
+    display: inline-block;
+
+    }
+
+a:hover, a:active {
+    background-color: #e43d12;
+    color: #faf6c3;
+}
+
+.account-buttons {
+  position: absolute;
+  top: 22px;
+  right: 20px;
+  font-size: 18px;
+}
