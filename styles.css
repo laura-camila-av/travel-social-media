@@ -2,6 +2,7 @@ body {
     font-family: Helvetica, Arial, sans-serif;
     background-color: #faf6c3;
     color: black;
+    text-align: center;
 
 }
 
@@ -42,3 +43,21 @@ a:hover, a:active {
   right: 20px;
   font-size: 18px;
 }
+
+.btn {
+    color: #e43d12;
+    border: 2px solid #e43d12;
+    border-radius: 5px;
+    padding: 10px 20px;
+    text-align: center;
+    display: inline-block;
+    background-color: transparent;
+    cursor: pointer;
+    text-decoration: none; /* removes underline for links */
+}
+
+.btn:hover {
+    background-color: #e43d12;
+    color: #faf6c3;
+}
+
