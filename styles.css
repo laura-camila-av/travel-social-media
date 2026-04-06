@@ -69,10 +69,75 @@ a:hover, a:active {
     margin: 30px auto;
 }
 
-/* Square cards */
+
 .itinerary-card {
     width: 100%;
     aspect-ratio: 1 / 1;
     background-color: black;
 }
 
+.itinerary-card:hover {
+    opacity: 0.85;
+    cursor: pointer;
+}
+
+@media (max-width: 600px) {
+    .itinerary-container {
+        gap: 0px;
+    }
+}
+
+.itinerary-card {
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    background-color: black;
+    position: relative;
+    overflow: hidden;
+}
+
+.overlay-text {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    
+    color: white;
+    font-size: 20px;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.itinerary-card:hover .overlay-text {
+    opacity: 1;
+}
+
+.itinerary-card:hover {
+    filter: brightness(70%);
+}
+
+.profile-section {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 20px;
+    margin-left: 40px;
+}
+
+
+.profile-pic {
+    width: 100px;
+    height: 100px;
+    background-color: black;
+    border-radius: 50%;
+}
+
+
+.username {
+    margin: 0;
+}
+
+.bio {
+    text-align: justify;
+    max-width: 800px;
+    margin: 20px 0 20px 40px; 
+}
