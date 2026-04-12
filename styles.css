@@ -219,3 +219,26 @@ a:hover, a:active {
 .main-image:hover .overlay-text {
     opacity: 1;
 }
+
+/*Navigation Bar to go on every page*/
+.navigation-bar {
+   ul {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    width: 250px;
+    background-color: #e43d12;
+    } 
+    
+    li a {
+        display: block;
+        color: white;
+        padding: 20px 14px;
+        text-decoration: none; 
+    }
+
+    li a:hover {
+        background-color: #e66240;
+        color: white;
+        }
+}
