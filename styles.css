@@ -228,6 +228,9 @@ a:hover, a:active {
     padding: 0;
     width: 250px;
     background-color: #e43d12;
+    position: fixed;
+    overflow: auto;
+    height: 100%;
     } 
     
     li a {
