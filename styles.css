@@ -3,6 +3,8 @@ body {
     background-color: #faf6c3;
     color: black;
     text-align: center;
+    margin: 0;
+    padding: 0;
 
 }
 
@@ -142,19 +144,18 @@ a:hover, a:active {
     margin: 20px 0 20px 40px; 
 }
 
-.itinerary-page {
+.main-content {
     display: flex;
-    justify-content: center;
-    align-items: flex-start;
-    gap: 40px;
-    margin-top: 30px;
+    flex-direction: column;
+    align-items: center;
 }
 
 
 .day-thumbnails {
     display: flex;
-    flex-direction: column;
-    gap: 20px;
+    justify-content: center; 
+    gap: 30px;
+    margin-top: 20px;
 }
 
 
@@ -165,19 +166,12 @@ a:hover, a:active {
     position: relative;
 }
 
-
 .main-image {
-    width: 500px;
+    width: 100%;
     aspect-ratio: 1 / 1;
     background-color: black;
-    position: relative;
+    position: center;
 }
-
-.day-details {
-    width: 400px;
-    text-align: left;
-}
-
 
 .time-block {
     border: 1px solid black;
@@ -215,8 +209,7 @@ a:hover, a:active {
     transition: opacity 0.3s ease;
 }
 
-.day-card:hover .overlay-text,
-.main-image:hover .overlay-text {
+.day-card:hover .overlay-text {
     opacity: 1;
 }
 
@@ -226,7 +219,7 @@ a:hover, a:active {
     list-style-type: none;
     margin: 0;
     padding: 0;
-    width: 250px;
+    width: 200px;
     background-color: #e43d12;
     position: fixed;
     overflow: auto;
@@ -244,4 +237,25 @@ a:hover, a:active {
         background-color: #e66240;
         color: white;
         }
+}
+
+.page-wrapper {
+    margin-left: 200px; /* same as nav width */
+    display: flex;
+    height: 100vh;
+    overflow: hidden;
+}
+
+.middle-column {
+    flex: 1;
+    overflow-y: auto;
+    padding: 20px;
+    text-align: center; /* centres everything in here at once */
+}
+
+.right-column {
+    width: 400px;
+    overflow-y: auto;
+    padding: 20px;
+    border-left: 1px solid #ccc;
 }
