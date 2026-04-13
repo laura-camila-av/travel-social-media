@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Webname - Search</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+    <!-- Left navigation bar -->
+    <div class="navigation-bar">
+        <ul>
+            <li><a href="#">Home</a></li>
+            <li><a href="#">Browse</a></li>
+            <li><a href="#">Submit Itinerary</a></li>
+            <li><a href="#">Bookmarks</a></li>
+            <li><a href="#">Profile</a></li>
+        </ul>
+    </div>
+
+    <div class="page-wrapper">
+        <!-- Middle content -->
+        <div class="middle-column">
+            
+            <!-- Account buttons -->
+            <div class="account-buttons">
+                <a href="#" class="btn">Login</a>
+                <a href="#" class="btn">Sign Up</a>
+            </div>
+
+            <h1>Webname</h1>
+            <h2>Search Itineraries</h2>
+            <p>Find trips by city, country, budget, duration, and travel style.</p>
+
+            <!-- Search bar -->
+            <div style="max-width: 900px; margin: 30px auto; display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;">
+                <input type="text" placeholder="Search by city or country"
+                    style="padding: 12px; width: 320px; border: 2px solid #e43d12; border-radius: 5px;">
+
+                <select style="padding: 12px; border: 2px solid #e43d12; border-radius: 5px;">
+                    <option>Duration</option>
+                    <option>1-3 days</option>
+                    <option>4-7 days</option>
+                    <option>8+ days</option>
+                </select>
+                <select style="padding: 12px; border: 2px solid #e43d12; border-radius: 5px;">
+                    <option>Travel Style</option>
+                    <option>Backpacker</option>
+                    <option>Solo</option>
+                    <option>Beach</option>
+                    <option>Cultural</option>
+                    <option>Luxury</option>
+                </select>
+                <select style="padding: 12px; border: 2px solid #e43d12; border-radius: 5px;">
+                    <option>Budget</option>
+                    <option>Low</option>
+                    <option>Medium</option>
+                    <option>High</option>
+                </select>
+
+                <button class="btn">Search</button>
+            </div>
+
+            <!-- Search results -->
+            <h2>Popular Results</h2>
+
+            <div class="itinerary-container">
+                <div class="itinerary-card">
+                    <div class="overlay-text">Tokyo Budget Trip</div>
+                </div>
+
+                <div class="itinerary-card">
+                    <div class="overlay-text">Kyoto Cultural Journey</div>
+                </div>
+
+                <div class="itinerary-card">
+                    <div class="overlay-text">Seoul Food Adventure</div>
+                </div>
+
+                <div class="itinerary-card">
+                    <div class="overlay-text">Bali Beach Escape</div>
+                </div>
+
+                <div class="itinerary-card">
+                    <div class="overlay-text">Paris 5-Day Plan</div>
+                </div>
+
+                <div class="itinerary-card">
+                    <div class="overlay-text">Sydney Weekend Guide</div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+</body>
+</html>
