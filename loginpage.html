@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Login / Register</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: Arial, sans-serif;
+    }
+
+    body {
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      padding: 20px;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 420px;
+      background: #fff;
+      border-radius: 18px;
+      box-shadow: 0 15px 40px rgba(0, 0, 0, 0.2);
+      overflow: hidden;
+    }
+
+    .tabs {
+      display: flex;
+      width: 100%;
+    }
+
+    .tab-btn {
+      flex: 1;
+      padding: 16px;
+      border: none;
+      background: #f3f3f3;
+      cursor: pointer;
+      font-size: 16px;
+      font-weight: bold;
+      transition: 0.3s;
+    }
+
+    .tab-btn.active {
+      background: #667eea;
+      color: white;
+    }
+
+    .form-box {
+      padding: 30px 25px;
+    }
+
+    h2 {
+      text-align: center;
+      margin-bottom: 20px;
+      color: #333;
+    }
+
+    .input-group {
+      margin-bottom: 15px;
+    }
+
+    .input-group label {
+      display: block;
+      margin-bottom: 6px;
+      color: #444;
+      font-size: 14px;
+      font-weight: bold;
+    }
+
+    .input-group input {
+      width: 100%;
+      padding: 12px 14px;
+      border: 1px solid #ccc;
+      border-radius: 10px;
+      outline: none;
+      font-size: 14px;
+      transition: 0.3s;
+    }
+
+    .input-group input:focus {
+      border-color: #667eea;
+      box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.15);
+    }
+
+    .btn {
+      width: 100%;
+      padding: 13px;
+      border: none;
+      border-radius: 10px;
+      background: #667eea;
+      color: white;
+      font-size: 15px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: 0.3s;
+      margin-top: 8px;
+    }
+
+    .btn:hover {
+      background: #5563d6;
+    }
+
+    .link {
+      display: block;
+      text-align: center;
+      margin-top: 14px;
+      font-size: 14px;
+      color: #667eea;
+      cursor: pointer;
+      text-decoration: none;
+    }
+
+    .link:hover {
+      text-decoration: underline;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    .message {
+      margin-top: 15px;
+      text-align: center;
+      font-size: 14px;
+      color: green;
+    }
+
+    .error {
+      color: red;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="tabs">
+      <button class="tab-btn active" onclick="showForm('login')">Login</button>
+      <button class="tab-btn" onclick="showForm('register')">Register</button>
+    </div>
+
+    <div class="form-box">
+      <!-- Login Form -->
+      <form id="loginForm">
+        <h2>Login</h2>
+
+        <div class="input-group">
+          <label for="loginEmail">Email</label>
+          <input type="email" id="loginEmail" placeholder="Enter email" required />
+        </div>
+
+        <div class="input-group">
+          <label for="loginPassword">Password</label>
+          <input type="password" id="loginPassword" placeholder="Enter password" required />
+        </div>
+
+        <button type="submit" class="btn">Login</button>
+        <a class="link" onclick="showForgotPassword()">Forgot Password?</a>
+        <p id="loginMessage" class="message"></p>
+      </form>
+
+      <!-- Register Form -->
+      <form id="registerForm" class="hidden">
+        <h2>Register</h2>
+
+        <div class="input-group">
+          <label for="registerEmail">Email</label>
+          <input type="email" id="registerEmail" placeholder="Enter email" required />
+        </div>
+
+        <div class="input-group">
+          <label for="registerPhone">Phone</label>
+          <input type="tel" id="registerPhone" placeholder="Enter phone number" required />
+        </div>
+
+        <div class="input-group">
+          <label for="registerPassword">Password</label>
+          <input type="password" id="registerPassword" placeholder="Create password" required />
+        </div>
+
+        <div class="input-group">
+          <label for="confirmPassword">Confirm Password</label>
+          <input type="password" id="confirmPassword" placeholder="Confirm password" required />
+        </div>
+
+        <button type="submit" class="btn">Register</button>
+        <p id="registerMessage" class="message"></p>
+      </form>
+
+      <!-- Forgot Password Form -->
+      <form id="forgotForm" class="hidden">
+        <h2>Forgot Password</h2>
+
+        <div class="input-group">
+          <label for="forgotEmail">Email</label>
+          <input type="email" id="forgotEmail" placeholder="Enter your email" required />
+        </div>
+
+        <button type="submit" class="btn">Send Reset Link</button>
+        <a class="link" onclick="showForm('login')">Back to Login</a>
+        <p id="forgotMessage" class="message"></p>
+      </form>
+    </div>
+  </div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-app.js";
+    import {
+      getAuth,
+      createUserWithEmailAndPassword,
+      signInWithEmailAndPassword,
+      sendPasswordResetEmail
+    } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-auth.js";
+    import {
+      getFirestore,
+      doc,
+      setDoc
+    } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyAWEihls-_e4KRHI-q07l8VgYrUWfxoNvw",
+      authDomain: "agilewebdev-456dc.firebaseapp.com",
+      projectId: "agilewebdev-456dc",
+      storageBucket: "agilewebdev-456dc.firebasestorage.app",
+      messagingSenderId: "717263318416",
+      appId: "1:717263318416:web:c893d4c090ee4c87b19715",
+      measurementId: "G-CPL9KD9JVD"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    const loginForm = document.getElementById("loginForm");
+    const registerForm = document.getElementById("registerForm");
+    const forgotForm = document.getElementById("forgotForm");
+    const tabButtons = document.querySelectorAll(".tab-btn");
+
+    window.showForm = function(formType) {
+      loginForm.classList.add("hidden");
+      registerForm.classList.add("hidden");
+      forgotForm.classList.add("hidden");
+
+      tabButtons.forEach(btn => btn.classList.remove("active"));
+
+      if (formType === "login") {
+        loginForm.classList.remove("hidden");
+        tabButtons[0].classList.add("active");
+      } else if (formType === "register") {
+        registerForm.classList.remove("hidden");
+        tabButtons[1].classList.add("active");
+      }
+    };
+
+    window.showForgotPassword = function() {
+      loginForm.classList.add("hidden");
+      registerForm.classList.add("hidden");
+      forgotForm.classList.remove("hidden");
+      tabButtons.forEach(btn => btn.classList.remove("active"));
+    };
+
+    loginForm.addEventListener("submit", async function(e) {
+      e.preventDefault();
+
+      const email = document.getElementById("loginEmail").value.trim();
+      const password = document.getElementById("loginPassword").value.trim();
+      const message = document.getElementById("loginMessage");
+
+      message.textContent = "";
+      message.classList.remove("error");
+
+      if (!email || !password) {
+        message.textContent = "Please fill in all fields.";
+        message.classList.add("error");
+        return;
+      }
+
+      try {
+        await signInWithEmailAndPassword(auth, email, password);
+        message.textContent = "Login successful.";
+        window.location.href = "username.html";
+      } catch (error) {
+        message.textContent = error.message;
+        message.classList.add("error");
+      }
+    });
+
+    registerForm.addEventListener("submit", async function(e) {
+      e.preventDefault();
+
+      const email = document.getElementById("registerEmail").value.trim();
+      const phone = document.getElementById("registerPhone").value.trim();
+      const password = document.getElementById("registerPassword").value.trim();
+      const confirmPassword = document.getElementById("confirmPassword").value.trim();
+      const message = document.getElementById("registerMessage");
+
+      message.textContent = "";
+      message.classList.remove("error");
+
+      if (!email || !phone || !password || !confirmPassword) {
+        message.textContent = "Please fill in all fields.";
+        message.classList.add("error");
+        return;
+      }
+
+      if (password !== confirmPassword) {
+        message.textContent = "Passwords do not match.";
+        message.classList.add("error");
+        return;
+      }
+
+      if (password.length < 6) {
+        message.textContent = "Password must be at least 6 characters.";
+        message.classList.add("error");
+        return;
+      }
+
+      try {
+        const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+        const user = userCredential.user;
+
+        await setDoc(doc(db, "users", user.uid), {
+          email: email,
+          phone: phone,
+          createdAt: new Date().toISOString()
+        });
+
+        message.textContent = "Registration successful.";
+        window.location.href = "username.html";
+      } catch (error) {
+        message.textContent = error.message;
+        message.classList.add("error");
+      }
+    });
+
+    forgotForm.addEventListener("submit", async function(e) {
+      e.preventDefault();
+
+      const email = document.getElementById("forgotEmail").value.trim();
+      const message = document.getElementById("forgotMessage");
+
+      message.textContent = "";
+      message.classList.remove("error");
+
+      if (!email) {
+        message.textContent = "Please enter your email.";
+        message.classList.add("error");
+        return;
+      }
+
+      try {
+        await sendPasswordResetEmail(auth, email);
+        message.textContent = "Password reset email sent.";
+      } catch (error) {
+        message.textContent = error.message;
+        message.classList.add("error");
+      }
+    });
+  </script>
+</body>
+</html>
