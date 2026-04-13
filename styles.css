@@ -259,3 +259,12 @@ a:hover, a:active {
     padding: 20px;
     border-left: 1px solid #ccc;
 }
+
+.file-input {
+    display: none;
+}
+
+.file-name {
+    margin-left: 10px;
+    font-size: 16px;
+}
