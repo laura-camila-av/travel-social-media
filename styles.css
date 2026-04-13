@@ -283,3 +283,12 @@ a:hover, a:active {
     flex-shrink: 0; /* stops the icon squishing if text is long */
     margin-top: 4px;
 }
+
+.file-input {
+    display: none;
+}
+
+.file-name {
+    margin-left: 10px;
+    font-size: 16px;
+}
