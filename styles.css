@@ -272,3 +272,14 @@ a:hover, a:active {
     font-size: 13px;
     overflow-y: auto;
 }
+
+.itinerary-detail-box p {
+    margin: 0;
+    text-align: justify;
+}
+
+.itinerary-detail-box i {
+    font-size: 24px;
+    flex-shrink: 0; /* stops the icon squishing if text is long */
+    margin-top: 4px;
+}
