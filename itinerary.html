@@ -29,16 +29,11 @@
         <label for="end-date">End Date</label><br>
         <input type="date" id="end-date" name="end-date" required><br><br>
 
-        <button type="button" onclick="generateDays()">Generate Itinerary Days</button>
+        <button type="button" onclick="generateDays()" class="btn">Generate Itinerary Days</button>
 
         <div id="days-container"></div>
 
-<<<<<<< HEAD
-        <br>
-        <input type="submit" value="Submit Itinerary">
-=======
         <button type="submit" class="btn">Submit Itinerary</button>
->>>>>>> main
     </form>
 
     <script>
@@ -91,13 +86,26 @@
                     <input type="text" id="accommodation-day${i}" name="accommodation-day${i}"><br><br>
 
                     <label for="photos-day${i}">Upload Photo</label><br>
-                    <input type="file" id="photos-day${i}" name="photos-day${i}" accept="image/*"><br><br>
+                    <label for="photos-day${i}" class="btn">Choose File</label>
+                    <input type="file" id="photos-day${i}" name="photos-day${i}" accept="image/*" class="file-input">
+                    <span id="file-name-day${i}" class="file-name">No file chosen</span><br><br>
 
                     <label for="caption-day${i}">Photo Caption</label><br>
                     <textarea id="caption-day${i}" name="caption-day${i}" rows="3"></textarea><br><br>
                 `;
 
                 daysContainer.appendChild(daySection);
+
+const fileInput = daySection.querySelector(`#photos-day${i}`);
+const fileName = daySection.querySelector(`#file-name-day${i}`);
+
+fileInput.addEventListener("change", function () {
+    if (this.files.length > 0) {
+        fileName.textContent = this.files[0].name;
+    } else {
+        fileName.textContent = "No file chosen";
+    }
+});
             }
         }
     </script>
