@@ -9,10 +9,9 @@
 <body>
     <h1>Create Your Itinerary</h1>
     <h2>Plan your trip day by day</h2>
-    <p>Fill in the details below to build your travel itinerary.</p>
+    <p>Enter your trip details, then generate the required number of day sections.</p>
 
-    <form action="#" method="post" enctype="multipart/form-data">
-
+    <form id="itinerary-form" action="#" method="post" enctype="multipart/form-data">
         <h2>Trip Details</h2>
 
         <label for="trip-title">Itinerary Title</label><br>
@@ -30,33 +29,77 @@
         <label for="end-date">End Date</label><br>
         <input type="date" id="end-date" name="end-date" required><br><br>
 
-        <h2>Day 1</h2>
+        <button type="button" onclick="generateDays()">Generate Itinerary Days</button>
 
-        <label for="activities-day1">Activities</label><br>
-        <textarea id="activities-day1" name="activities-day1" rows="4" required></textarea><br><br>
+        <div id="days-container"></div>
 
-        <label for="cost-day1">Total Cost</label><br>
-        <input type="number" id="cost-day1" name="cost-day1" min="0" step="0.01" required><br><br>
-
-        <label for="rented-items-day1">Rented Items</label><br>
-        <input type="text" id="rented-items-day1" name="rented-items-day1"><br><br>
-
-        <label for="dining-day1">Dining</label><br>
-        <input type="text" id="dining-day1" name="dining-day1"><br><br>
-
-        <label for="transport-day1">Transport Taken</label><br>
-        <input type="text" id="transport-day1" name="transport-day1" placeholder="e.g. Train, Bus, Taxi"><br><br>
-
-        <label for="accommodation-day1">Accommodation (optional)</label><br>
-        <input type="text" id="accommodation-day1" name="accommodation-day1"><br><br>
-
-        <label for="photos-day1">Upload Photo</label><br>
-        <input type="file" id="photos-day1" name="photos-day1" accept="image/*"><br><br>
-
-        <label for="caption-day1">Photo Caption</label><br>
-        <textarea id="caption-day1" name="caption-day1" rows="3"></textarea><br><br>
-
+<<<<<<< HEAD
+        <br>
+        <input type="submit" value="Submit Itinerary">
+=======
         <button type="submit" class="btn">Submit Itinerary</button>
+>>>>>>> main
     </form>
+
+    <script>
+        function generateDays() {
+            const startDateInput = document.getElementById("start-date").value;
+            const endDateInput = document.getElementById("end-date").value;
+            const daysContainer = document.getElementById("days-container");
+
+            daysContainer.innerHTML = "";
+
+            if (!startDateInput || !endDateInput) {
+                alert("Please enter both a start date and an end date.");
+                return;
+            }
+
+            const startDate = new Date(startDateInput);
+            const endDate = new Date(endDateInput);
+
+            if (endDate < startDate) {
+                alert("End date cannot be earlier than start date.");
+                return;
+            }
+
+            const timeDifference = endDate - startDate;
+            const dayCount = Math.floor(timeDifference / (1000 * 60 * 60 * 24)) + 1;
+
+            for (let i = 1; i <= dayCount; i++) {
+                const daySection = document.createElement("section");
+                daySection.classList.add("day-section");
+
+                daySection.innerHTML = `
+                    <h2>Day ${i}</h2>
+
+                    <label for="activities-day${i}">Activities</label><br>
+                    <textarea id="activities-day${i}" name="activities-day${i}" rows="4" required></textarea><br><br>
+
+                    <label for="cost-day${i}">Total Cost</label><br>
+                    <input type="number" id="cost-day${i}" name="cost-day${i}" min="0" step="0.01" required><br><br>
+
+                    <label for="rented-items-day${i}">Rented Items</label><br>
+                    <input type="text" id="rented-items-day${i}" name="rented-items-day${i}"><br><br>
+
+                    <label for="dining-day${i}">Dining</label><br>
+                    <input type="text" id="dining-day${i}" name="dining-day${i}"><br><br>
+
+                    <label for="transport-day${i}">Transport Taken</label><br>
+                    <input type="text" id="transport-day${i}" name="transport-day${i}" placeholder="e.g. Train, Bus, Taxi"><br><br>
+
+                    <label for="accommodation-day${i}">Accommodation (Optional)</label><br>
+                    <input type="text" id="accommodation-day${i}" name="accommodation-day${i}"><br><br>
+
+                    <label for="photos-day${i}">Upload Photo</label><br>
+                    <input type="file" id="photos-day${i}" name="photos-day${i}" accept="image/*"><br><br>
+
+                    <label for="caption-day${i}">Photo Caption</label><br>
+                    <textarea id="caption-day${i}" name="caption-day${i}" rows="3"></textarea><br><br>
+                `;
+
+                daysContainer.appendChild(daySection);
+            }
+        }
+    </script>
 </body>
 </html>
