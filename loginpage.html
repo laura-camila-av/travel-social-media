@@ -1,125 +1,12 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+  <link rel="stylesheet" href="styles.css">
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Login / Register</title>
   <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-      font-family: Arial, sans-serif;
-    }
-
-    body {
-      min-height: 100vh;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      background: linear-gradient(135deg, #667eea, #764ba2);
-      padding: 20px;
-    }
-
-    .container {
-      width: 100%;
-      max-width: 420px;
-      background: #fff;
-      border-radius: 18px;
-      box-shadow: 0 15px 40px rgba(0, 0, 0, 0.2);
-      overflow: hidden;
-    }
-
-    .tabs {
-      display: flex;
-      width: 100%;
-    }
-
-    .tab-btn {
-      flex: 1;
-      padding: 16px;
-      border: none;
-      background: #f3f3f3;
-      cursor: pointer;
-      font-size: 16px;
-      font-weight: bold;
-      transition: 0.3s;
-    }
-
-    .tab-btn.active {
-      background: #667eea;
-      color: white;
-    }
-
-    .form-box {
-      padding: 30px 25px;
-    }
-
-    h2 {
-      text-align: center;
-      margin-bottom: 20px;
-      color: #333;
-    }
-
-    .input-group {
-      margin-bottom: 15px;
-    }
-
-    .input-group label {
-      display: block;
-      margin-bottom: 6px;
-      color: #444;
-      font-size: 14px;
-      font-weight: bold;
-    }
-
-    .input-group input {
-      width: 100%;
-      padding: 12px 14px;
-      border: 1px solid #ccc;
-      border-radius: 10px;
-      outline: none;
-      font-size: 14px;
-      transition: 0.3s;
-    }
-
-    .input-group input:focus {
-      border-color: #667eea;
-      box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.15);
-    }
-
-    .btn {
-      width: 100%;
-      padding: 13px;
-      border: none;
-      border-radius: 10px;
-      background: #667eea;
-      color: white;
-      font-size: 15px;
-      font-weight: bold;
-      cursor: pointer;
-      transition: 0.3s;
-      margin-top: 8px;
-    }
-
-    .btn:hover {
-      background: #5563d6;
-    }
-
-    .link {
-      display: block;
-      text-align: center;
-      margin-top: 14px;
-      font-size: 14px;
-      color: #667eea;
-      cursor: pointer;
-      text-decoration: none;
-    }
-
-    .link:hover {
-      text-decoration: underline;
-    }
-
+  
     .hidden {
       display: none;
     }
@@ -136,24 +23,24 @@
     }
   </style>
 </head>
-<body>
-  <div class="container">
-    <div class="tabs">
-      <button class="tab-btn active" onclick="showForm('login')">Login</button>
-      <button class="tab-btn" onclick="showForm('register')">Register</button>
+<body class="login-page-body">
+  <div class="login-page-container">
+    <div class="login-page-tabs">
+      <button class="login-page-tab-btn active" onclick="showForm('login')">Login</button>
+      <button class="login-page-tab-btn" onclick="showForm('register')">Register</button>
     </div>
 
-    <div class="form-box">
+    <div class="login-page-form-box">
       <!-- Login Form -->
       <form id="loginForm">
-        <h2>Login</h2>
+        <h2 class ="login-page-h2 " >Login</h2>
 
-        <div class="input-group">
+        <div class="login-page-input-group">
           <label for="loginEmail">Email</label>
           <input type="email" id="loginEmail" placeholder="Enter email" required />
         </div>
 
-        <div class="input-group">
+        <div class="login-page-input-group">
           <label for="loginPassword">Password</label>
           <input type="password" id="loginPassword" placeholder="Enter password" required />
         </div>
