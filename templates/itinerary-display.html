@@ -19,10 +19,10 @@
         </ul>
     </div>
 
-    <h1><strong>Website Name</strong> </h1>
        
     <div class="page-wrapper">
         <div class="middle-column">
+    
             <h2>Itinerary Title</h2>
             <div class="main-image"></div>
 
@@ -56,11 +56,28 @@
    <div class="right-column">
     <div class="itinerary-detail-box">
         <i class="fa-solid fa-bed"></i>
-        <p>Filler text filler text filler text fillertext filler text fillertext Filler text filler text fillertext filler text fillertext</p>
+        <p>Hotel name, 123 Hotel address, hotel location.
+
+        </p>
     </div>
-    <div class="itinerary-detail-box">
+    <div class="itinerary-detail-box" id="activities-box">
         <i class="fa-solid fa-camera"></i>
-        <p>Filler text filler text filler text fillertext filler text fillertext Filler text filler text fillertext filler text fillertext</p>
+        <div class="activities-content">
+            <div class="activities-collapsed">
+                <p style="font-size: 20px; margin: 2px 0;">Hiking at Mount Fuji</p>
+                <p style="font-size: 20px; margin: 2px 0;">Visit Senso-ji Temple</p>
+                <p style="font-size: 20px; margin: 2px 0;">Shibuya Crossing</p>
+                <p style="font-size: 20px; margin: 2px 0;">TeamLab Planets</p>
+            </div>
+            <div class="activities-expanded" style="display: none;">
+                <p class="activity-name" style="font-size: 20px; margin: 0;"></p>
+                <p class="activity-desc" style="font-size: 15px; margin: 5px 0;"></p>
+                <div class="activities-arrows">
+                    <i class="fa-solid fa-arrow-left" id="prev-activity"></i>
+                    <i class="fa-solid fa-arrow-right" id="next-activity"></i>
+                </div>
+            </div>
+        </div>
     </div>
     <div class="itinerary-detail-box">
         <i class="fa-solid fa-utensils"></i>
@@ -74,5 +91,8 @@
         
     
 </div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+<script src="{{ url_for('static', filename='itinerary-display.js') }}"></script>
 </body>
+
 </html>
