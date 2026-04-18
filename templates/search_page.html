@@ -11,11 +11,13 @@
     <!-- Left navigation bar -->
     <div class="navigation-bar">
         <ul>
-            <li><a href="#">Home</a></li>
-            <li><a href="#">Browse</a></li>
-            <li><a href="#">Submit Itinerary</a></li>
-            <li><a href="#">Bookmarks</a></li>
-            <li><a href="#">Profile</a></li>
+            <li><a href="{{ url_for('user_profile') }}">Your Profile</a></li>
+            <li><a href="{{ url_for('itinerary') }}">Create Itinerary</a></li>
+            <li><a href="{{ url_for('dms') }}">Messages</a></li>
+            <li><a href="#">Feed</a></li>
+            <li><a href="{{ url_for('search') }}">Search</a></li>
+            <li><a href="#">Notifications</a></li>
+            <li><a href="#">Log Out</a></li>
         </ul>
     </div>
 
@@ -24,11 +26,6 @@
         <div class="middle-column">
             
             <!-- Account buttons -->
-            <div class="account-buttons">
-                <a href="#" class="btn">Login</a>
-                <a href="#" class="btn">Sign Up</a>
-            </div>
-
             <h1>Webname</h1>
             <h2>Search Itineraries</h2>
             <p>Find trips by city, country, budget, duration, and travel style.</p>
