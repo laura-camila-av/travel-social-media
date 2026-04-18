@@ -11,12 +11,8 @@ def user_profile():
     return render_template('user-profile.html')
 
 @app.route('/create')
-def itinerary():
+def itinerary_create():
     return render_template('itinerary.html')
-
-@app.route('/itinerary-display')
-def itinerary_display():
-    return render_template('itinerary-display.html')
 
 @app.route('/messages')
 def dms():
@@ -25,6 +21,10 @@ def dms():
 @app.route('/search')
 def search():
     return render_template('search_page.html')
+
+@app.route('/itinerary/<int:itinerary_id>')
+def itinerary_display(itinerary_id):
+    return render_template('itinerary-display.html')
 
 if __name__ == '__main__':
     app.run(debug=True)
