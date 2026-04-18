@@ -20,9 +20,6 @@ h2 {
     
 }
 
-p {
-
-}
 
 a:link, a:visited {
     color: #e43d12;
@@ -292,3 +289,110 @@ a:hover, a:active {
     margin-left: 10px;
     font-size: 16px;
 }
+/* LOGIN PAGE STYLING*/ 
+ 
+    .login-page-body{
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+    }
+
+    .login-page-container {
+      width: 100%;
+      max-width: 420px;
+      background: #fff;
+      border-radius: 18px;
+      box-shadow: 0 15px 40px rgba(0, 0, 0, 0.2);
+      overflow: hidden;
+    }
+
+    .login-page-tabs {
+      display: flex;
+      width: 100%;
+    }
+
+
+    .login-page-tab-btn {
+      flex: 1;
+      padding: 16px;
+      border: none;
+      background: #faf6c3;
+      cursor: pointer;
+      font-size: 16px;
+      font-weight: bold;
+      transition: 0.3s;
+    }
+
+    .login-page-tab-btn.active {
+      background: #e43d12;
+      color: white;
+    }
+
+    .login-page-form-box {
+      padding: 30px 25px;
+    }
+
+    .login-page-h2 {
+      text-align: center;
+      margin-bottom: 20px;
+      color: #333;
+    }
+
+    .login-page-input-group {
+      margin-bottom: 15px;
+    }
+
+    .login-page-input-group label {
+      display: block;
+      margin-bottom: 6px;
+      color: #444;
+      font-size: 14px;
+      font-weight: bold;
+    }
+
+    .login-page-input-group input {
+      width: 100%;
+      padding: 12px 14px;
+      border: 1px solid #000000;
+      border-radius: 10px;
+      outline: none;
+      font-size: 14px;
+      transition: 0.3s;
+    }
+
+    .login-page-input-group input:focus {
+      border-color: #faf6c3;
+      box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.15);
+    }
+
+
+    .login-page-link {
+      display: block;
+      text-align: center;
+      margin-top: 14px;
+      font-size: 14px;
+      color: #100606;
+      cursor: pointer;
+      text-decoration: none;
+    }
+
+    .login-page-link:hover {
+      text-decoration: underline;
+    }
+
+    .login-page-hidden {
+      display: none;
+    }
+
+    .login-page-message {
+      margin-top: 15px;
+      text-align: center;
+      font-size: 14px;
+      color: green;
+    }
+
+    .login-page-error {
+      color: red;
+    }
