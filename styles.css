@@ -5,7 +5,6 @@ body {
     text-align: center;
     margin: 0;
     padding: 0;
-
 }
 
 h1 {
@@ -44,15 +43,20 @@ a:hover, a:active {
 }
 
 .btn {
-    color: #e43d12;
-    border: 2px solid #e43d12;
-    border-radius: 5px;
-    padding: 10px 20px;
-    text-align: center;
-    display: inline-block;
-    background-color: transparent;
-    cursor: pointer;
-    text-decoration: none; /* removes underline for links */
+    width: 100%;
+      height: 48px;
+      color: #e43d12;
+      border: 2px solid #e43d12;
+      border-radius: 10px;
+      padding: 0 20px;
+      text-align: center;
+      display: block;
+      background-color: transparent;
+      cursor: pointer;
+      font-size: 16px;
+      font-weight: bold;
+      margin-top: 12px;
+      transition: 0.3s;
 }
 
 .btn:hover {
@@ -396,3 +400,216 @@ a:hover, a:active {
     .login-page-error {
       color: red;
     }
+
+    /* username page styling */
+
+.username-page-body {
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+      background-color: #faf6c3;
+      margin: 0;
+      font-family: Helvetica, Arial, sans-serif;
+    }
+
+    .username-page-container {
+      width: 100%;
+      max-width: 420px;
+      background: #fffdf4;
+      border: 2px solid #e43d12;
+      border-radius: 18px;
+      box-shadow: 0 15px 40px rgba(0, 0, 0, 0.12);
+      overflow: hidden;
+    }
+
+    .username-page-box {
+      padding: 30px 25px;
+      text-align: center;
+    }
+
+    .username-page-h2 {
+      text-align: center;
+      margin-bottom: 20px;
+      color: #a6643c;
+      font-size: 28px;
+    }
+
+    .username-page-text {
+      color: #444;
+      font-size: 14px;
+      margin-bottom: 18px;
+    }
+
+    .username-page-input-group {
+      margin-bottom: 15px;
+      text-align: left;
+    }
+
+    .username-page-input-group label {
+      display: block;
+      margin-bottom: 6px;
+      color: #444;
+      font-size: 14px;
+      font-weight: bold;
+    }
+
+    .username-page-input-group input {
+      width: 100%;
+      box-sizing: border-box;
+      padding: 12px 14px;
+      border: 1.5px solid #e43d12;
+      border-radius: 10px;
+      outline: none;
+      font-size: 14px;
+      background-color: #fff;
+      transition: 0.3s;
+    }
+
+    .username-page-input-group input:focus {
+      border-color: #a6643c;
+      box-shadow: 0 0 0 3px rgba(228, 61, 18, 0.12);
+    }
+
+    .username-page-message {
+      margin-top: 15px;
+      text-align: center;
+      font-size: 14px;
+      color: green;
+      min-height: 20px;
+    }
+
+    .username-page-error {
+      color: red;
+    }
+
+    /* dms page styling */
+    .dms-body {
+  margin: 0;
+  height: 100vh;
+  display: flex;
+  background-color: #faf6c3;
+}
+/* SIDEBAR */
+.dms-sidebar {
+  width: 300px;
+  border-right: 2px solid #e43d12;
+  background: #fffdf4;
+  padding: 20px;
+  overflow-y: auto;
+}
+
+.dms-sidebar h2 {
+  margin-top: 0;
+  color: #a6643c;
+}
+
+.user {
+  padding: 12px;
+  border-radius: 12px;
+  cursor: pointer;
+  margin-bottom: 10px;
+  background: #faf6c3;
+  border: 1.5px solid #e43d12;
+  transition: 0.2s;
+}
+
+.user:hover {
+  background: #e43d12;
+  color: #faf6c3;
+}
+
+/* CHAT AREA */
+.dms-chat-area {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+/* HEADER */
+.dms-chat-header {
+  padding: 20px;
+  background: #fffdf4;
+  border-bottom: 2px solid #e43d12;
+  font-weight: bold;
+  color: #a6643c;
+}
+
+/* MESSAGES */
+.dms-messages {
+  flex: 1;
+  padding: 20px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/* MESSAGE BUBBLES */
+.dms-message {
+  max-width: 60%;
+  padding: 10px 14px;
+  border-radius: 14px;
+  word-wrap: break-word;
+  font-size: 14px;
+}
+
+.dms-mine {
+  align-self: flex-end;
+  background: #e43d12;
+  color: #faf6c3;
+}
+
+.dms-theirs {
+  align-self: flex-start;
+  background: #faf6c3;
+  color: #222;
+  border: 1px solid #e43d12;
+}
+
+/* INPUT AREA */
+.dms-composer {
+  display: flex;
+  gap: 10px;
+  padding: 16px;
+  background: #fffdf4;
+  border-top: 2px solid #e43d12;
+}
+
+.dms-composer input {
+  flex: 1;
+  padding: 12px;
+  border: 1.5px solid #e43d12;
+  border-radius: 10px;
+  outline: none;
+}
+
+.dms-composer input:focus {
+  border-color: #a6643c;
+  box-shadow: 0 0 0 3px rgba(228, 61, 18, 0.12);
+}
+
+.dms-composer button {
+  height: 48px;
+  padding: 0 18px;
+  border-radius: 10px;
+  border: 2px solid #e43d12;
+  background: transparent;
+  color: #e43d12;
+  font-weight: bold;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.dms-composer button:hover {
+  background: #e43d12;
+  color: #faf6c3;
+}
+
+/* EMPTY STATE */
+.dms-empty {
+  padding: 20px;
+  color: #777;
+  text-align: center;
+}
