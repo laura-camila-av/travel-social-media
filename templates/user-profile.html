@@ -5,39 +5,52 @@
 </head>
 
 <body>
-
-    <!-- Top Right Button -->
-    <div class="account-buttons">
-        <a href="#" class="btn itinerary-btn">Create Itinerary</a>
+     <!--Navigation bar-->
+    <div class ="navigation-bar">
+        <ul>
+            <li><a href="{{ url_for('user_profile') }}">Your Profile</a></li>
+            <li><a href="{{ url_for('itinerary') }}">Create Itinerary</a></li>
+            <li><a href="{{ url_for('dms') }}">Messages</a></li>
+            <li><a href="#">Feed</a></li>
+            <li><a href="{{ url_for('search') }}">Search</a></li>
+            <li><a href="#">Notifications</a></li>
+            <li><a href="#">Log Out</a></li>
+        </ul>
     </div>
 
     <!-- Website Title -->
-    <h1>Website Name</h1>
+    <div class="page-wrapper">
+        <div class="middle-column">
+            <h1>Website Name</h1>
 
     <!-- Profile Section -->
-    <div class="profile-section">
-        <div class="profile-pic"></div>
-        <h2 class="username">Username</h2>
-    </div>
+        <div class="profile-section">
+            <div class="profile-pic"></div>
+            <h2 class="username">Username</h2>
+        </div>
 
     <!-- Bio -->
-    <p class="bio">
-        Biography Biography Biography Biography Biography Biography Biography Biography Biography Biography Biography Biography Biography Biography Biography Biography Biography Biography Biography Biography Biography Biography Biography Biography Biography Biography Biography Biography Biography Biography Biography Biography Biography Biography Biography Biography Biography Biography Biography Biography Biography Biography Biography Biography Biography Biography Biography Biography Biography Biography.
-    </p>
+        <p class="bio">
+            Biography Biography Biography Biography Biography Biography Biography Biography Biography Biography Biography Biography Biography Biography Biography Biography Biography Biography Biography Biography Biography Biography Biography Biography Biography Biography Biography Biography Biography Biography Biography Biography Biography Biography Biography Biography Biography Biography Biography Biography Biography Biography Biography Biography Biography Biography Biography Biography Biography Biography.
+        </p>
 
     <!-- Itineraries -->
-    <h2>Your Itineraries</h2>
+        <h2>Your Itineraries</h2>
 
-    <div class="itinerary-container">
-        <div class="itinerary-card">
-            <div class="overlay-text">Itinerary Title</div>
+        <div class="itinerary-container">
+            <div class="itinerary-card">
+                <div class="overlay-text">Itinerary Title</div>
+            </div>
+            <div class="itinerary-card">
+                <div class="overlay-text">Itinerary Title</div>
+            </div>
+            <div class="itinerary-card">
+                <div class="overlay-text">Itinerary Title</div>
+            </div>
         </div>
-        <div class="itinerary-card">
-            <div class="overlay-text">Itinerary Title</div>
+
         </div>
-        <div class="itinerary-card">
-            <div class="overlay-text">Itinerary Title</div>
-        </div>
+
     </div>
 
 </body>
