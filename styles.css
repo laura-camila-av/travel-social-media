@@ -313,11 +313,12 @@ a:hover, a:active {
       width: 100%;
     }
 
+
     .login-page-tab-btn {
       flex: 1;
       padding: 16px;
       border: none;
-      background: #f3f3f3;
+      background: #faf6c3;
       cursor: pointer;
       font-size: 16px;
       font-weight: bold;
@@ -325,7 +326,7 @@ a:hover, a:active {
     }
 
     .login-page-tab-btn.active {
-      background: #667eea;
+      background: #e43d12;
       color: white;
     }
 
@@ -354,7 +355,7 @@ a:hover, a:active {
     .login-page-input-group input {
       width: 100%;
       padding: 12px 14px;
-      border: 1px solid #ccc;
+      border: 1px solid #000000;
       border-radius: 10px;
       outline: none;
       font-size: 14px;
@@ -362,7 +363,7 @@ a:hover, a:active {
     }
 
     .login-page-input-group input:focus {
-      border-color: #667eea;
+      border-color: #faf6c3;
       box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.15);
     }
 
@@ -372,7 +373,7 @@ a:hover, a:active {
       text-align: center;
       margin-top: 14px;
       font-size: 14px;
-      color: #667eea;
+      color: #100606;
       cursor: pointer;
       text-decoration: none;
     }
