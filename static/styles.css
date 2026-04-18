@@ -126,6 +126,9 @@ a:hover, a:active {
     margin-left: 40px;
 }
 
+.itinerary-container a {
+    text-decoration: none;
+}
 
 .profile-pic {
     width: 100px;

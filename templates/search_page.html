@@ -12,7 +12,7 @@
     <div class="navigation-bar">
         <ul>
             <li><a href="{{ url_for('user_profile') }}">Your Profile</a></li>
-            <li><a href="{{ url_for('itinerary') }}">Create Itinerary</a></li>
+            <li><a href="{{ url_for('itinerary_create') }}">Create Itinerary</a></li>
             <li><a href="{{ url_for('dms') }}">Messages</a></li>
             <li><a href="#">Feed</a></li>
             <li><a href="{{ url_for('search') }}">Search</a></li>
@@ -62,31 +62,38 @@
             <!-- Search results -->
             <h2>Popular Results</h2>
 
-            <div class="itinerary-container">
-                <div class="itinerary-card">
-                    <div class="overlay-text">Tokyo Budget Trip</div>
-                </div>
-
-                <div class="itinerary-card">
-                    <div class="overlay-text">Kyoto Cultural Journey</div>
-                </div>
-
-                <div class="itinerary-card">
-                    <div class="overlay-text">Seoul Food Adventure</div>
-                </div>
-
-                <div class="itinerary-card">
-                    <div class="overlay-text">Bali Beach Escape</div>
-                </div>
-
-                <div class="itinerary-card">
-                    <div class="overlay-text">Paris 5-Day Plan</div>
-                </div>
-
-                <div class="itinerary-card">
-                    <div class="overlay-text">Sydney Weekend Guide</div>
-                </div>
-            </div>
+<div class="itinerary-container">
+    <a href="{{ url_for('itinerary_display', itinerary_id=1) }}">
+        <div class="itinerary-card">
+            <div class="overlay-text">Tokyo Budget Trip</div>
+        </div>
+    </a>
+    <a href="{{ url_for('itinerary_display', itinerary_id=2) }}">
+        <div class="itinerary-card">
+            <div class="overlay-text">Kyoto Cultural Journey</div>
+        </div>
+    </a>
+    <a href="{{ url_for('itinerary_display', itinerary_id=3) }}">
+        <div class="itinerary-card">
+            <div class="overlay-text">Seoul Food Adventure</div>
+        </div>
+    </a>
+    <a href="{{ url_for('itinerary_display', itinerary_id=4) }}">
+        <div class="itinerary-card">
+            <div class="overlay-text">Bali Beach Escape</div>
+        </div>
+    </a>
+    <a href="{{ url_for('itinerary_display', itinerary_id=5) }}">
+        <div class="itinerary-card">
+            <div class="overlay-text">Paris 5-Day Plan</div>
+        </div>
+    </a>
+    <a href="{{ url_for('itinerary_display', itinerary_id=6) }}">
+        <div class="itinerary-card">
+            <div class="overlay-text">Sydney Weekend Guide</div>
+        </div>
+    </a>
+</div>
         </div>
 
     </div>
