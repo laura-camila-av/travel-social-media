@@ -29,11 +29,11 @@
         <label for="end-date">End Date</label><br>
         <input type="date" id="end-date" name="end-date" required><br><br>
 
-        <button type="button" onclick="generateDays()" class="btn">Generate Itinerary Days</button>
+        <button type="button" onclick="generateDays()" class="btn btn-itinerary-form">Generate Itinerary Days</button>
 
         <div id="days-container"></div>
 
-        <button type="submit" class="btn">Submit Itinerary</button>
+        <button type="submit" class="btn btn-itinerary-form">Submit Itinerary</button>
     </form>
 
     <script>
@@ -67,8 +67,19 @@
                 daySection.innerHTML = `
                     <h2>Day ${i}</h2>
 
-                    <label for="activities-day${i}">Activities</label><br>
-                    <textarea id="activities-day${i}" name="activities-day${i}" rows="4" required></textarea><br><br>
+                    <label>Activities</label><br>
+                    <div class="activity-input-area" id="activity-input-area-day${i}">
+                        <ul class="activity-list" id="activity-list-day${i}"></ul>
+                        <input type="text" class="activity-input" id="activity-input-day${i}" placeholder="Type an activity and press Enter">
+                    </div>
+                    <div class="activity-details-grid" id="activity-details-day${i}"></div><br><br>
+
+                    <label>Dining</label><br>
+                    <div class="activity-input-area" id="dining-input-area-day${i}">
+                        <ul class="activity-list" id="dining-list-day${i}"></ul>
+                        <input type="text" class="activity-input" id="dining-input-day${i}" placeholder="Type a restaurant and press Enter">
+                    </div>
+                    <div class="activity-details-grid" id="dining-details-day${i}"></div><br><br>
 
                     <label for="cost-day${i}">Total Cost</label><br>
                     <input type="number" id="cost-day${i}" name="cost-day${i}" min="0" step="0.01" required><br><br>
@@ -76,17 +87,27 @@
                     <label for="rented-items-day${i}">Rented Items</label><br>
                     <input type="text" id="rented-items-day${i}" name="rented-items-day${i}"><br><br>
 
-                    <label for="dining-day${i}">Dining</label><br>
-                    <input type="text" id="dining-day${i}" name="dining-day${i}"><br><br>
-
-                    <label for="transport-day${i}">Transport Taken</label><br>
-                    <input type="text" id="transport-day${i}" name="transport-day${i}" placeholder="e.g. Train, Bus, Taxi"><br><br>
+                <label>Transport Taken</label><br>
+                <div class="checkbox-group">
+                    <label><input type="checkbox" name="transport-day${i}" value="Rented a car"> Rented a car</label>
+                    <label><input type="checkbox" name="transport-day${i}" value="Taxi"> Taxi</label>
+                    <label><input type="checkbox" name="transport-day${i}" value="Rideshare (Uber, Gojek, Didi)"> Rideshare (Uber, Gojek, Didi)</label>
+                    <label><input type="checkbox" name="transport-day${i}" value="Bus"> Bus</label>
+                    <label><input type="checkbox" name="transport-day${i}" value="Train"> Train</label>
+                    <label><input type="checkbox" name="transport-day${i}" value="Tram"> Tram</label>
+                    <label><input type="checkbox" name="transport-day${i}" value="Subway/Metro"> Subway/Metro</label>
+                    <label><input type="checkbox" name="transport-day${i}" value="Ferry/Boat"> Ferry/Boat</label>
+                    <label><input type="checkbox" name="transport-day${i}" value="Domestic flight"> Domestic flight</label>
+                    <label><input type="checkbox" name="transport-day${i}" value="Tuk tuk"> Tuk tuk</label>
+                    <label><input type="checkbox" name="transport-day${i}" value="Rented a motorbike/scooter"> Rented a motorbike/scooter</label>
+                    <label><input type="checkbox" name="transport-day${i}" value="Other"> Other</label>
+                </div><br>
 
                     <label for="accommodation-day${i}">Accommodation (Optional)</label><br>
                     <input type="text" id="accommodation-day${i}" name="accommodation-day${i}"><br><br>
 
                     <label for="photos-day${i}">Upload Photo</label><br>
-                    <label for="photos-day${i}" class="btn">Choose File</label>
+                    <label for="photos-day${i}" class="btn btn-itinerary-form">Choose File</label>
                     <input type="file" id="photos-day${i}" name="photos-day${i}" accept="image/*" class="file-input">
                     <span id="file-name-day${i}" class="file-name">No file chosen</span><br><br>
 
@@ -96,18 +117,91 @@
 
                 daysContainer.appendChild(daySection);
 
-const fileInput = daySection.querySelector(`#photos-day${i}`);
-const fileName = daySection.querySelector(`#file-name-day${i}`);
+            const fileInput = daySection.querySelector(`#photos-day${i}`);
+            const fileName = daySection.querySelector(`#file-name-day${i}`);
 
-fileInput.addEventListener("change", function () {
-    if (this.files.length > 0) {
-        fileName.textContent = this.files[0].name;
-    } else {
-        fileName.textContent = "No file chosen";
-    }
-});
+            fileInput.addEventListener("change", function () {
+            if (this.files.length > 0) {
+                fileName.textContent = this.files[0].name;
+            } else {
+             fileName.textContent = "No file chosen";
+            }
+            });
+            setupActivityInput(i);
+            setupDiningInput(i);
             }
         }
+    function setupActivityInput(dayNum) {
+        const input = document.getElementById(`activity-input-day${dayNum}`);
+        const list = document.getElementById(`activity-list-day${dayNum}`);
+        const grid = document.getElementById(`activity-details-day${dayNum}`);
+        let activityCount = 0;
+
+        input.addEventListener("keydown", function(e) {
+            if (e.key === "Enter") {
+                e.preventDefault();
+                const value = this.value.trim();
+                if (value === "") return;
+
+                activityCount++;
+                const id = `detail-day${dayNum}-act${activityCount}`;
+
+                const li = document.createElement("li");
+                li.innerHTML = `${value} <span class="remove-activity" onclick="removeActivity('${id}', this)">✕</span>`;
+                list.appendChild(li);
+
+                const box = document.createElement("div");
+                box.classList.add("activity-detail-box");
+                box.id = id;
+                box.innerHTML = `
+                    <p class="activity-detail-title">${value}</p>
+                    <textarea placeholder="Enter details for ${value}..." rows="3"></textarea>
+                `;
+                grid.appendChild(box);
+
+                this.value = "";
+            }
+    });
+}
+
+    function removeActivity(boxId, span) {
+        document.getElementById(boxId).remove();
+        span.parentElement.remove();
+    }
+
+function setupDiningInput(dayNum) {
+    const input = document.getElementById(`dining-input-day${dayNum}`);
+    const list = document.getElementById(`dining-list-day${dayNum}`);
+    const grid = document.getElementById(`dining-details-day${dayNum}`);
+    let diningCount = 0;
+
+    input.addEventListener("keydown", function(e) {
+        if (e.key === "Enter") {
+            e.preventDefault();
+            const value = this.value.trim();
+            if (value === "") return;
+
+            diningCount++;
+            const id = `dining-detail-day${dayNum}-item${diningCount}`;
+
+            const li = document.createElement("li");
+            li.innerHTML = `${value} <span class="remove-activity" onclick="removeActivity('${id}', this)">✕</span>`;
+            list.appendChild(li);
+
+            const box = document.createElement("div");
+            box.classList.add("activity-detail-box");
+            box.id = id;
+            box.innerHTML = `
+                <p class="activity-detail-title">${value}</p>
+                <textarea placeholder="Enter details for ${value}..." rows="3"></textarea>
+            `;
+            grid.appendChild(box);
+
+            this.value = "";
+        }
+    });
+}
+
     </script>
 </body>
 </html>
