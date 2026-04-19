@@ -6,12 +6,13 @@
     <title>Create Itinerary</title>
     <link rel="stylesheet" href="../static/styles.css">
 </head>
-<body>
+<body> 
     <h1>Create Your Itinerary</h1>
     <h2>Plan your trip day by day</h2>
     <p>Enter your trip details, then generate the required number of day sections.</p>
 
-    <form id="itinerary-form" action="#" method="post" enctype="multipart/form-data">
+<form id="itinerary-form" action="#" method="post" enctype="multipart/form-data">
+    <div id="trip-details-section">
         <h2>Trip Details</h2>
 
         <label for="trip-title">Itinerary Title</label><br>
@@ -30,11 +31,13 @@
         <input type="date" id="end-date" name="end-date" required><br><br>
 
         <button type="button" onclick="generateDays()" class="btn btn-itinerary-form">Generate Itinerary Days</button>
+    </div>
 
-        <div id="days-container"></div>
+    <div id="days-container"></div>
 
-        <button type="submit" class="btn btn-itinerary-form">Submit Itinerary</button>
-    </form>
+    <button type="submit" class="btn btn-itinerary-form" id="submit-btn" style="display:none;">Submit Itinerary</button>
+
+</form>
 
     <script>
         function generateDays() {
@@ -59,6 +62,8 @@
 
             const timeDifference = endDate - startDate;
             const dayCount = Math.floor(timeDifference / (1000 * 60 * 60 * 24)) + 1;
+
+            document.getElementById("trip-details-section").style.display = "none";
 
             for (let i = 1; i <= dayCount; i++) {
                 const daySection = document.createElement("section");
@@ -130,6 +135,7 @@
             setupActivityInput(i);
             setupDiningInput(i);
             }
+        document.getElementById("submit-btn").style.display = "block";
         }
     function setupActivityInput(dayNum) {
         const input = document.getElementById(`activity-input-day${dayNum}`);
