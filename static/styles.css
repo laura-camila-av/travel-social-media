@@ -63,6 +63,96 @@ a:hover, a:active {
     background-color: #e43d12;
     color: #faf6c3;
 }
+/*Itinerary display and form styling START*/
+.btn-itinerary-form {
+    width: 33%;
+    display: block;
+    margin: 12px auto 0;
+}
+
+.checkbox-group {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+    text-align: left;
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.checkbox-group label {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 14px;
+}
+
+.day-section h2 {
+    position: sticky;
+    top: 0;
+    background-color: #faf6c3;
+    padding: 10px 0;
+    z-index: 1;
+} 
+
+.activity-input-area {
+    border: 2px solid #e43d12;
+    background-color: #e43d12;
+    color: white;
+    border-radius: 8px;
+    padding: 10px;
+    max-width: 300px;
+    margin: 0 auto;
+}
+
+.activity-list {
+    list-style: disc;
+    padding-left: 20px;
+    margin: 0 0 8px 0;
+}
+
+.activity-list li {
+    margin: 4px 0;
+    font-size: 15px;
+}
+
+.remove-activity {
+    color: white;
+    cursor: pointer;
+    margin-left: 8px;
+    font-size: 12px;
+}
+
+.activity-details-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+    margin-top: 10px;
+    margin-left: 10px;
+    margin-right: 10px;
+}
+
+.activity-detail-box {
+    border: 2px solid #e43d12;
+    border-radius: 8px;
+    padding: 10px;
+    font-size: 14px;
+}
+
+.activity-detail-title {
+    font-weight: bold;
+    margin: 0 0 6px 0;
+    font-size: 15px;
+}
+
+.activity-detail-box textarea {
+    width: 100%;
+    resize: none;
+    border: none;
+    outline: none;
+    font-size: 13px;
+    background: transparent;
+    font-family: inherit;
+}
 
 .itinerary-container {
     display: grid;
