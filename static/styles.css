@@ -361,6 +361,7 @@ a:hover, a:active {
     overflow-y: auto;
     padding: 20px;
     text-align: center; /* centres everything in here at once */
+    background-color: #faf6c3;
 }
 
 .right-column {
@@ -369,23 +370,25 @@ a:hover, a:active {
     padding: 20px 0 20px 20px; 
     border-left: 1px solid #ccc;
     align-items: center;
+    background-color: #faf6c3;
 }
 
 .itinerary-detail-box {
-    text-align: center;
-    padding: 5px;
-    margin: 10px;
-    background-color:#e43d12;
-    border-radius: 10px;
-    width: 300px;
-    height: 150px;
-    color: white;
-    font-size: 13px;
-    overflow-y: auto;
     display: flex;
-    align-items: center;
-    padding-right: 20px;
+    flex-direction: row;
+    align-items: stretch;
     position: relative;
+    margin: 10px;
+    width: 300px;
+    min-height: 120px;
+    border-radius: 12px;
+    overflow: hidden;
+    cursor: pointer;
+    transition: filter 0.2s ease;
+}
+
+.itinerary-detail-box:hover {
+    filter: brightness(1.1); /*CHANGE THIS LATER*/
 }
 
 .itinerary-detail-box p {
@@ -407,18 +410,39 @@ a:hover, a:active {
 }
 
 .activities-arrows {
-    position: absolute;
-    bottom: 5px;
-    left: 5px;
-    right: 5px;
+  
     display: flex;
     justify-content: space-between;
     cursor: pointer;
+    margin-top: 15px;
+    align-items: center;
 }
 
 .activities-arrows i {
     font-size: 30px;
     padding: 5px;
+}
+
+.detail-icon-panel {
+    background-color: #b32806;
+    width: 25%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.detail-icon-panel i {
+    font-size: 40px;
+    color: white;
+}
+
+.detail-content {
+    background-color: #e43d12;
+    flex: 1;
+    padding: 12px;
+    color: white;
+    position: relative;
 }
 
 /*Itinerary display styling END*/
