@@ -18,8 +18,24 @@ h2 {
     color: #a6643c;
     
 }
+/* Scroll bar */
+::-webkit-scrollbar {
+    width: 8px;
+}
 
+::-webkit-scrollbar-track {
+    background: #faf6c3;
+}
 
+::-webkit-scrollbar-thumb {
+    background-color: #e43d12;
+    border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background-color: #a6643c;
+}
+/* Scroll bar */
 a:link, a:visited {
     color: #e43d12;
     border: 2px solid #e43d12;
