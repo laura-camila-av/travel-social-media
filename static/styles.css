@@ -1,6 +1,7 @@
 body {
     font-family: Helvetica, Arial, sans-serif;
-    background-color: #faf6c3;
+    background-color: #faf6c3; !important;
+
     color: black;
     text-align: center;
     margin: 0;
@@ -410,7 +411,6 @@ a:hover, a:active {
 }
 
 .activities-arrows {
-  
     display: flex;
     justify-content: space-between;
     cursor: pointer;
@@ -443,6 +443,23 @@ a:hover, a:active {
     padding: 12px;
     color: white;
     position: relative;
+}
+
+.dot-indicator {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+}
+
+.dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background-color: rgba(255, 255, 255, 0.4);
+}
+
+.dot.active {
+    background-color: white;
 }
 
 /*Itinerary display styling END*/
