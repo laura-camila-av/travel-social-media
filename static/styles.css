@@ -1,7 +1,6 @@
 body {
     font-family: Helvetica, Arial, sans-serif;
     background-color: #faf6c3; !important;
-
     color: black;
     text-align: center;
     margin: 0;
@@ -36,7 +35,7 @@ h2 {
 ::-webkit-scrollbar-thumb:hover {
     background-color: #a6643c;
 }
-/* Scroll bar */
+/* Scroll bar END */
 a:link, a:visited {
     color: #e43d12;
     border: 2px solid #e43d12;
@@ -52,6 +51,20 @@ a:hover, a:active {
     color: #faf6c3;
 }
 
+/*Search Page Styling START*/
+.card-link, .card-link:link, .card-link:visited {
+    border: none; !important;
+    padding: 0;
+    background-color: transparent;
+    display: block;
+}
+
+.card-link:hover, .card-link:active {
+    background-color: transparent;
+    border: none;
+}
+
+/*Search Page Styling END */
 .account-buttons {
   position: absolute;
   top: 22px;
@@ -790,4 +803,22 @@ a:hover, a:active {
   padding: 20px;
   color: #777;
   text-align: center;
+}
+
+/*Feed Page Styling Start*/
+.card-info {
+    padding: 6px 2px;
+}
+
+.card-title {
+    margin: 0;
+    font-size: 15px;
+    font-weight: bold;
+    color: black;
+}
+
+.card-meta {
+    margin: 2px 0;
+    font-size: 13px;
+    color: #555;
 }
