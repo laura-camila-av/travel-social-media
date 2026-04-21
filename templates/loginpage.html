@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <link rel="stylesheet" href="../static/styles.css">
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Login / Register</title>
@@ -9,108 +9,118 @@
 <body class="login-page-body">
   <div class="login-page-container">
     <div class="login-page-tabs">
-      <button class="login-page-tab-btn active" onclick="showForm('login')">Login</button>
-      <button class="login-page-tab-btn" onclick="showForm('register')">Register</button>
+      <button class="login-page-tab-btn active" type="button" onclick="showForm('login')">Login</button>
+      <button class="login-page-tab-btn" type="button" onclick="showForm('register')">Register</button>
     </div>
 
     <div class="login-page-form-box">
       <!-- Login Form -->
-      <form id="loginForm">
+      <form id="loginForm" method="POST" action="/login">
         <h2 class="login-page-h2">Login</h2>
 
         <div class="login-page-input-group">
           <label for="loginEmail">Email</label>
-          <input type="email" id="loginEmail" placeholder="Enter email" required />
+          <input type="email" id="loginEmail" name="email" placeholder="Enter email" required />
         </div>
 
         <div class="login-page-input-group">
           <label for="loginPassword">Password</label>
-          <input type="password" id="loginPassword" placeholder="Enter password" required />
+          <input type="password" id="loginPassword" name="password" placeholder="Enter password" required />
         </div>
 
         <button type="submit" class="btn">Login</button>
         <button type="button" class="btn" onclick="showForgotPassword()">Forgot Password</button>
 
-        <p id="loginMessage" class="login-page-message"></p>
+        {% with messages = get_flashed_messages(with_categories=true) %}
+          {% if messages %}
+            {% for category, message in messages %}
+              {% if category == "login_error" %}
+                <p class="login-page-message login-page-error">{{ message }}</p>
+              {% endif %}
+            {% endfor %}
+          {% endif %}
+        {% endwith %}
       </form>
 
       <!-- Register Form -->
-      <form id="registerForm" class="login-page-hidden">
+      <form id="registerForm" class="login-page-hidden" method="POST" action="/register">
         <h2 class="login-page-h2">Register</h2>
 
         <div class="login-page-input-group">
           <label for="registerEmail">Email</label>
-          <input type="email" id="registerEmail" placeholder="Enter email" required />
+          <input type="email" id="registerEmail" name="email" placeholder="Enter email" required />
         </div>
 
         <div class="login-page-input-group">
           <label for="registerPhone">Phone</label>
-          <input type="tel" id="registerPhone" placeholder="Enter phone number" required />
+          <input type="tel" id="registerPhone" name="phone" placeholder="Enter phone number" required />
         </div>
 
         <div class="login-page-input-group">
           <label for="registerPassword">Password</label>
-          <input type="password" id="registerPassword" placeholder="Create password" required />
+          <input type="password" id="registerPassword" name="password" placeholder="Create password" required />
         </div>
 
         <div class="login-page-input-group">
           <label for="confirmPassword">Confirm Password</label>
-          <input type="password" id="confirmPassword" placeholder="Confirm password" required />
+          <input type="password" id="confirmPassword" name="confirm_password" placeholder="Confirm password" required />
         </div>
 
         <button type="submit" class="btn">Register</button>
-        <p id="registerMessage" class="login-page-message"></p>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+          {% if messages %}
+            {% for category, message in messages %}
+              {% if category == "register_error" %}
+                <p class="login-page-message login-page-error">{{ message }}</p>
+              {% endif %}
+            {% endfor %}
+          {% endif %}
+        {% endwith %}
       </form>
 
       <!-- Forgot Password Form -->
-      <form id="forgotForm" class="login-page-hidden">
-        <h2 class="login-page-h2">Forgot Password</h2>
+      <form id="forgotForm" class="login-page-hidden" method="POST" action="/forgot-password">
+        <h2 class="login-page-h2">Reset Password</h2>
 
         <div class="login-page-input-group">
           <label for="forgotEmail">Email</label>
-          <input type="email" id="forgotEmail" placeholder="Enter your email" required />
+          <input type="email" id="forgotEmail" name="email" placeholder="Enter your email" required />
         </div>
 
-        <button type="submit" class="btn">Send Reset Link</button>
+        <div class="login-page-input-group">
+          <label for="newPassword">New Password</label>
+          <input type="password" id="newPassword" name="new_password" placeholder="Enter new password" required />
+        </div>
+
+        <div class="login-page-input-group">
+          <label for="confirmNewPassword">Confirm New Password</label>
+          <input type="password" id="confirmNewPassword" name="confirm_new_password" placeholder="Confirm new password" required />
+        </div>
+
+        <button type="submit" class="btn">Reset Password</button>
         <button type="button" class="btn" onclick="showForm('login')">Back to Login</button>
-        <p id="forgotMessage" class="login-page-message"></p>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+          {% if messages %}
+            {% for category, message in messages %}
+              {% if category == "forgot_error" or category == "success" %}
+                <p class="login-page-message {% if category == 'forgot_error' %}login-page-error{% endif %}">{{ message }}</p>
+              {% endif %}
+            {% endfor %}
+          {% endif %}
+        {% endwith %}
       </form>
     </div>
   </div>
 
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-app.js";
-    import {
-      getAuth,
-      createUserWithEmailAndPassword,
-      signInWithEmailAndPassword,
-      sendPasswordResetEmail
-    } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-auth.js";
-    import {
-      getFirestore,
-      doc,
-      setDoc
-    } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
-
-    const firebaseConfig = {
-      apiKey: "YOUR_API_KEY",
-      authDomain: "YOUR_AUTH_DOMAIN",
-      projectId: "YOUR_PROJECT_ID",
-      storageBucket: "YOUR_STORAGE_BUCKET",
-      messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
-      appId: "YOUR_APP_ID"
-    };
-
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-    const db = getFirestore(app);
-
+  <script>
     const loginForm = document.getElementById("loginForm");
     const registerForm = document.getElementById("registerForm");
     const forgotForm = document.getElementById("forgotForm");
     const tabButtons = document.querySelectorAll(".login-page-tab-btn");
 
-    window.showForm = function(formType) {
+    function showForm(formType) {
       loginForm.classList.add("login-page-hidden");
       registerForm.classList.add("login-page-hidden");
       forgotForm.classList.add("login-page-hidden");
@@ -124,112 +134,14 @@
         registerForm.classList.remove("login-page-hidden");
         tabButtons[1].classList.add("active");
       }
-    };
+    }
 
-    window.showForgotPassword = function() {
+    function showForgotPassword() {
       loginForm.classList.add("login-page-hidden");
       registerForm.classList.add("login-page-hidden");
       forgotForm.classList.remove("login-page-hidden");
       tabButtons.forEach(btn => btn.classList.remove("active"));
-    };
-
-    loginForm.addEventListener("submit", async function(e) {
-      e.preventDefault();
-
-      const email = document.getElementById("loginEmail").value.trim();
-      const password = document.getElementById("loginPassword").value.trim();
-      const message = document.getElementById("loginMessage");
-
-      message.textContent = "";
-      message.classList.remove("login-page-error");
-
-      if (!email || !password) {
-        message.textContent = "Please fill in all fields.";
-        message.classList.add("login-page-error");
-        return;
-      }
-
-      try {
-        await signInWithEmailAndPassword(auth, email, password);
-        message.textContent = "Login successful.";
-        window.location.href = "username.html";
-      } catch (error) {
-        message.textContent = error.message;
-        message.classList.add("login-page-error");
-      }
-    });
-
-    registerForm.addEventListener("submit", async function(e) {
-      e.preventDefault();
-
-      const email = document.getElementById("registerEmail").value.trim();
-      const phone = document.getElementById("registerPhone").value.trim();
-      const password = document.getElementById("registerPassword").value.trim();
-      const confirmPassword = document.getElementById("confirmPassword").value.trim();
-      const message = document.getElementById("registerMessage");
-
-      message.textContent = "";
-      message.classList.remove("login-page-error");
-
-      if (!email || !phone || !password || !confirmPassword) {
-        message.textContent = "Please fill in all fields.";
-        message.classList.add("login-page-error");
-        return;
-      }
-
-      if (password !== confirmPassword) {
-        message.textContent = "Passwords do not match.";
-        message.classList.add("login-page-error");
-        return;
-      }
-
-      if (password.length < 6) {
-        message.textContent = "Password must be at least 6 characters.";
-        message.classList.add("login-page-error");
-        return;
-      }
-
-      try {
-        const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-        const user = userCredential.user;
-
-        await setDoc(doc(db, "users", user.uid), {
-          email: email,
-          phone: phone,
-          createdAt: new Date().toISOString()
-        });
-
-        message.textContent = "Registration successful.";
-        window.location.href = "username.html";
-      } catch (error) {
-        message.textContent = error.message;
-        message.classList.add("login-page-error");
-      }
-    });
-
-    forgotForm.addEventListener("submit", async function(e) {
-      e.preventDefault();
-
-      const email = document.getElementById("forgotEmail").value.trim();
-      const message = document.getElementById("forgotMessage");
-
-      message.textContent = "";
-      message.classList.remove("login-page-error");
-
-      if (!email) {
-        message.textContent = "Please enter your email.";
-        message.classList.add("login-page-error");
-        return;
-      }
-
-      try {
-        await sendPasswordResetEmail(auth, email);
-        message.textContent = "Password reset email sent.";
-      } catch (error) {
-        message.textContent = error.message;
-        message.classList.add("login-page-error");
-      }
-    });
+    }
   </script>
 </body>
 </html>

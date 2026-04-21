@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Choose Username</title>
-  <link rel="stylesheet" href="../static/styles.css">
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
 </head>
 <body class="username-page-body">
   <div class="username-page-container">
@@ -12,87 +12,27 @@
       <h2 class="username-page-h2">Choose a Username</h2>
       <p class="username-page-text">Pick a username that other users will see.</p>
 
-      <div class="username-page-input-group">
-        <label for="username">Username</label>
-        <input type="text" id="username" placeholder="Enter username">
-      </div>
+      <form method="POST" action="/username">
+        <div class="username-page-input-group">
+          <label for="username">Username</label>
+          <input type="text" id="username" name="username" placeholder="Enter username" required>
+        </div>
 
-      <button class="btn" onclick="setUsername()">Save Username</button>
-      <p class="username-page-message" id="message"></p>
+        <button type="submit" class="btn">Save Username</button>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+          {% if messages %}
+            {% for category, message in messages %}
+              {% if category == "username_error" or category == "success" %}
+                <p class="username-page-message {% if category == 'username_error' %}username-page-error{% endif %}">
+                  {{ message }}
+                </p>
+              {% endif %}
+            {% endfor %}
+          {% endif %}
+        {% endwith %}
+      </form>
     </div>
   </div>
-
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-app.js";
-    import { getAuth } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-auth.js";
-    import {
-      getFirestore,
-      doc,
-      getDoc,
-      setDoc
-    } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
-
-    const firebaseConfig = {
-      apiKey: "YOUR_API_KEY",
-      authDomain: "YOUR_PROJECT.firebaseapp.com",
-      projectId: "YOUR_PROJECT_ID"
-    };
-
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-    const db = getFirestore(app);
-
-    window.setUsername = async function () {
-      const username = document.getElementById("username").value.trim();
-      const message = document.getElementById("message");
-
-      message.textContent = "";
-      message.classList.remove("username-page-error");
-
-      if (!username) {
-        message.textContent = "Enter a username.";
-        message.classList.add("username-page-error");
-        return;
-      }
-
-      try {
-        const usernameRef = doc(db, "usernames", username);
-        const usernameSnap = await getDoc(usernameRef);
-
-        if (usernameSnap.exists()) {
-          message.textContent = "Username already taken.";
-          message.classList.add("username-page-error");
-          return;
-        }
-
-        const user = auth.currentUser;
-
-        if (!user) {
-          message.textContent = "Not logged in.";
-          message.classList.add("username-page-error");
-          return;
-        }
-
-        await setDoc(doc(db, "usernames", username), {
-          uid: user.uid
-        });
-
-        await setDoc(doc(db, "users", user.uid), {
-          username: username
-        }, { merge: true });
-
-        message.textContent = "Username saved.";
-
-        setTimeout(() => {
-          window.location.href = "home.html";
-        }, 1000);
-
-      } catch (error) {
-        message.textContent = error.message;
-        message.classList.add("username-page-error");
-      }
-    };
-  </script>
-
 </body>
 </html>

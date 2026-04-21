@@ -4,11 +4,11 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>DMs</title>
-  <link rel="stylesheet" href="../static/styles.css">
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
 </head>
 <body class="dms-body">
   <div class="dms-sidebar">
-    <h2 class="dms-sidebar h2">Users</h2>
+    <h2 class="dms-sidebar-title">Users</h2>
     <div id="userList"></div>
   </div>
 
@@ -17,156 +17,100 @@
     <div class="dms-messages" id="messages">
       <div class="dms-empty">Choose someone to start chatting.</div>
     </div>
+
     <form class="dms-composer" id="messageForm">
-      <input type="text" id="messageInput" placeholder="Type a message..." />
+      <input type="text" id="messageInput" placeholder="Type a message..." required />
       <button type="submit">Send</button>
     </form>
   </div>
 
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-app.js";
-    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-auth.js";
-    import {
-      getFirestore,
-      collection,
-      query,
-      where,
-      getDocs,
-      addDoc,
-      setDoc,
-      doc,
-      getDoc,
-      orderBy,
-      onSnapshot,
-      serverTimestamp
-    } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
-
-    const firebaseConfig = {
-      apiKey: "YOUR_API_KEY",
-      authDomain: "YOUR_PROJECT.firebaseapp.com",
-      projectId: "YOUR_PROJECT_ID",
-      storageBucket: "YOUR_PROJECT.firebasestorage.app",
-      messagingSenderId: "YOUR_SENDER_ID",
-      appId: "YOUR_APP_ID"
-    };
-
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-    const db = getFirestore(app);
-
+  <script>
     const userList = document.getElementById("userList");
     const chatHeader = document.getElementById("chatHeader");
     const messagesDiv = document.getElementById("messages");
     const messageForm = document.getElementById("messageForm");
     const messageInput = document.getElementById("messageInput");
 
-    let currentUser = null;
-    let selectedUser = null;
-    let currentChatId = null;
-    let unsubscribeMessages = null;
-
-    function getMemberKey(uid1, uid2) {
-      return [uid1, uid2].sort().join("_");
-    }
+    let selectedUserId = null;
 
     async function loadUsers() {
+      const response = await fetch("/api/users");
+      const users = await response.json();
+
       userList.innerHTML = "";
-      const usersSnapshot = await getDocs(collection(db, "users"));
 
-      usersSnapshot.forEach((docSnap) => {
-        if (docSnap.id === currentUser.uid) return;
+      if (users.length === 0) {
+        userList.innerHTML = '<div class="dms-empty">No other users found.</div>';
+        return;
+      }
 
-        const user = docSnap.data();
+      users.forEach((user) => {
         const userEl = document.createElement("div");
         userEl.className = "user";
         userEl.textContent = user.username || user.email || "Unnamed user";
 
         userEl.addEventListener("click", async () => {
-          selectedUser = { uid: docSnap.id, ...user };
+          selectedUserId = user.id;
           chatHeader.textContent = "Chat with " + (user.username || user.email);
-
-          await openOrCreateChat(currentUser.uid, selectedUser.uid);
+          await loadMessages();
         });
 
         userList.appendChild(userEl);
       });
     }
 
-    async function openOrCreateChat(uid1, uid2) {
-      const memberKey = getMemberKey(uid1, uid2);
+    async function loadMessages() {
+      if (!selectedUserId) return;
 
-      const chatsRef = collection(db, "chats");
-      const q = query(chatsRef, where("memberKey", "==", memberKey));
-      const result = await getDocs(q);
+      const response = await fetch(`/api/messages/${selectedUserId}`);
+      const messages = await response.json();
 
-      if (!result.empty) {
-        currentChatId = result.docs[0].id;
-      } else {
-        const newChatRef = await addDoc(collection(db, "chats"), {
-          members: [uid1, uid2],
-          memberKey,
-          createdAt: serverTimestamp()
-        });
-        currentChatId = newChatRef.id;
+      messagesDiv.innerHTML = "";
+
+      if (messages.length === 0) {
+        messagesDiv.innerHTML = '<div class="dms-empty">No messages yet.</div>';
+        return;
       }
 
-      listenForMessages();
-    }
-
-    function listenForMessages() {
-      if (!currentChatId) return;
-
-      if (unsubscribeMessages) {
-        unsubscribeMessages();
-      }
-
-      const messagesRef = collection(db, "chats", currentChatId, "messages");
-      const q = query(messagesRef, orderBy("createdAt", "asc"));
-
-      unsubscribeMessages = onSnapshot(q, (snapshot) => {
-        messagesDiv.innerHTML = "";
-
-        if (snapshot.empty) {
-          messagesDiv.innerHTML = '<div class="empty">No messages yet.</div>';
-          return;
-        }
-
-        snapshot.forEach((docSnap) => {
-          const msg = docSnap.data();
-          const msgEl = document.createElement("div");
-          msgEl.className = "message " + (msg.senderId === currentUser.uid ? "mine" : "theirs");
-          msgEl.textContent = msg.text;
-          messagesDiv.appendChild(msgEl);
-        });
-
-        messagesDiv.scrollTop = messagesDiv.scrollHeight;
+      messages.forEach((msg) => {
+        const msgEl = document.createElement("div");
+        msgEl.className = "message " + (msg.is_mine ? "mine" : "theirs");
+        msgEl.textContent = msg.text;
+        messagesDiv.appendChild(msgEl);
       });
+
+      messagesDiv.scrollTop = messagesDiv.scrollHeight;
     }
 
     messageForm.addEventListener("submit", async (e) => {
       e.preventDefault();
 
       const text = messageInput.value.trim();
-      if (!text || !currentUser || !selectedUser || !currentChatId) return;
+      if (!text || !selectedUserId) return;
 
-      await addDoc(collection(db, "chats", currentChatId, "messages"), {
-        senderId: currentUser.uid,
-        text,
-        createdAt: serverTimestamp()
+      const response = await fetch("/api/messages", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          receiver_id: selectedUserId,
+          text: text
+        })
       });
 
-      messageInput.value = "";
-    });
-
-    onAuthStateChanged(auth, async (user) => {
-      if (!user) {
-        window.location.href = "index.html";
-        return;
+      if (response.ok) {
+        messageInput.value = "";
+        await loadMessages();
       }
-
-      currentUser = user;
-      await loadUsers();
     });
+
+    loadUsers();
+    setInterval(() => {
+      if (selectedUserId) {
+        loadMessages();
+      }
+    }, 3000);
   </script>
 </body>
 </html>
