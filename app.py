@@ -26,5 +26,9 @@ def search():
 def itinerary_display(itinerary_id):
     return render_template('itinerary-display.html')
 
+@app.route('/feed')
+def feed():
+    return render_template('feed.html')
+
 if __name__ == '__main__':
     app.run(debug=True)
