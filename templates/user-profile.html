@@ -3,6 +3,13 @@
 <head>
     <link rel="stylesheet" href="../static/styles.css">
 </head>
+<style>
+    .bio-editing {
+    outline: 2px solid #e43d12;
+    border-radius: 5px;
+    padding: 8px;
+    }
+</style>
 
 <body>
      <!--Navigation bar-->
@@ -30,25 +37,28 @@
         </div>
 
     <!-- Bio -->
-        <p class="bio">
-            Biography Biography Biography Biography Biography Biography Biography Biography Biography Biography Biography Biography Biography Biography Biography Biography Biography Biography Biography Biography Biography Biography Biography Biography Biography Biography Biography Biography Biography Biography Biography Biography Biography Biography Biography Biography Biography Biography Biography Biography Biography Biography Biography Biography Biography Biography Biography Biography Biography Biography.
+   <div class="bio-wrapper">
+        <p class="bio" id="bio-text">
+            Biography Biography Biography...
         </p>
+        <span class="tooltip-text">Double-click to edit</span>
+    </div>
 
     <!-- Itineraries -->
         <h2>Your Itineraries</h2>
 
 <div class="itinerary-container">
-    <a href="{{ url_for('itinerary_display', itinerary_id=1) }}">
+    <a class="card-link" href="{{ url_for('itinerary_display', itinerary_id=1) }}">
         <div class="itinerary-card">
             <div class="overlay-text">Itinerary Title</div>
         </div>
     </a>
-    <a href="{{ url_for('itinerary_display', itinerary_id=2) }}">
+    <a class="card-link" href="{{ url_for('itinerary_display', itinerary_id=1) }}">
         <div class="itinerary-card">
             <div class="overlay-text">Itinerary Title</div>
         </div>
     </a>
-    <a href="{{ url_for('itinerary_display', itinerary_id=3) }}">
+    <a class="card-link" href="{{ url_for('itinerary_display', itinerary_id=1) }}">
         <div class="itinerary-card">
             <div class="overlay-text">Itinerary Title</div>
         </div>
@@ -57,6 +67,19 @@
         </div>
 
     </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <script>
+        $('#bio-text').dblclick(function() {
+            $(this).attr('contenteditable', 'true');
+            $(this).focus();
+            $(this).addClass('bio-editing');
+        });
 
+        $('#bio-text').on('blur', function() {
+            $(this).attr('contenteditable', 'false');
+            $(this).removeClass('bio-editing');
+            // later: save to database via AJAX here
+        });
+    </script>
 </body>
 </html>
