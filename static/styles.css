@@ -7,6 +7,12 @@ body {
     padding: 0;
 }
 
+.logo {
+    display: block;
+    margin: 80px auto 20px auto;
+    width: 400px;
+}
+
 h1 {
     font-size:xx-large;
     color: #e43d12
