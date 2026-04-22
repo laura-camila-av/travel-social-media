@@ -108,22 +108,24 @@ def register():
 
 @app.route('/login', methods=['POST'])
 def login():
-    email = request.form.get('email', '').strip()
+    identifier = request.form.get('identifier', '').strip()
     password = request.form.get('password', '').strip()
 
-    if not email or not password:
+    if not identifier or not password:
         flash("Please fill in all fields.", "login_error")
         return redirect(url_for('login_page'))
 
-    user = User.query.filter_by(email=email).first()
+    if "@" in identifier:
+        user = User.query.filter_by(email=identifier).first()
+    else:
+        user = User.query.filter_by(username=identifier).first()
 
     if user is None or not user.check_password(password):
-        flash("Invalid email or password.", "login_error")
+        flash("Invalid credentials.", "login_error")
         return redirect(url_for('login_page'))
 
     session["user_id"] = user.id
 
-    # If user has not chosen a username yet, send them there first
     if not user.username:
         return redirect(url_for('choose_username'))
 
