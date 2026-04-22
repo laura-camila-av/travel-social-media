@@ -238,6 +238,7 @@ a:hover, a:active {
     filter: brightness(70%);
 }
 
+/*User Profile Styling START*/
 .profile-section {
     display: flex;
     align-items: center;
@@ -268,6 +269,37 @@ a:hover, a:active {
     margin: 20px 0 20px 40px; 
 }
 
+.bio-wrapper {
+    position: relative;
+    display: inline-block;
+    width: 100%;
+}
+
+.bio-wrapper .tooltip-text {
+    visibility: hidden;
+    background-color: #333;
+    color: white;
+    font-size: 12px;
+    padding: 4px 8px;
+    border-radius: 4px;
+    position: absolute;
+    top: -28px;
+    left: 50%;
+    transform: translateX(-50%);
+    white-space: nowrap;
+}
+
+.bio-wrapper:hover .tooltip-text {
+    visibility: visible;
+}
+
+.bio-editing {
+    outline: 2px solid #e43d12;
+    border-radius: 5px;
+    padding: 8px;
+}
+
+/*User Profile Styling END*/
 .main-content {
     display: flex;
     flex-direction: column;

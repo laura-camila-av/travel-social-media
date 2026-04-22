@@ -44,8 +44,11 @@ def homepage():
 
 @app.route('/profile')
 def user_profile():
-    return render_template('user-profile.html')
-
+    user_id = session.get("user_id")
+    if not user_id:
+        return redirect(url_for('login_page'))
+    user = User.query.get(user_id)
+    return render_template('user-profile.html', user=user)
 
 @app.route('/create')
 def itinerary_create():
