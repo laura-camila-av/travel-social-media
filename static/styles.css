@@ -575,6 +575,10 @@ a:hover, a:active {
 
 .login-page-input-group {
   margin-bottom: 15px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  width: 100%;
 }
 
 .login-page-input-group label {
@@ -593,6 +597,7 @@ a:hover, a:active {
   outline: none;
   font-size: 14px;
   transition: 0.3s;
+  box-sizing: border-box;
 }
 
 .login-page-input-group input:focus {
@@ -713,7 +718,7 @@ a:hover, a:active {
   color: red;
 }
 
-/* dms page styling */
+    /* dms page styling */
 .dms-body {
   margin: 0;
   height: 100vh;
@@ -776,7 +781,7 @@ a:hover, a:active {
 }
 
 /* MESSAGE BUBBLES */
-.message {
+.dms-message {
   max-width: 60%;
   padding: 10px 14px;
   border-radius: 14px;
@@ -784,13 +789,13 @@ a:hover, a:active {
   font-size: 14px;
 }
 
-.message.mine {
+.dms-mine {
   align-self: flex-end;
   background: #e43d12;
   color: #faf6c3;
 }
 
-.message.theirs {
+.dms-theirs {
   align-self: flex-start;
   background: #faf6c3;
   color: #222;
