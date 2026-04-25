@@ -1,15 +1,15 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <link rel="stylesheet" href="../static/styles.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <style>
+        .bio-editing {
+            outline: 2px solid #e43d12;
+            border-radius: 5px;
+            padding: 8px;
+        }
+    </style>
 </head>
-<style>
-    .bio-editing {
-    outline: 2px solid #e43d12;
-    border-radius: 5px;
-    padding: 8px;
-    }
-</style>
 
 <body>
      <!--Navigation bar-->
@@ -33,14 +33,14 @@
     <!-- Profile Section -->
         <div class="profile-section">
             <div class="profile-pic"></div>
-            <h2 class="username">Username</h2>
+            <h2 class="username">{{ user.username }}</h2>
         </div>
 
     <!-- Bio -->
-   <div class="bio-wrapper">
-        <p class="bio" id="bio-text">
-            Biography Biography Biography...
-        </p>
+  <div class="bio-wrapper">
+    <p class="bio" id="bio-text">
+        {{ user.bio if user.bio else 'Double-click to add a bio...' }}
+    </p>
         <span class="tooltip-text">Double-click to edit</span>
     </div>
 
@@ -68,18 +68,6 @@
 
     </div>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
-    <script>
-        $('#bio-text').dblclick(function() {
-            $(this).attr('contenteditable', 'true');
-            $(this).focus();
-            $(this).addClass('bio-editing');
-        });
-
-        $('#bio-text').on('blur', function() {
-            $(this).attr('contenteditable', 'false');
-            $(this).removeClass('bio-editing');
-            // later: save to database via AJAX here
-        });
-    </script>
+    <script src="{{ url_for('static', filename='user-profile.js') }}"></script>
 </body>
 </html>

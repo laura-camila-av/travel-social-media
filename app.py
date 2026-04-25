@@ -17,6 +17,7 @@ class User(db.Model):
     phone = db.Column(db.String(20), nullable=False)
     password_hash = db.Column(db.String(255), nullable=False)
     username = db.Column(db.String(50), unique=True, nullable=True)
+    bio = db.Column(db.Text, nullable=True)
 
     def set_password(self, password):
         self.password_hash = generate_password_hash(password)
@@ -31,6 +32,20 @@ class Message(db.Model):
     text = db.Column(db.Text, nullable=False)
     created_at = db.Column(db.DateTime, server_default=db.func.now())
 
+@app.route('/save-bio', methods=['POST'])
+def save_bio():
+    user_id = session.get("user_id")
+    if not user_id:
+        return jsonify({"error": "Not logged in"}), 401
+    
+    data = request.get_json()
+    bio_text = data.get("bio", "").strip()
+    
+    user = User.query.get(user_id)
+    user.bio = bio_text
+    db.session.commit()
+    
+    return jsonify({"success": True})
 
 @app.before_request
 def create_tables():
