@@ -54,7 +54,7 @@
     </div>
 
     <!-- Itineraries -->
-        <h2>Your Itineraries</h2>
+        <h2>{{ user.username }}'s Itineraries</h2>
 
 <div class="itinerary-container">
     <a class="card-link" href="{{ url_for('itinerary_display', itinerary_id=1) }}">
