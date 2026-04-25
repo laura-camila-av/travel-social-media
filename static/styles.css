@@ -257,16 +257,51 @@ a:hover, a:active {
     text-decoration: none;
 }
 
-.profile-pic {
+#profile-pic-container {
+    position: relative;
     width: 100px;
     height: 100px;
-    background-color: black;
-    border-radius: 50%;
+    cursor: pointer;
 }
 
+#profile-img {
+    width: 130px;
+    height: 130px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.profile-pic-placeholder {
+    width: 130px;
+    height: 130px;
+    border-radius: 50%;
+    background-color: black;
+    margin-bottom: 10px;
+}
+
+.avatar-upload-label {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background-color: rgba(0,0,0,0.5);
+    color: white;
+    font-size: 11px;
+    text-align: center;
+    padding: 4px 0;
+    border-radius: 0 0 50px 50px;
+    cursor: pointer;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+}
+
+#profile-pic-container:hover .avatar-upload-label {
+    opacity: 1;
+}
 
 .username {
-    margin: 0;
+    margin: 40px;
+    font-size: 35px;
 }
 
 .bio {
@@ -303,6 +338,63 @@ a:hover, a:active {
     outline: 2px solid #e43d12;
     border-radius: 5px;
     padding: 8px;
+}
+
+.tag {
+    background-color: #e43d12;
+    color: white;
+    font-size: 13px;
+    padding: 2px 8px;
+    border-radius: 20px;
+    height: 20px;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.tag-remove {
+    cursor: pointer;
+    font-size: 11px;
+    opacity: 0.8;
+}
+
+.tag-remove:hover {
+    opacity: 1;
+}
+
+.tag-add {
+    background-color: transparent;
+    color: #e43d12;
+    border: 2px dashed #e43d12;
+    font-size: 13px;
+    padding: 2px 8px;
+    border-radius: 20px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+}
+
+.tag-add:hover {
+    background-color: #e43d12;
+    color: white;
+}
+
+.tag-input {
+    border: none;
+    outline: none;
+    background: transparent;
+    color: white;
+    font-size: 13px;
+    width: 80px;
+    max-width: 150px;
+}
+
+.tag-container {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-bottom: 12px;
+    justify-content: center;
 }
 
 /*User Profile Styling END*/

@@ -2,11 +2,15 @@ from flask import Flask, render_template, request, redirect, url_for, session, f
 from sqlalchemy import or_, and_
 from flask_sqlalchemy import SQLAlchemy
 from werkzeug.security import generate_password_hash, check_password_hash
+import os
 
 app = Flask(__name__)
 app.config["SECRET_KEY"] = "change-this-to-a-random-secret-key"
 app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///users.db"
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
+app.config['UPLOAD_FOLDER'] = os.path.join(os.path.dirname(__file__), 'static', 'uploads')
+app.config['ALLOWED_EXTENSIONS'] = {'png', 'jpg', 'jpeg', 'gif'}
+
 
 db = SQLAlchemy(app)
 
@@ -17,7 +21,15 @@ class User(db.Model):
     phone = db.Column(db.String(20), nullable=False)
     password_hash = db.Column(db.String(255), nullable=False)
     username = db.Column(db.String(50), unique=True, nullable=True)
+    bio = db.Column(db.Text, nullable=True)
+    avatar_url = db.Column(db.String(255), nullable=True)
+    interest_1 = db.Column(db.String(25), nullable=True)
+    interest_2 = db.Column(db.String(25), nullable=True)
+    interest_3 = db.Column(db.String(25), nullable=True)
+    interest_4 = db.Column(db.String(25), nullable=True)
+    interest_5 = db.Column(db.String(25), nullable=True)
 
+    
     def set_password(self, password):
         self.password_hash = generate_password_hash(password)
 
@@ -31,6 +43,39 @@ class Message(db.Model):
     text = db.Column(db.Text, nullable=False)
     created_at = db.Column(db.DateTime, server_default=db.func.now())
 
+@app.route('/save-bio', methods=['POST'])
+def save_bio():
+    user_id = session.get("user_id")
+    if not user_id:
+        return jsonify({"error": "Not logged in"}), 401
+    
+    data = request.get_json()
+    bio_text = data.get("bio", "").strip()
+    
+    user = User.query.get(user_id)
+    user.bio = bio_text
+    db.session.commit()
+    
+    return jsonify({"success": True})
+@app.route('/save-interests', methods=['POST'])
+def save_interests():
+    user_id = session.get("user_id")
+    if not user_id:
+        return jsonify({"error": "Not logged in"}), 401
+    
+    data = request.get_json()
+    interests = data.get("interests", [])
+    
+    user = User.query.get(user_id)
+    user.interest_1 = interests[0] if len(interests) > 0 else None
+    user.interest_2 = interests[1] if len(interests) > 1 else None
+    user.interest_3 = interests[2] if len(interests) > 2 else None
+    user.interest_4 = interests[3] if len(interests) > 3 else None
+    user.interest_5 = interests[4] if len(interests) > 4 else None
+    
+    db.session.commit()
+    
+    return jsonify({"success": True})
 
 @app.before_request
 def create_tables():
@@ -48,7 +93,37 @@ def user_profile():
     if not user_id:
         return redirect(url_for('login_page'))
     user = User.query.get(user_id)
-    return render_template('user-profile.html', user=user)
+    interests = [i for i in [user.interest_1, user.interest_2, user.interest_3, user.interest_4, user.interest_5] if i]
+    return render_template('user-profile.html', user=user, interests=interests)
+
+def allowed_file(filename):
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in app.config['ALLOWED_EXTENSIONS']
+
+@app.route('/upload-avatar', methods=['POST'])
+def upload_avatar():
+    user_id = session.get("user_id")
+    if not user_id:
+        return jsonify({"error": "Not logged in"}), 401
+
+    if 'avatar' not in request.files:
+        return jsonify({"error": "No file provided"}), 400
+
+    file = request.files['avatar']
+
+    if file.filename == '':
+        return jsonify({"error": "No file selected"}), 400
+
+    if file and allowed_file(file.filename):
+        filename = f"avatar_{user_id}.{file.filename.rsplit('.', 1)[1].lower()}"
+        file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+        
+        user = User.query.get(user_id)
+        user.avatar_url = filename
+        db.session.commit()
+        
+        return jsonify({"success": True, "filename": filename})
+
+    return jsonify({"error": "File type not allowed"}), 400
 
 @app.route('/create')
 def itinerary_create():
