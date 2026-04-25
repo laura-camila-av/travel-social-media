@@ -23,6 +23,12 @@ class User(db.Model):
     username = db.Column(db.String(50), unique=True, nullable=True)
     bio = db.Column(db.Text, nullable=True)
     avatar_url = db.Column(db.String(255), nullable=True)
+    interest_1 = db.Column(db.String(25), nullable=True)
+    interest_2 = db.Column(db.String(25), nullable=True)
+    interest_3 = db.Column(db.String(25), nullable=True)
+    interest_4 = db.Column(db.String(25), nullable=True)
+    interest_5 = db.Column(db.String(25), nullable=True)
+
     
     def set_password(self, password):
         self.password_hash = generate_password_hash(password)
@@ -51,6 +57,25 @@ def save_bio():
     db.session.commit()
     
     return jsonify({"success": True})
+@app.route('/save-interests', methods=['POST'])
+def save_interests():
+    user_id = session.get("user_id")
+    if not user_id:
+        return jsonify({"error": "Not logged in"}), 401
+    
+    data = request.get_json()
+    interests = data.get("interests", [])
+    
+    user = User.query.get(user_id)
+    user.interest_1 = interests[0] if len(interests) > 0 else None
+    user.interest_2 = interests[1] if len(interests) > 1 else None
+    user.interest_3 = interests[2] if len(interests) > 2 else None
+    user.interest_4 = interests[3] if len(interests) > 3 else None
+    user.interest_5 = interests[4] if len(interests) > 4 else None
+    
+    db.session.commit()
+    
+    return jsonify({"success": True})
 
 @app.before_request
 def create_tables():
@@ -68,7 +93,8 @@ def user_profile():
     if not user_id:
         return redirect(url_for('login_page'))
     user = User.query.get(user_id)
-    return render_template('user-profile.html', user=user)
+    interests = [i for i in [user.interest_1, user.interest_2, user.interest_3, user.interest_4, user.interest_5] if i]
+    return render_template('user-profile.html', user=user, interests=interests)
 
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in app.config['ALLOWED_EXTENSIONS']

@@ -340,6 +340,63 @@ a:hover, a:active {
     padding: 8px;
 }
 
+.tag {
+    background-color: #e43d12;
+    color: white;
+    font-size: 13px;
+    padding: 2px 8px;
+    border-radius: 20px;
+    height: 20px;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.tag-remove {
+    cursor: pointer;
+    font-size: 11px;
+    opacity: 0.8;
+}
+
+.tag-remove:hover {
+    opacity: 1;
+}
+
+.tag-add {
+    background-color: transparent;
+    color: #e43d12;
+    border: 2px dashed #e43d12;
+    font-size: 13px;
+    padding: 2px 8px;
+    border-radius: 20px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+}
+
+.tag-add:hover {
+    background-color: #e43d12;
+    color: white;
+}
+
+.tag-input {
+    border: none;
+    outline: none;
+    background: transparent;
+    color: white;
+    font-size: 13px;
+    width: 80px;
+    max-width: 150px;
+}
+
+.tag-container {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-bottom: 12px;
+    justify-content: center;
+}
+
 /*User Profile Styling END*/
 .main-content {
     display: flex;
