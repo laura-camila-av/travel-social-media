@@ -2,11 +2,15 @@ from flask import Flask, render_template, request, redirect, url_for, session, f
 from sqlalchemy import or_, and_
 from flask_sqlalchemy import SQLAlchemy
 from werkzeug.security import generate_password_hash, check_password_hash
+import os
 
 app = Flask(__name__)
 app.config["SECRET_KEY"] = "change-this-to-a-random-secret-key"
 app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///users.db"
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
+app.config['UPLOAD_FOLDER'] = os.path.join(os.path.dirname(__file__), 'static', 'uploads')
+app.config['ALLOWED_EXTENSIONS'] = {'png', 'jpg', 'jpeg', 'gif'}
+
 
 db = SQLAlchemy(app)
 
@@ -18,7 +22,8 @@ class User(db.Model):
     password_hash = db.Column(db.String(255), nullable=False)
     username = db.Column(db.String(50), unique=True, nullable=True)
     bio = db.Column(db.Text, nullable=True)
-
+    avatar_url = db.Column(db.String(255), nullable=True)
+    
     def set_password(self, password):
         self.password_hash = generate_password_hash(password)
 
@@ -64,6 +69,35 @@ def user_profile():
         return redirect(url_for('login_page'))
     user = User.query.get(user_id)
     return render_template('user-profile.html', user=user)
+
+def allowed_file(filename):
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in app.config['ALLOWED_EXTENSIONS']
+
+@app.route('/upload-avatar', methods=['POST'])
+def upload_avatar():
+    user_id = session.get("user_id")
+    if not user_id:
+        return jsonify({"error": "Not logged in"}), 401
+
+    if 'avatar' not in request.files:
+        return jsonify({"error": "No file provided"}), 400
+
+    file = request.files['avatar']
+
+    if file.filename == '':
+        return jsonify({"error": "No file selected"}), 400
+
+    if file and allowed_file(file.filename):
+        filename = f"avatar_{user_id}.{file.filename.rsplit('.', 1)[1].lower()}"
+        file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+        
+        user = User.query.get(user_id)
+        user.avatar_url = filename
+        db.session.commit()
+        
+        return jsonify({"success": True, "filename": filename})
+
+    return jsonify({"error": "File type not allowed"}), 400
 
 @app.route('/create')
 def itinerary_create():

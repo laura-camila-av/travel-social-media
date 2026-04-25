@@ -31,10 +31,18 @@
             <h1>Website Name</h1>
 
     <!-- Profile Section -->
-        <div class="profile-section">
-            <div class="profile-pic"></div>
-            <h2 class="username">{{ user.username }}</h2>
+    <div class="profile-section">
+        <div class="profile-pic" id="profile-pic-container">
+            {% if user.avatar_url %}
+                <img src="{{ url_for('static', filename='uploads/' + user.avatar_url) }}" id="profile-img">
+            {% else %}
+                <div class="profile-pic-placeholder"></div>
+            {% endif %}
+            <label for="avatar-upload" class="avatar-upload-label">Change Photo</label>
+            <input type="file" id="avatar-upload" accept="image/*" style="display:none;">
         </div>
+        <h2 class="username">{{ user.username }}</h2>
+    </div>
 
     <!-- Bio -->
   <div class="bio-wrapper">

@@ -257,13 +257,46 @@ a:hover, a:active {
     text-decoration: none;
 }
 
-.profile-pic {
+#profile-pic-container {
+    position: relative;
     width: 100px;
     height: 100px;
-    background-color: black;
-    border-radius: 50%;
+    cursor: pointer;
 }
 
+#profile-img {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.profile-pic-placeholder {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    background-color: black;
+}
+
+.avatar-upload-label {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background-color: rgba(0,0,0,0.5);
+    color: white;
+    font-size: 11px;
+    text-align: center;
+    padding: 4px 0;
+    border-radius: 0 0 50px 50px;
+    cursor: pointer;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+}
+
+#profile-pic-container:hover .avatar-upload-label {
+    opacity: 1;
+}
 
 .username {
     margin: 0;
