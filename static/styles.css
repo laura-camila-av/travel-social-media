@@ -265,17 +265,18 @@ a:hover, a:active {
 }
 
 #profile-img {
-    width: 100px;
-    height: 100px;
+    width: 130px;
+    height: 130px;
     border-radius: 50%;
     object-fit: cover;
 }
 
 .profile-pic-placeholder {
-    width: 100px;
-    height: 100px;
+    width: 130px;
+    height: 130px;
     border-radius: 50%;
     background-color: black;
+    margin-bottom: 10px;
 }
 
 .avatar-upload-label {
@@ -299,7 +300,8 @@ a:hover, a:active {
 }
 
 .username {
-    margin: 0;
+    margin: 40px;
+    font-size: 35px;
 }
 
 .bio {
