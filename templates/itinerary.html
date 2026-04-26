@@ -26,6 +26,26 @@
             <h2>Plan your trip day by day</h2>
             <p>Enter your trip details, then generate the required number of day sections.</p>
 
+            <div class="itinerary-top-actions">
+    <button type="button" class="btn btn-itinerary-form" id="open-guide-btn">How this form works</button>
+    <button type="button" class="btn btn-itinerary-form" id="save-draft-btn">Save Progress</button>
+    <button type="button" class="btn btn-itinerary-form" id="clear-draft-btn">Clear Saved Draft</button>
+</div>
+
+<div id="guide-modal" class="modal-overlay hidden">
+    <div class="modal-box">
+        <h2>How to use this form</h2>
+        <ol class="guide-list">
+            <li>Enter your trip title, name, destination, start date, and end date.</li>
+            <li>Click <strong>Generate Itinerary Days</strong>.</li>
+            <li>Fill in each day with activities, dining, cost, transport, accommodation, photo, and captions.</li>
+            <li>Click <strong>Save Progress</strong> any time to continue later.</li>
+            <li>When finished, submit the itinerary.</li>
+        </ol>
+        <button type="button" class="btn btn-itinerary-form" id="close-guide-btn">Close</button>
+    </div>
+</div>
+
 <form id="itinerary-form" action="#" method="post" enctype="multipart/form-data">
     <div id="trip-details-section">
         <h2>Trip Details</h2>
@@ -111,18 +131,18 @@
 
                 <label>Transport Taken</label><br>
                 <div class="checkbox-group">
-                    <label><input type="checkbox" name="transport-day${i}" value="Rented a car"> Rented a car</label>
-                    <label><input type="checkbox" name="transport-day${i}" value="Taxi"> Taxi</label>
-                    <label><input type="checkbox" name="transport-day${i}" value="Rideshare (Uber, Gojek, Didi)"> Rideshare (Uber, Gojek, Didi)</label>
-                    <label><input type="checkbox" name="transport-day${i}" value="Bus"> Bus</label>
-                    <label><input type="checkbox" name="transport-day${i}" value="Train"> Train</label>
-                    <label><input type="checkbox" name="transport-day${i}" value="Tram"> Tram</label>
-                    <label><input type="checkbox" name="transport-day${i}" value="Subway/Metro"> Subway/Metro</label>
-                    <label><input type="checkbox" name="transport-day${i}" value="Ferry/Boat"> Ferry/Boat</label>
-                    <label><input type="checkbox" name="transport-day${i}" value="Domestic flight"> Domestic flight</label>
-                    <label><input type="checkbox" name="transport-day${i}" value="Tuk tuk"> Tuk tuk</label>
-                    <label><input type="checkbox" name="transport-day${i}" value="Rented a motorbike/scooter"> Rented a motorbike/scooter</label>
-                    <label><input type="checkbox" name="transport-day${i}" value="Other"> Other</label>
+                    <label><input type="checkbox" id="transport-day${i}-car" name="transport-day${i}" value="Rented a car"> Rented a car</label>
+                    <label><input type="checkbox" id="transport-day${i}-taxi" name="transport-day${i}" value="Taxi"> Taxi</label>
+                    <label><input type="checkbox" id="transport-day${i}-rideshare" name="transport-day${i}" value="Rideshare (Uber, Gojek, Didi)"> Rideshare (Uber, Gojek, Didi)</label>
+                    <label><input type="checkbox" id="transport-day${i}-bus" name="transport-day${i}" value="Bus"> Bus</label>
+                    <label><input type="checkbox" id="transport-day${i}-train" name="transport-day${i}" value="Train"> Train</label>
+                    <label><input type="checkbox" id="transport-day${i}-tram" name="transport-day${i}" value="Tram"> Tram</label>
+                    <label><input type="checkbox" id="transport-day${i}-metro" name="transport-day${i}" value="Subway/Metro"> Subway/Metro</label>
+                    <label><input type="checkbox" id="transport-day${i}-ferry" name="transport-day${i}" value="Ferry/Boat"> Ferry/Boat</label>
+                    <label><input type="checkbox" id="transport-day${i}-flight" name="transport-day${i}" value="Domestic flight"> Domestic flight</label>
+                    <label><input type="checkbox" id="transport-day${i}-tuktuk" name="transport-day${i}" value="Tuk tuk"> Tuk tuk</label>
+                    <label><input type="checkbox" id="transport-day${i}-scooter" name="transport-day${i}" value="Rented a motorbike/scooter"> Rented a motorbike/scooter</label>
+                    <label><input type="checkbox" id="transport-day${i}-other" name="transport-day${i}" value="Other"> Other</label>
                 </div><br>
 
                     <label for="accommodation-day${i}">Accommodation (Optional)</label><br>
@@ -148,42 +168,47 @@
             } else {
              fileName.textContent = "No file chosen";
             }
+            saveDraft();
             });
             setupActivityInput(i);
             setupDiningInput(i);
+            setupAutoSaveForGeneratedFields();
             }
         document.getElementById("submit-btn").style.display = "block";
         }
     function setupActivityInput(dayNum) {
-        const input = document.getElementById(`activity-input-day${dayNum}`);
-        const list = document.getElementById(`activity-list-day${dayNum}`);
-        const grid = document.getElementById(`activity-details-day${dayNum}`);
-        let activityCount = 0;
+    const input = document.getElementById(`activity-input-day${dayNum}`);
+    const list = document.getElementById(`activity-list-day${dayNum}`);
+    const grid = document.getElementById(`activity-details-day${dayNum}`);
+    let activityCount = 0;
 
-        input.addEventListener("keydown", function(e) {
-            if (e.key === "Enter") {
-                e.preventDefault();
-                const value = this.value.trim();
-                if (value === "") return;
+    input.addEventListener("keydown", function(e) {
+        if (e.key === "Enter") {
+            e.preventDefault();
+            const value = this.value.trim();
+            if (value === "") return;
 
-                activityCount++;
-                const id = `detail-day${dayNum}-act${activityCount}`;
+            activityCount++;
+            const id = `detail-day${dayNum}-act${activityCount}`;
 
-                const li = document.createElement("li");
-                li.innerHTML = `${value} <span class="remove-activity" onclick="removeActivity('${id}', this)">✕</span>`;
-                list.appendChild(li);
+            const li = document.createElement("li");
+            li.innerHTML = `${value} <span class="remove-activity" onclick="removeActivity('${id}', this); saveDraft();">✕</span>`;
+            list.appendChild(li);
 
-                const box = document.createElement("div");
-                box.classList.add("activity-detail-box");
-                box.id = id;
-                box.innerHTML = `
-                    <p class="activity-detail-title">${value}</p>
-                    <textarea placeholder="Enter details for ${value}..." rows="3"></textarea>
-                `;
-                grid.appendChild(box);
+            const box = document.createElement("div");
+            box.classList.add("activity-detail-box");
+            box.id = id;
+            box.innerHTML = `
+                <p class="activity-detail-title">${value}</p>
+                <textarea id="${id}-textarea" placeholder="Enter details for ${value}..." rows="3"></textarea>
+            `;
+            grid.appendChild(box);
 
-                this.value = "";
-            }
+            box.querySelector("textarea").addEventListener("input", saveDraft);
+
+            this.value = "";
+            saveDraft();
+        }
     });
 }
 
@@ -208,7 +233,7 @@ function setupDiningInput(dayNum) {
             const id = `dining-detail-day${dayNum}-item${diningCount}`;
 
             const li = document.createElement("li");
-            li.innerHTML = `${value} <span class="remove-activity" onclick="removeActivity('${id}', this)">✕</span>`;
+            li.innerHTML = `${value} <span class="remove-activity" onclick="removeActivity('${id}', this); saveDraft();">✕</span>`;
             list.appendChild(li);
 
             const box = document.createElement("div");
@@ -216,15 +241,224 @@ function setupDiningInput(dayNum) {
             box.id = id;
             box.innerHTML = `
                 <p class="activity-detail-title">${value}</p>
-                <textarea placeholder="Enter details for ${value}..." rows="3"></textarea>
+                <textarea id="${id}-textarea" placeholder="Enter details for ${value}..." rows="3"></textarea>
             `;
             grid.appendChild(box);
 
+            box.querySelector("textarea").addEventListener("input", saveDraft);
+
             this.value = "";
+            saveDraft();
         }
     });
 }
 
     </script>
+    <script>
+const STORAGE_KEY = "itineraryDraft";
+
+document.addEventListener("DOMContentLoaded", function () {
+    setupGuideModal();
+    setupDraftButtons();
+    restoreDraft();
+    setupAutoSaveForTripDetails();
+});
+
+function setupGuideModal() {
+    const openBtn = document.getElementById("open-guide-btn");
+    const closeBtn = document.getElementById("close-guide-btn");
+    const modal = document.getElementById("guide-modal");
+
+    openBtn.addEventListener("click", function () {
+        modal.classList.remove("hidden");
+    });
+
+    closeBtn.addEventListener("click", function () {
+        modal.classList.add("hidden");
+    });
+
+    modal.addEventListener("click", function (e) {
+        if (e.target === modal) {
+            modal.classList.add("hidden");
+        }
+    });
+}
+
+function setupDraftButtons() {
+    document.getElementById("save-draft-btn").addEventListener("click", saveDraft);
+
+    document.getElementById("clear-draft-btn").addEventListener("click", function () {
+        localStorage.removeItem(STORAGE_KEY);
+        alert("Saved draft cleared.");
+    });
+}
+
+function setupAutoSaveForTripDetails() {
+    const tripFieldIds = [
+        "trip-title",
+        "creator-name",
+        "destination",
+        "start-date",
+        "end-date"
+    ];
+
+    tripFieldIds.forEach(id => {
+        const field = document.getElementById(id);
+        if (field) {
+            field.addEventListener("input", saveDraft);
+            field.addEventListener("change", saveDraft);
+        }
+    });
+}
+
+function collectDraftData() {
+    const draft = {
+        tripTitle: document.getElementById("trip-title").value,
+        creatorName: document.getElementById("creator-name").value,
+        destination: document.getElementById("destination").value,
+        startDate: document.getElementById("start-date").value,
+        endDate: document.getElementById("end-date").value,
+        tripDetailsHidden: document.getElementById("trip-details-section").style.display === "none",
+        submitVisible: document.getElementById("submit-btn").style.display === "block",
+        days: []
+    };
+
+    const daySections = document.querySelectorAll(".day-section");
+
+    daySections.forEach((section, index) => {
+        const dayNum = index + 1;
+
+        const transports = [];
+        document.querySelectorAll(`input[name="transport-day${dayNum}"]:checked`).forEach(cb => {
+            transports.push(cb.value);
+        });
+
+        const activityDetails = [];
+        document.querySelectorAll(`#activity-details-day${dayNum} .activity-detail-box`).forEach(box => {
+            const title = box.querySelector(".activity-detail-title").textContent.trim();
+            const textarea = box.querySelector("textarea");
+            activityDetails.push({
+                title: title,
+                text: textarea ? textarea.value : ""
+            });
+        });
+
+        const diningDetails = [];
+        document.querySelectorAll(`#dining-details-day${dayNum} .activity-detail-box`).forEach(box => {
+            const title = box.querySelector(".activity-detail-title").textContent.trim();
+            const textarea = box.querySelector("textarea");
+            diningDetails.push({
+                title: title,
+                text: textarea ? textarea.value : ""
+            });
+        });
+
+        draft.days.push({
+            cost: document.getElementById(`cost-day${dayNum}`)?.value || "",
+            rentedItems: document.getElementById(`rented-items-day${dayNum}`)?.value || "",
+            accommodation: document.getElementById(`accommodation-day${dayNum}`)?.value || "",
+            caption: document.getElementById(`caption-day${dayNum}`)?.value || "",
+            fileName: document.getElementById(`file-name-day${dayNum}`)?.textContent || "No file chosen",
+            transports: transports,
+            activityDetails: activityDetails,
+            diningDetails: diningDetails
+        });
+    });
+
+    return draft;
+}
+
+function saveDraft() {
+    const draft = collectDraftData();
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(draft));
+}
+
+function restoreDraft() {
+    const saved = localStorage.getItem(STORAGE_KEY);
+    if (!saved) return;
+
+    const draft = JSON.parse(saved);
+
+    document.getElementById("trip-title").value = draft.tripTitle || "";
+    document.getElementById("creator-name").value = draft.creatorName || "";
+    document.getElementById("destination").value = draft.destination || "";
+    document.getElementById("start-date").value = draft.startDate || "";
+    document.getElementById("end-date").value = draft.endDate || "";
+
+    if (draft.startDate && draft.endDate && draft.days && draft.days.length > 0) {
+        generateDays();
+
+        if (draft.tripDetailsHidden) {
+            document.getElementById("trip-details-section").style.display = "none";
+        }
+
+        if (draft.submitVisible) {
+            document.getElementById("submit-btn").style.display = "block";
+        }
+
+        draft.days.forEach((day, index) => {
+            const dayNum = index + 1;
+
+            const costField = document.getElementById(`cost-day${dayNum}`);
+            const rentedField = document.getElementById(`rented-items-day${dayNum}`);
+            const accommodationField = document.getElementById(`accommodation-day${dayNum}`);
+            const captionField = document.getElementById(`caption-day${dayNum}`);
+            const fileNameField = document.getElementById(`file-name-day${dayNum}`);
+
+            if (costField) costField.value = day.cost || "";
+            if (rentedField) rentedField.value = day.rentedItems || "";
+            if (accommodationField) accommodationField.value = day.accommodation || "";
+            if (captionField) captionField.value = day.caption || "";
+            if (fileNameField) fileNameField.textContent = day.fileName || "No file chosen";
+
+            (day.transports || []).forEach(value => {
+                const checkbox = Array.from(document.querySelectorAll(`input[name="transport-day${dayNum}"]`))
+                    .find(cb => cb.value === value);
+                if (checkbox) checkbox.checked = true;
+            });
+
+            restoreDynamicList(dayNum, "activity", day.activityDetails || []);
+            restoreDynamicList(dayNum, "dining", day.diningDetails || []);
+        });
+
+        setupAutoSaveForGeneratedFields();
+    }
+}
+
+function restoreDynamicList(dayNum, type, items) {
+    const list = document.getElementById(`${type}-list-day${dayNum}`);
+    const grid = document.getElementById(`${type}-details-day${dayNum}`);
+    if (!list || !grid) return;
+
+    grid.innerHTML = "";
+    list.innerHTML = "";
+
+    items.forEach((item, index) => {
+        const id = `${type}-detail-day${dayNum}-restored${index + 1}`;
+
+        const li = document.createElement("li");
+        li.innerHTML = `${item.title} <span class="remove-activity" onclick="removeActivity('${id}', this); saveDraft();">✕</span>`;
+        list.appendChild(li);
+
+        const box = document.createElement("div");
+box.classList.add("activity-detail-box");
+box.id = id;
+box.innerHTML = `
+    <p class="activity-detail-title">${item.title}</p>
+    <textarea rows="3">${item.text || ""}</textarea>
+`;
+grid.appendChild(box);
+
+box.querySelector("textarea").addEventListener("input", saveDraft);
+    });
+}
+
+function setupAutoSaveForGeneratedFields() {
+    document.querySelectorAll("#days-container input, #days-container textarea").forEach(field => {
+        field.addEventListener("input", saveDraft);
+        field.addEventListener("change", saveDraft);
+    });
+}
+</script>
 </body>
 </html>
