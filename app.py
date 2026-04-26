@@ -106,11 +106,29 @@ def homepage():
 @app.route('/profile')
 def user_profile():
     user_id = session.get("user_id")
+
     if not user_id:
         return redirect(url_for('login_page'))
-    user = User.query.get(user_id)
-    interests = [i for i in [user.interest_1, user.interest_2, user.interest_3, user.interest_4, user.interest_5] if i]
-    return render_template('user-profile.html', user=user, interests=interests)
+
+    user = User.query.get_or_404(user_id)
+
+    interests = [
+        user.interest_1,
+        user.interest_2,
+        user.interest_3,
+        user.interest_4,
+        user.interest_5
+    ]
+    interests = [interest for interest in interests if interest]
+
+    saved_items = SavedItinerary.query.filter_by(user_id=user_id).all()
+
+    return render_template(
+        'user-profile.html',
+        user=user,
+        interests=interests,
+        saved_items=saved_items
+    )
 
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in app.config['ALLOWED_EXTENSIONS']

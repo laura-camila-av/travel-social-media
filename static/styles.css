@@ -1023,3 +1023,28 @@ a:hover, a:active {
 .hidden {
     display: none;
 }
+.profile-tabs {
+    display: flex;
+    justify-content: center;
+    gap: 40px;
+    margin: 30px 40px 10px;
+    padding: 10px 0;
+}
+.profile-tab {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 26px;
+    color: #000000;
+    padding-bottom: 8px;
+    transition: 0.2s;
+}
+
+.profile-tab.active {
+    color: #e43d12;
+    border-bottom: 2px solid #e43d12; /* ✅ clean underline */
+}
+/* hover same as buttons */
+.profile-tab:hover {
+    transform: scale(1.1);
+}
