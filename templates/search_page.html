@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Webname - Search</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
     <link rel="stylesheet" href="../static/styles.css">
 </head>
 
@@ -15,26 +16,27 @@
             <li><a href="{{ url_for('user_profile') }}">Your Profile</a></li>
             <li><a href="{{ url_for('itinerary_create') }}">Create Itinerary</a></li>
             <li><a href="{{ url_for('dms') }}">Messages</a></li>
-            <li><a href="{{url_for('feed')}}">Feed</a></li>
+            <li><a href="{{ url_for('feed') }}">Feed</a></li>
             <li><a href="{{ url_for('search') }}">Search</a></li>
             <li><a href="#">Notifications</a></li>
-            <li><a href="#">Log Out</a></li>
+            <li><a href="{{ url_for('logout') }}">Log Out</a></li>
         </ul>
     </div>
 
     <div class="page-wrapper">
-        <!-- Middle content -->
         <div class="middle-column">
-            
-            <!-- Account buttons -->
+
             <h1>Webname</h1>
-            <h2>Search Itineraries</h2>
-            <p>Find trips by city, country, budget, duration, and travel style.</p>
+            <h2>Search</h2>
+            <p>Find trips or search other users by username.</p>
 
             <!-- Search bar -->
-            <div style="max-width: 900px; margin: 30px auto; display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;">
-                <input type="text" placeholder="Search by city or country"
-                    style="padding: 12px; width: 320px; border: 2px solid #e43d12; border-radius: 5px;">
+            <form method="GET" action="{{ url_for('search') }}"
+                  style="max-width: 900px; margin: 30px auto; display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;">
+
+                <input type="text" name="q" value="{{ q }}"
+                       placeholder="Search by username, city or country"
+                       style="padding: 12px; width: 320px; border: 2px solid #e43d12; border-radius: 5px;">
 
                 <select style="padding: 12px; border: 2px solid #e43d12; border-radius: 5px;">
                     <option>Duration</option>
@@ -42,6 +44,7 @@
                     <option>4-7 days</option>
                     <option>8+ days</option>
                 </select>
+
                 <select style="padding: 12px; border: 2px solid #e43d12; border-radius: 5px;">
                     <option>Travel Style</option>
                     <option>Backpacker</option>
@@ -50,6 +53,7 @@
                     <option>Cultural</option>
                     <option>Luxury</option>
                 </select>
+
                 <select style="padding: 12px; border: 2px solid #e43d12; border-radius: 5px;">
                     <option>Budget</option>
                     <option>Low</option>
@@ -57,46 +61,74 @@
                     <option>High</option>
                 </select>
 
-                <button class="btn">Search</button>
-            </div>
+                <button class="btn" type="submit">Search</button>
+            </form>
+
+            <!-- User search results -->
+            {% if q %}
+                <h2>User Results</h2>
+
+                {% if users %}
+                    <div class="user-search-results">
+                        {% for found_user in users %}
+                            <a class="user-result-card" href="{{ url_for('view_user_profile', user_id=found_user.id) }}">
+                                {% if found_user.avatar_url %}
+                                    <img src="{{ url_for('static', filename='uploads/' + found_user.avatar_url) }}" class="user-result-avatar">
+                                {% else %}
+                                    <div class="user-result-placeholder"></div>
+                                {% endif %}
+
+                                <span>@{{ found_user.username }}</span>
+                            </a>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <p>No users found.</p>
+                {% endif %}
+            {% endif %}
 
             <!-- Search results -->
             <h2>Popular Results</h2>
 
-<div class="itinerary-container">
-    <a class="card-link" href="{{ url_for('itinerary_display', itinerary_id=1) }}">
-        <div class="itinerary-card">
-            <div class="overlay-text">Tokyo Budget Trip</div>
-        </div>
-    </a>
-    <a class="card-link" href="{{ url_for('itinerary_display', itinerary_id=2) }}">
-        <div class="itinerary-card">
-            <div class="overlay-text">Kyoto Cultural Journey</div>
-        </div>
-    </a>
-    <a class="card-link" href="{{ url_for('itinerary_display', itinerary_id=3) }}">
-        <div class="itinerary-card">
-            <div class="overlay-text">Seoul Food Adventure</div>
-        </div>
-    </a>
-    <a class="card-link" href="{{ url_for('itinerary_display', itinerary_id=4) }}">
-        <div class="itinerary-card">
-            <div class="overlay-text">Bali Beach Escape</div>
-        </div>
-    </a>
-    <a class="card-link" href="{{ url_for('itinerary_display', itinerary_id=5) }}">
-        <div class="itinerary-card">
-            <div class="overlay-text">Paris 5-Day Plan</div>
-        </div>
-    </a>
-    <a class="card-link" href="{{ url_for('itinerary_display', itinerary_id=6) }}">
-        <div class="itinerary-card">
-            <div class="overlay-text">Sydney Weekend Guide</div>
-        </div>
-    </a>
-</div>
-        </div>
+            <div class="itinerary-container">
+                <a class="card-link" href="{{ url_for('itinerary_display', itinerary_id=1) }}">
+                    <div class="itinerary-card">
+                        <div class="overlay-text">Tokyo Budget Trip</div>
+                    </div>
+                </a>
 
+                <a class="card-link" href="{{ url_for('itinerary_display', itinerary_id=2) }}">
+                    <div class="itinerary-card">
+                        <div class="overlay-text">Kyoto Cultural Journey</div>
+                    </div>
+                </a>
+
+                <a class="card-link" href="{{ url_for('itinerary_display', itinerary_id=3) }}">
+                    <div class="itinerary-card">
+                        <div class="overlay-text">Seoul Food Adventure</div>
+                    </div>
+                </a>
+
+                <a class="card-link" href="{{ url_for('itinerary_display', itinerary_id=4) }}">
+                    <div class="itinerary-card">
+                        <div class="overlay-text">Bali Beach Escape</div>
+                    </div>
+                </a>
+
+                <a class="card-link" href="{{ url_for('itinerary_display', itinerary_id=5) }}">
+                    <div class="itinerary-card">
+                        <div class="overlay-text">Paris 5-Day Plan</div>
+                    </div>
+                </a>
+
+                <a class="card-link" href="{{ url_for('itinerary_display', itinerary_id=6) }}">
+                    <div class="itinerary-card">
+                        <div class="overlay-text">Sydney Weekend Guide</div>
+                    </div>
+                </a>
+            </div>
+
+        </div>
     </div>
 
 </body>
