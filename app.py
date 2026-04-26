@@ -43,6 +43,16 @@ class Message(db.Model):
     text = db.Column(db.Text, nullable=False)
     created_at = db.Column(db.DateTime, server_default=db.func.now())
 
+class Like(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    itinerary_id = db.Column(db.Integer, nullable=False)
+    created_at = db.Column(db.DateTime, server_default=db.func.now())
+
+    __table_args__ = (
+        db.UniqueConstraint('user_id', 'itinerary_id', name='unique_user_itinerary_like'),
+    )
+
 @app.route('/save-bio', methods=['POST'])
 def save_bio():
     user_id = session.get("user_id")
@@ -132,7 +142,23 @@ def search():
 
 @app.route('/itinerary/<int:itinerary_id>')
 def itinerary_display(itinerary_id):
-    return render_template('itinerary-display.html')
+    user_id = session.get("user_id")
+
+    like_count = Like.query.filter_by(itinerary_id=itinerary_id).count()
+    user_liked = False
+
+    if user_id:
+        user_liked = Like.query.filter_by(
+            user_id=user_id,
+            itinerary_id=itinerary_id
+        ).first() is not None
+
+    return render_template(
+        'itinerary-display.html',
+        itinerary_id=itinerary_id,
+        like_count=like_count,
+        user_liked=user_liked
+    )
 
 
 @app.route('/feed')
@@ -342,6 +368,39 @@ def api_send_message():
     db.session.commit()
 
     return jsonify({"success": True})
+
+@app.route('/api/like/<int:itinerary_id>', methods=['POST'])
+def toggle_like(itinerary_id):
+    user_id = session.get("user_id")
+
+    if not user_id:
+        return jsonify({"error": "Not logged in"}), 401
+
+    existing_like = Like.query.filter_by(
+        user_id=user_id,
+        itinerary_id=itinerary_id
+    ).first()
+
+    if existing_like:
+        db.session.delete(existing_like)
+        liked = False
+    else:
+        new_like = Like(
+            user_id=user_id,
+            itinerary_id=itinerary_id
+        )
+        db.session.add(new_like)
+        liked = True
+
+    db.session.commit()
+
+    like_count = Like.query.filter_by(itinerary_id=itinerary_id).count()
+
+    return jsonify({
+        "liked": liked,
+        "like_count": like_count
+    })
+
 @app.route('/logout')
 def logout():
     session.clear()

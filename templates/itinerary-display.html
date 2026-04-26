@@ -25,8 +25,25 @@
         <div class="middle-column">
     
             <h2>Itinerary Title</h2>
+            <div class="creator-section">
+                <div class="creator-pic"></div>
+                <p>@Creator_username</p>
+            </div>
             <div class="main-image"></div>
+            <div class="like-section">
+                <button 
+                    id="likeButton" 
+                    class="like-button {% if user_liked %}liked{% endif %}" 
+                    type="button"
+                    data-itinerary-id="{{ itinerary_id }}"
+                >
+                    <i id="likeIcon" class="{% if user_liked %}fa-solid{% else %}fa-regular{% endif %} fa-heart"></i>
+                </button>
 
+                <span id="likeCount">
+                    {{ like_count }} {% if like_count == 1 %}like{% else %}likes{% endif %}
+                </span>
+            </div>
             <div class="day-thumbnails">
     
             <div class="day-card">
@@ -44,12 +61,6 @@
         <div class="day-card">
             <div class="overlay-text">Day 5</div>
         </div>
-
-        </div>
-
-        <div class="creator-section">
-            <div class="creator-pic"></div>
-            <p>@Creator_username</p>
 
         </div>
         
@@ -141,6 +152,40 @@
 </div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
 <script src="{{ url_for('static', filename='itinerary-display.js') }}"></script>
+<script>
+    const likeButton = document.getElementById("likeButton");
+    const likeIcon = document.getElementById("likeIcon");
+    const likeCount = document.getElementById("likeCount");
+
+    likeButton.addEventListener("click", async function () {
+        const itineraryId = likeButton.dataset.itineraryId;
+
+        const response = await fetch(`/api/like/${itineraryId}`, {
+            method: "POST"
+        });
+
+        if (response.status === 401) {
+            window.location.href = "/login";
+            return;
+        }
+
+        const data = await response.json();
+
+        if (data.liked) {
+            likeButton.classList.add("liked");
+            likeIcon.classList.remove("fa-regular");
+            likeIcon.classList.add("fa-solid");
+        } else {
+            likeButton.classList.remove("liked");
+            likeIcon.classList.remove("fa-solid");
+            likeIcon.classList.add("fa-regular");
+        }
+
+        likeCount.textContent = data.like_count === 1
+            ? "1 like"
+            : data.like_count + " likes";
+    });
+</script>
 </body>
 
 </html>
