@@ -77,10 +77,6 @@ def save_interests():
     
     return jsonify({"success": True})
 
-@app.before_request
-def create_tables():
-    db.create_all()
-
 
 @app.route('/')
 def homepage():
@@ -353,5 +349,10 @@ def logout():
 
 
 if __name__ == '__main__':
+    os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
+
+    with app.app_context():
+        db.create_all()
+
     app.run(debug=True)
 
