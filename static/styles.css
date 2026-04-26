@@ -1,6 +1,6 @@
 body {
     font-family: Helvetica, Arial, sans-serif;
-    background-color: #faf6c3; !important;
+    background-color: #faf6c3 !important;
     color: black;
     text-align: center;
     margin: 0;
@@ -15,7 +15,7 @@ body {
 
 h1 {
     font-size:xx-large;
-    color: #e43d12
+    color: #e43d12;
 
 }
 
@@ -59,7 +59,7 @@ a:hover, a:active {
 
 /*Search Page Styling START*/
 .card-link, .card-link:link, .card-link:visited {
-    border: none; !important;
+    border: none !important;
     padding: 0;
     background-color: transparent;
     display: block;
@@ -222,22 +222,6 @@ a:hover, a:active {
     background-color: black;
     position: relative;
     overflow: hidden;
-}
-
-.overlay-text {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    
-    color: white;
-    font-size: 20px;
-    opacity: 0;
-    transition: opacity 0.3s ease;
-}
-
-.itinerary-card:hover .overlay-text {
-    opacity: 1;
 }
 
 .itinerary-card:hover {
@@ -501,8 +485,7 @@ a:hover, a:active {
 }
 
 /*Navigation Bar to go on every page*/
-.navigation-bar {
-   ul {
+.navigation-bar ul {
     list-style-type: none;
     margin: 0;
     padding: 0;
@@ -511,19 +494,18 @@ a:hover, a:active {
     position: fixed;
     overflow: auto;
     height: 100%;
-    } 
-    
-    li a {
-        display: block;
-        color: white;
-        padding: 20px 14px;
-        text-decoration: none; 
-    }
+}
 
-    li a:hover {
-        background-color: #e66240;
-        color: white;
-        }
+.navigation-bar li a {
+    display: block;
+    color: white;
+    padding: 20px 14px;
+    text-decoration: none;
+}
+
+.navigation-bar li a:hover {
+    background-color: #e66240;
+    color: white;
 }
 /*Itinerary display styling START*/
 .page-wrapper {
