@@ -106,28 +106,54 @@ def homepage():
 @app.route('/profile')
 def user_profile():
     user_id = session.get("user_id")
-
     if not user_id:
         return redirect(url_for('login_page'))
 
-    user = User.query.get_or_404(user_id)
-
+    user = User.query.get(user_id)
     interests = [
-        user.interest_1,
-        user.interest_2,
-        user.interest_3,
-        user.interest_4,
-        user.interest_5
+        i for i in [
+            user.interest_1,
+            user.interest_2,
+            user.interest_3,
+            user.interest_4,
+            user.interest_5
+        ] if i
     ]
-    interests = [interest for interest in interests if interest]
-
-    saved_items = SavedItinerary.query.filter_by(user_id=user_id).all()
 
     return render_template(
         'user-profile.html',
         user=user,
         interests=interests,
-        saved_items=saved_items
+        is_own_profile=True
+    )
+
+
+@app.route('/user/<int:user_id>')
+def view_user_profile(user_id):
+    current_user_id = session.get("user_id")
+    if not current_user_id:
+        return redirect(url_for('login_page'))
+
+    user = User.query.get_or_404(user_id)
+
+    if user.id == current_user_id:
+        return redirect(url_for('user_profile'))
+
+    interests = [
+        i for i in [
+            user.interest_1,
+            user.interest_2,
+            user.interest_3,
+            user.interest_4,
+            user.interest_5
+        ] if i
+    ]
+
+    return render_template(
+        'user-profile.html',
+        user=user,
+        interests=interests,
+        is_own_profile=False
     )
 
 def allowed_file(filename):
@@ -165,7 +191,25 @@ def itinerary_create():
 
 @app.route('/search')
 def search():
-    return render_template('search_page.html')
+    user_id = session.get("user_id")
+    if not user_id:
+        return redirect(url_for('login_page'))
+
+    q = request.args.get('q', '').strip()
+
+    users = []
+    if q:
+        users = User.query.filter(
+            User.id != user_id,
+            User.username.isnot(None),
+            User.username.ilike(f'%{q}%')
+        ).all()
+
+    return render_template(
+        'search_page.html',
+        q=q,
+        users=users
+    )
 
 
 @app.route('/itinerary/<int:itinerary_id>')
