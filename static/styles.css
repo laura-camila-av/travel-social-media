@@ -228,35 +228,49 @@ a:hover, a:active {
     filter: brightness(70%);
 }
 
-/* like button */
-.like-section {
+/* action buttons */
+.action-buttons {
     display: flex;
-    align-items: center;
-    gap: 10px;
+    align-items: flex-start;
+    gap: 20px;
+    justify-content: flex-start;
     margin: 15px 0;
+    text-align: left; 
 }
-
-.like-button {
+/* stack heart + count */
+.like-group {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+/* buttons */
+.like-button,
+.save-button {
     background: none;
     border: none;
     cursor: pointer;
-    font-size: 30px;
+    font-size: 28px;
     color: #222;
     padding: 0;
     transition: 0.2s;
 }
-
-.like-button.liked {
+/* active states */
+.like-button.liked,
+.save-button.saved {
     color: #e43d12;
 }
-
-.like-button:hover {
+/* hover effect */
+.like-button:hover,
+.save-button:hover {
     transform: scale(1.12);
 }
-
+/* like count text */
 #likeCount {
+    font-size: 13px;
+    margin-top: 4px;
     font-weight: bold;
 }
+
 
 /*User Profile Styling START*/
 .profile-section {

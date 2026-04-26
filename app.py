@@ -53,6 +53,16 @@ class Like(db.Model):
         db.UniqueConstraint('user_id', 'itinerary_id', name='unique_user_itinerary_like'),
     )
 
+class SavedItinerary(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    itinerary_id = db.Column(db.Integer, nullable=False)
+    created_at = db.Column(db.DateTime, server_default=db.func.now())
+
+    __table_args__ = (
+        db.UniqueConstraint('user_id', 'itinerary_id', name='unique_user_saved_itinerary'),
+    )
+
 @app.route('/save-bio', methods=['POST'])
 def save_bio():
     user_id = session.get("user_id")
@@ -146,9 +156,15 @@ def itinerary_display(itinerary_id):
 
     like_count = Like.query.filter_by(itinerary_id=itinerary_id).count()
     user_liked = False
+    user_saved = False
 
     if user_id:
         user_liked = Like.query.filter_by(
+            user_id=user_id,
+            itinerary_id=itinerary_id
+        ).first() is not None
+
+        user_saved = SavedItinerary.query.filter_by(
             user_id=user_id,
             itinerary_id=itinerary_id
         ).first() is not None
@@ -157,9 +173,40 @@ def itinerary_display(itinerary_id):
         'itinerary-display.html',
         itinerary_id=itinerary_id,
         like_count=like_count,
-        user_liked=user_liked
+        user_liked=user_liked,
+        user_saved=user_saved
     )
 
+
+
+@app.route('/api/save/<int:itinerary_id>', methods=['POST'])
+def toggle_save(itinerary_id):
+    user_id = session.get("user_id")
+
+    if not user_id:
+        return jsonify({"error": "Not logged in"}), 401
+
+    existing_save = SavedItinerary.query.filter_by(
+        user_id=user_id,
+        itinerary_id=itinerary_id
+    ).first()
+
+    if existing_save:
+        db.session.delete(existing_save)
+        saved = False
+    else:
+        new_save = SavedItinerary(
+            user_id=user_id,
+            itinerary_id=itinerary_id
+        )
+        db.session.add(new_save)
+        saved = True
+
+    db.session.commit()
+
+    return jsonify({
+        "saved": saved
+    })
 
 @app.route('/feed')
 def feed():
