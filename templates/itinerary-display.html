@@ -30,19 +30,31 @@
                 <p>@Creator_username</p>
             </div>
             <div class="main-image"></div>
-            <div class="like-section">
+            <div class="action-buttons">
+                <!-- LIKE COLUMN -->
+                <div class="like-group">
+                    <button 
+                        id="likeButton" 
+                        class="like-button {% if user_liked %}liked{% endif %}" 
+                        type="button"
+                        data-itinerary-id="{{ itinerary_id }}"
+                    >
+                        <i id="likeIcon" class="{% if user_liked %}fa-solid{% else %}fa-regular{% endif %} fa-heart"></i>
+                    </button>
+
+                    <span id="likeCount">
+                        {{ like_count }} {% if like_count == 1 %}like{% else %}likes{% endif %}
+                    </span>
+                </div>
+                <!-- SAVE BUTTON -->
                 <button 
-                    id="likeButton" 
-                    class="like-button {% if user_liked %}liked{% endif %}" 
+                    id="saveButton"
+                    class="save-button {% if user_saved %}saved{% endif %}"
                     type="button"
                     data-itinerary-id="{{ itinerary_id }}"
                 >
-                    <i id="likeIcon" class="{% if user_liked %}fa-solid{% else %}fa-regular{% endif %} fa-heart"></i>
+                    <i id="saveIcon" class="{% if user_saved %}fa-solid{% else %}fa-regular{% endif %} fa-bookmark"></i>
                 </button>
-
-                <span id="likeCount">
-                    {{ like_count }} {% if like_count == 1 %}like{% else %}likes{% endif %}
-                </span>
             </div>
             <div class="day-thumbnails">
     
@@ -185,6 +197,37 @@
             ? "1 like"
             : data.like_count + " likes";
     });
+</script>
+<script>
+    const saveButton = document.getElementById("saveButton");
+    const saveIcon = document.getElementById("saveIcon");
+
+    if (saveButton) {
+        saveButton.addEventListener("click", async function () {
+            const itineraryId = saveButton.dataset.itineraryId;
+
+            const response = await fetch(`/api/save/${itineraryId}`, {
+                method: "POST"
+            });
+
+            if (response.status === 401) {
+                window.location.href = "/login";
+                return;
+            }
+
+            const data = await response.json();
+
+            if (data.saved) {
+                saveButton.classList.add("saved");
+                saveIcon.classList.remove("fa-regular");
+                saveIcon.classList.add("fa-solid");
+            } else {
+                saveButton.classList.remove("saved");
+                saveIcon.classList.remove("fa-solid");
+                saveIcon.classList.add("fa-regular");
+            }
+        });
+    }
 </script>
 </body>
 
