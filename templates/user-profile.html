@@ -89,24 +89,24 @@
             <h2>{{ user.username }}'s Itineraries</h2>
 
             <div class="itinerary-container">
-                <a class="card-link" href="{{ url_for('itinerary_display', itinerary_id=1) }}">
-                    <div class="itinerary-card">
-                        <div class="overlay-text">Itinerary Title</div>
+                {% if user_itineraries %}
+                    {% for itinerary in user_itineraries %}
+                        <a class="card-link" href="{{ url_for('itinerary_display', itinerary_id=itinerary.id) }}">
+                            <div class="itinerary-card">
+                                <div class="overlay-text">{{ itinerary.title }}</div>
+                            </div>
+                        </a>
+                    {% endfor %}
+                {% else %}
+                    <div class="empty-state">
+                        <i class="fa-solid fa-map"></i>
+                        <p>You haven’t created any itineraries yet</p>
                     </div>
-                </a>
-
-                <a class="card-link" href="{{ url_for('itinerary_display', itinerary_id=2) }}">
-                    <div class="itinerary-card">
-                        <div class="overlay-text">Itinerary Title</div>
-                    </div>
-                </a>
-
-                <a class="card-link" href="{{ url_for('itinerary_display', itinerary_id=3) }}">
-                    <div class="itinerary-card">
-                        <div class="overlay-text">Itinerary Title</div>
-                    </div>
-                </a>
+                {% endif %}
             </div>
+            <a href="{{ url_for('itinerary_create') }}">
+                Create your first itinerary
+            </a>
         </div>
 
         {% if is_own_profile %}
@@ -124,7 +124,10 @@
                 </a>
                 {% endfor %}
                 {% else %}
-                <p>No saved itineraries yet.</p>
+                <div class="empty-state">
+                    <i class="fa-solid fa-map"></i>
+                    <p>You haven’t saved any itineraries yet</p>
+                </div>
                 {% endif %}
             </div>
         </div>
