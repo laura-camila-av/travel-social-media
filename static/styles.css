@@ -902,3 +902,16 @@ a:hover, a:active {
 .hidden {
     display: none;
 }
+
+.budget-summary {
+    max-width: 350px;
+    margin: 0 auto 10px;
+    padding: 12px;
+    border: 2px solid #e43d12;
+    border-radius: 10px;
+    background-color: #fff7dc;
+}
+
+.budget-summary p {
+    margin: 6px 0;
+}

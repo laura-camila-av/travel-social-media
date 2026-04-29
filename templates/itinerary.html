@@ -59,6 +59,15 @@
         <label for="destination">Destination</label><br>
         <input type="text" id="destination" name="destination" required><br><br>
 
+        <label for="trip-budget">Trip Budget</label><br>
+        <input type="number" id="trip-budget" name="trip-budget" min="0" step="0.01" placeholder="Enter your total budget"><br><br>
+
+        <div id="budget-summary" class="budget-summary hidden">
+            <p><strong>Budget:</strong> $<span id="budget-total">0.00</span></p>
+            <p><strong>Spent so far:</strong> $<span id="budget-spent">0.00</span></p>
+            <p><strong>Remaining:</strong> $<span id="budget-remaining">0.00</span></p>
+        </div><br>
+
         <label for="start-date">Start Date</label><br>
         <input type="date" id="start-date" name="start-date" required><br><br>
 
@@ -298,6 +307,7 @@ function setupAutoSaveForTripDetails() {
         "trip-title",
         "creator-name",
         "destination",
+        "trip-budget",
         "start-date",
         "end-date"
     ];
@@ -305,8 +315,15 @@ function setupAutoSaveForTripDetails() {
     tripFieldIds.forEach(id => {
         const field = document.getElementById(id);
         if (field) {
-            field.addEventListener("input", saveDraft);
-            field.addEventListener("change", saveDraft);
+            field.addEventListener("input", function () {
+                saveDraft();
+                updateBudgetSummary();
+        });
+
+            field.addEventListener("change", function () {
+                saveDraft();
+                updateBudgetSummary();
+        });
         }
     });
 }
@@ -316,6 +333,7 @@ function collectDraftData() {
         tripTitle: document.getElementById("trip-title").value,
         creatorName: document.getElementById("creator-name").value,
         destination: document.getElementById("destination").value,
+        tripBudget: document.getElementById("trip-budget").value,
         startDate: document.getElementById("start-date").value,
         endDate: document.getElementById("end-date").value,
         tripDetailsHidden: document.getElementById("trip-details-section").style.display === "none",
@@ -382,6 +400,7 @@ function restoreDraft() {
     document.getElementById("trip-title").value = draft.tripTitle || "";
     document.getElementById("creator-name").value = draft.creatorName || "";
     document.getElementById("destination").value = draft.destination || "";
+    document.getElementById("trip-budget").value = draft.tripBudget || "";
     document.getElementById("start-date").value = draft.startDate || "";
     document.getElementById("end-date").value = draft.endDate || "";
 
@@ -422,6 +441,7 @@ function restoreDraft() {
         });
 
         setupAutoSaveForGeneratedFields();
+        updateBudgetSummary();
     }
 }
 
@@ -455,9 +475,50 @@ box.querySelector("textarea").addEventListener("input", saveDraft);
 
 function setupAutoSaveForGeneratedFields() {
     document.querySelectorAll("#days-container input, #days-container textarea").forEach(field => {
-        field.addEventListener("input", saveDraft);
-        field.addEventListener("change", saveDraft);
+        field.addEventListener("input", function () {
+            saveDraft();
+            updateBudgetSummary();
+        });
+
+        field.addEventListener("change", function () {
+            saveDraft();
+            updateBudgetSummary();
+        });
     });
+}
+function updateBudgetSummary() {
+    const budgetInput = document.getElementById("trip-budget");
+    const summaryBox = document.getElementById("budget-summary");
+    const totalEl = document.getElementById("budget-total");
+    const spentEl = document.getElementById("budget-spent");
+    const remainingEl = document.getElementById("budget-remaining");
+
+    if (!budgetInput || !summaryBox) return;
+
+    const totalBudget = parseFloat(budgetInput.value) || 0;
+    let spent = 0;
+
+    document.querySelectorAll('[id^="cost-day"]').forEach(input => {
+        spent += parseFloat(input.value) || 0;
+    });
+
+    const remaining = totalBudget - spent;
+
+    if (totalBudget > 0) {
+        summaryBox.classList.remove("hidden");
+    } else {
+        summaryBox.classList.add("hidden");
+    }
+
+    totalEl.textContent = totalBudget.toFixed(2);
+    spentEl.textContent = spent.toFixed(2);
+    remainingEl.textContent = remaining.toFixed(2);
+
+    if (remaining < 0) {
+        remainingEl.style.color = "red";
+    } else {
+        remainingEl.style.color = "";
+    }
 }
 </script>
 </body>
