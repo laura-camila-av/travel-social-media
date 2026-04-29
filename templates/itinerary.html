@@ -59,6 +59,16 @@
         <label for="destination">Destination</label><br>
         <input type="text" id="destination" name="destination" required><br><br>
 
+        <label for="start-date">Start Date</label><br>
+        <input type="date" id="start-date" name="start-date" required><br><br>
+
+        <label for="end-date">End Date</label><br>
+        <input type="date" id="end-date" name="end-date" required><br><br>
+
+        <button type="button" onclick="generateDays()" class="btn btn-itinerary-form">Generate Itinerary Days</button>
+    </div>
+
+    <div id="budget-section">
         <label for="trip-budget">Trip Budget</label><br>
         <input type="number" id="trip-budget" name="trip-budget" min="0" step="0.01" placeholder="Enter your total budget"><br><br>
 
@@ -67,14 +77,6 @@
             <p><strong>Spent so far:</strong> $<span id="budget-spent">0.00</span></p>
             <p><strong>Remaining:</strong> $<span id="budget-remaining">0.00</span></p>
         </div><br>
-
-        <label for="start-date">Start Date</label><br>
-        <input type="date" id="start-date" name="start-date" required><br><br>
-
-        <label for="end-date">End Date</label><br>
-        <input type="date" id="end-date" name="end-date" required><br><br>
-
-        <button type="button" onclick="generateDays()" class="btn btn-itinerary-form">Generate Itinerary Days</button>
     </div>
 
     <div id="days-container"></div>
