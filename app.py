@@ -63,6 +63,12 @@ class SavedItinerary(db.Model):
         db.UniqueConstraint('user_id', 'itinerary_id', name='unique_user_saved_itinerary'),
     )
 
+class Itinerary(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    title = db.Column(db.String(120), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    created_at = db.Column(db.DateTime, server_default=db.func.now())
+    
 @app.route('/save-bio', methods=['POST'])
 def save_bio():
     user_id = session.get("user_id")
@@ -121,12 +127,14 @@ def user_profile():
     ]
     interests = [interest for interest in interests if interest]
 
+    user_itineraries = Itinerary.query.filter_by(user_id=user_id).all()
     saved_items = SavedItinerary.query.filter_by(user_id=user_id).all()
 
     return render_template(
         'user-profile.html',
         user=user,
         interests=interests,
+        user_itineraries=user_itineraries,
         saved_items=saved_items,
         is_own_profile=True
     )
@@ -194,6 +202,26 @@ def upload_avatar():
 
 @app.route('/create')
 def itinerary_create():
+    user_id = session.get("user_id")
+    if not user_id:
+        return redirect(url_for('login_page'))
+
+    if request.method == 'POST':
+        title = request.form.get('title', '').strip()
+
+        if not title:
+            flash("Please enter a title.", "error")
+            return redirect(url_for('itinerary_create'))
+
+        new_itinerary = Itinerary(
+            title=title,
+            user_id=user_id
+        )
+
+        db.session.add(new_itinerary)
+        db.session.commit()
+
+        return redirect(url_for('user_profile'))
     return render_template('itinerary.html')
 
 @app.route('/search')
