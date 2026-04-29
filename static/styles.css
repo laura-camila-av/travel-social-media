@@ -176,6 +176,13 @@ a:hover, a:active {
     color: white;
 }
 
+.field-expanded-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+}
+
 .activity-input-area {
     border: 2px solid #e43d12;
     background-color: #e43d12;
@@ -1135,6 +1142,12 @@ a:hover, a:active {
 
 .hidden {
     display: none;
+}
+
+#submit-btn {
+    display: block;
+    margin-left: auto;
+    margin-top: 20px;
 }
 
 .budget-summary {

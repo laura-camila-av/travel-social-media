@@ -173,10 +173,18 @@ daySection.innerHTML = `
         </div>
     </div>
 
-    <div class="field-expanded hidden" id="expanded-day${i}">
+<div class="field-expanded hidden" id="expanded-day${i}">
+    <div class="field-expanded-header">
         <button type="button" class="exit-field-btn" onclick="exitField(${i})">Exit field</button>
-        <div class="expanded-content" id="expanded-content-day${i}"></div>
+        <div>
+            <button type="button" class="btn btn-itinerary-form" onclick="saveDraft()">Save Progress</button>
+            <button type="button" class="btn btn-itinerary-form" onclick="localStorage.removeItem('itineraryDraft'); alert('Draft cleared.')">Clear Draft</button>
+        </div>
     </div>
+    <div class="expanded-content" id="expanded-content-day${i}"></div>
+</div>
+
+
 
     <div class="field-forms hidden" id="forms-day${i}">
         <div id="form-activities-day${i}">
@@ -261,9 +269,11 @@ daySection.innerHTML = `
                 navBar.appendChild(btn);
             }
 
-            daysContainer.insertBefore(navBar, daysContainer.firstChild);
-            showDay(1);
-            document.getElementById("submit-btn").style.display = "block";
+        daysContainer.insertBefore(navBar, daysContainer.firstChild);
+        showDay(1);
+
+        // only show submit on last day
+        document.getElementById("submit-btn").style.display = "none";
         }
 
         function setupActivityInput(dayNum) {
@@ -656,12 +666,17 @@ function updateTilePreview(field, dayNum) {
         let totalDays = 0;
 
         function showDay(dayNum) {
-            document.querySelectorAll('.day-section').forEach((section, index) => {
-                section.style.display = index + 1 === dayNum ? 'block' : 'none';
-            });
-            currentDay = dayNum;
-            updateDayNav();
-        }
+    document.querySelectorAll('.day-section').forEach((section, index) => {
+        section.style.display = index + 1 === dayNum ? 'block' : 'none';
+    });
+    currentDay = dayNum;
+    updateDayNav();
+
+    const submitBtn = document.getElementById("submit-btn");
+    if (submitBtn) {
+        submitBtn.style.display = dayNum === totalDays ? 'block' : 'none';
+    }
+}
 
         function updateDayNav() {
             document.querySelectorAll('.day-nav-btn').forEach((btn, index) => {
