@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Create Itinerary</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 </head>
 <body>
     <div class="navigation-bar">
@@ -110,63 +111,121 @@
                 const daySection = document.createElement("section");
                 daySection.classList.add("day-section");
 
-                daySection.innerHTML = `
-                    <h2>
-                        <button type="button" class="btn btn-itinerary-form" onclick="document.getElementById('guide-modal').classList.remove('hidden')">How this works</button>
-                        <span>Day ${i}</span>
-                        <div>
-                            <button type="button" class="btn btn-itinerary-form" onclick="saveDraft()">Save Progress</button>
-                            <button type="button" class="btn btn-itinerary-form" onclick="localStorage.removeItem('itineraryDraft'); alert('Draft cleared.')">Clear Draft</button>
-                        </div>
-                    </h2>
+daySection.innerHTML = `
+    <div class="field-grid" id="field-grid-day${i}">
 
-                    <label>Activities</label><br>
-                    <div class="activity-input-area" id="activity-input-area-day${i}">
-                        <ul class="activity-list" id="activity-list-day${i}"></ul>
-                        <input type="text" class="activity-input" id="activity-input-day${i}" placeholder="Type an activity and press Enter">
-                    </div>
-                    <div class="activity-details-grid" id="activity-details-day${i}"></div><br><br>
+        <div class="itinerary-detail-box" id="tile-activities-day${i}" onclick="expandField('activities', ${i})">
+            <div class="detail-icon-panel">
+                <i class="fa-solid fa-camera"></i>
+            </div>
+            <div class="detail-content">
+                <div class="tile-preview" id="preview-activities-day${i}"></div>
+            </div>
+        </div>
 
-                    <label>Dining</label><br>
-                    <div class="activity-input-area" id="dining-input-area-day${i}">
-                        <ul class="activity-list" id="dining-list-day${i}"></ul>
-                        <input type="text" class="activity-input" id="dining-input-day${i}" placeholder="Type a restaurant and press Enter">
-                    </div>
-                    <div class="activity-details-grid" id="dining-details-day${i}"></div><br><br>
+        <div class="itinerary-detail-box" id="tile-dining-day${i}" onclick="expandField('dining', ${i})">
+            <div class="detail-icon-panel">
+                <i class="fa-solid fa-utensils"></i>
+            </div>
+            <div class="detail-content">
+            <div class="tile-preview" id="preview-dining-day${i}"></div>
+            </div>
+        </div>
+        <div class="itinerary-detail-box" id="tile-transport-day${i}" onclick="expandField('transport', ${i})">
+             <div class="detail-icon-panel">
+            <i class="fa-solid fa-car"></i>
+            </div>
+            <div class="detail-content">
+            <div class="tile-preview" id="preview-transport-day${i}"></div>
+             </div>
+        </div>
+        <div class="itinerary-detail-box" id="tile-accommodation-day${i}" onclick="expandField('accommodation', ${i})">
+            <div class="detail-icon-panel">
+            <i class="fa-solid fa-bed"></i>
+            </div>
+            <div class="detail-content">
+            <div class="tile-preview" id="preview-accommodation-day${i}"></div>
+            </div>
+        </div>
+        <div class="itinerary-detail-box" id="tile-cost-day${i}" onclick="expandField('cost', ${i})">
+            <div class="detail-icon-panel">
+            <i class="fa-solid fa-dollar-sign"></i>
+            </div>
+            <div class="detail-content">
+            <div class="tile-preview" id="preview-cost-day${i}"></div>
+            </div>
+        </div>
+        <div class="itinerary-detail-box" id="tile-rented-day${i}" onclick="expandField('rented', ${i})">
+            <div class="detail-icon-panel">
+            <i class="fa-solid fa-person-skiing"></i>
+            </div>
+            <div class="detail-content">
+            <div class="tile-preview" id="preview-rented-day${i}"></div>
+            </div>
+        </div>
+        <div class="itinerary-detail-box" id="tile-photo-day${i}" onclick="expandField('photo', ${i})">
+            <div class="detail-icon-panel">
+            <i class="fa-solid fa-image"></i>
+            </div>
+            <div class="detail-content">
+            <div class="tile-preview" id="preview-photo-day${i}"></div>
+            </div>
+        </div>
+    </div>
 
-                    <label for="cost-day${i}">Total Cost</label><br>
-                    <input type="number" id="cost-day${i}" name="cost-day${i}" min="0" step="0.01" required><br><br>
+    <div class="field-expanded hidden" id="expanded-day${i}">
+        <button type="button" class="exit-field-btn" onclick="exitField(${i})">Exit field</button>
+        <div class="expanded-content" id="expanded-content-day${i}"></div>
+    </div>
 
-                    <label for="rented-items-day${i}">Rented Items</label><br>
-                    <input type="text" id="rented-items-day${i}" name="rented-items-day${i}"><br><br>
-
-                    <label>Transport Taken</label><br>
-                    <div class="checkbox-group">
-                        <label><input type="checkbox" id="transport-day${i}-car" name="transport-day${i}" value="Rented a car"> Rented a car</label>
-                        <label><input type="checkbox" id="transport-day${i}-taxi" name="transport-day${i}" value="Taxi"> Taxi</label>
-                        <label><input type="checkbox" id="transport-day${i}-rideshare" name="transport-day${i}" value="Rideshare (Uber, Gojek, Didi)"> Rideshare (Uber, Gojek, Didi)</label>
-                        <label><input type="checkbox" id="transport-day${i}-bus" name="transport-day${i}" value="Bus"> Bus</label>
-                        <label><input type="checkbox" id="transport-day${i}-train" name="transport-day${i}" value="Train"> Train</label>
-                        <label><input type="checkbox" id="transport-day${i}-tram" name="transport-day${i}" value="Tram"> Tram</label>
-                        <label><input type="checkbox" id="transport-day${i}-metro" name="transport-day${i}" value="Subway/Metro"> Subway/Metro</label>
-                        <label><input type="checkbox" id="transport-day${i}-ferry" name="transport-day${i}" value="Ferry/Boat"> Ferry/Boat</label>
-                        <label><input type="checkbox" id="transport-day${i}-flight" name="transport-day${i}" value="Domestic flight"> Domestic flight</label>
-                        <label><input type="checkbox" id="transport-day${i}-tuktuk" name="transport-day${i}" value="Tuk tuk"> Tuk tuk</label>
-                        <label><input type="checkbox" id="transport-day${i}-scooter" name="transport-day${i}" value="Rented a motorbike/scooter"> Rented a motorbike/scooter</label>
-                        <label><input type="checkbox" id="transport-day${i}-other" name="transport-day${i}" value="Other"> Other</label>
-                    </div><br>
-
-                    <label for="accommodation-day${i}">Accommodation (Optional)</label><br>
-                    <input type="text" id="accommodation-day${i}" name="accommodation-day${i}"><br><br>
-
-                    <label for="photos-day${i}">Upload Photo</label><br>
-                    <label for="photos-day${i}" class="btn btn-itinerary-form">Choose File</label>
-                    <input type="file" id="photos-day${i}" name="photos-day${i}" accept="image/*" class="file-input">
-                    <span id="file-name-day${i}" class="file-name">No file chosen</span><br><br>
-
-                    <label for="caption-day${i}">Photo Caption</label><br>
-                    <textarea id="caption-day${i}" name="caption-day${i}" rows="3"></textarea><br><br>
-                `;
+    <div class="field-forms hidden" id="forms-day${i}">
+        <div id="form-activities-day${i}">
+            <div class="activity-input-area" id="activity-input-area-day${i}">
+                <ul class="activity-list" id="activity-list-day${i}"></ul>
+                <input type="text" class="activity-input" id="activity-input-day${i}" placeholder="Type an activity and press Enter">
+            </div>
+            <div class="activity-details-grid" id="activity-details-day${i}"></div>
+        </div>
+        <div id="form-dining-day${i}">
+            <div class="activity-input-area" id="dining-input-area-day${i}">
+                <ul class="activity-list" id="dining-list-day${i}"></ul>
+                <input type="text" class="activity-input" id="dining-input-day${i}" placeholder="Type a restaurant and press Enter">
+            </div>
+            <div class="activity-details-grid" id="dining-details-day${i}"></div>
+        </div>
+        <div id="form-transport-day${i}">
+            <div class="checkbox-group">
+                <label><input type="checkbox" name="transport-day${i}" value="Rented a car"> Rented a car</label>
+                <label><input type="checkbox" name="transport-day${i}" value="Taxi"> Taxi</label>
+                <label><input type="checkbox" name="transport-day${i}" value="Rideshare (Uber, Gojek, Didi)"> Rideshare (Uber, Gojek, Didi)</label>
+                <label><input type="checkbox" name="transport-day${i}" value="Bus"> Bus</label>
+                <label><input type="checkbox" name="transport-day${i}" value="Train"> Train</label>
+                <label><input type="checkbox" name="transport-day${i}" value="Tram"> Tram</label>
+                <label><input type="checkbox" name="transport-day${i}" value="Subway/Metro"> Subway/Metro</label>
+                <label><input type="checkbox" name="transport-day${i}" value="Ferry/Boat"> Ferry/Boat</label>
+                <label><input type="checkbox" name="transport-day${i}" value="Domestic flight"> Domestic flight</label>
+                <label><input type="checkbox" name="transport-day${i}" value="Tuk tuk"> Tuk tuk</label>
+                <label><input type="checkbox" name="transport-day${i}" value="Rented a motorbike/scooter"> Rented a motorbike/scooter</label>
+                <label><input type="checkbox" name="transport-day${i}" value="Other"> Other</label>
+            </div>
+        </div>
+        <div id="form-accommodation-day${i}">
+            <input type="text" id="accommodation-day${i}" name="accommodation-day${i}" placeholder="Enter accommodation name and address">
+        </div>
+        <div id="form-cost-day${i}">
+            <input type="number" id="cost-day${i}" name="cost-day${i}" min="0" step="0.01" placeholder="Enter total cost for the day">
+        </div>
+        <div id="form-rented-day${i}">
+            <input type="text" id="rented-items-day${i}" name="rented-items-day${i}" placeholder="Enter any rented items">
+        </div>
+        <div id="form-photo-day${i}">
+            <label for="photos-day${i}" class="btn btn-itinerary-form">Choose File</label>
+            <input type="file" id="photos-day${i}" name="photos-day${i}" accept="image/*" class="file-input">
+            <span id="file-name-day${i}" class="file-name">No file chosen</span><br><br>
+            <textarea id="caption-day${i}" name="caption-day${i}" rows="3" placeholder="Enter a caption for your photo"></textarea>
+        </div>
+    </div>
+`;
 
                 daysContainer.appendChild(daySection);
 
@@ -283,6 +342,77 @@
                 }
             });
         }
+
+        function expandField(field, dayNum) {
+    const grid = document.getElementById(`field-grid-day${dayNum}`);
+    const expanded = document.getElementById(`expanded-day${dayNum}`);
+    const content = document.getElementById(`expanded-content-day${dayNum}`);
+    const formContent = document.getElementById(`form-${field}-day${dayNum}`);
+
+    grid.classList.add('hidden');
+    expanded.classList.remove('hidden');
+
+    content.innerHTML = '';
+    content.appendChild(formContent.cloneNode(true));
+
+    // re-attach event listeners for activity/dining inputs
+    if (field === 'activities') setupActivityInput(dayNum);
+    if (field === 'dining') setupDiningInput(dayNum);
+
+    expanded.dataset.currentField = field;
+}
+
+function exitField(dayNum) {
+    const grid = document.getElementById(`field-grid-day${dayNum}`);
+    const expanded = document.getElementById(`expanded-day${dayNum}`);
+    const field = expanded.dataset.currentField;
+
+    updateTilePreview(field, dayNum);
+
+    grid.classList.remove('hidden');
+    expanded.classList.add('hidden');
+    saveDraft();
+}
+
+function updateTilePreview(field, dayNum) {
+    const preview = document.getElementById(`preview-${field}-day${dayNum}`);
+    preview.innerHTML = '';
+
+    if (field === 'activities') {
+        const items = document.querySelectorAll(`#activity-list-day${dayNum} li`);
+        items.forEach(item => {
+            const p = document.createElement('p');
+            p.textContent = item.textContent.replace('✕', '').trim();
+            preview.appendChild(p);
+        });
+    } else if (field === 'dining') {
+        const items = document.querySelectorAll(`#dining-list-day${dayNum} li`);
+        items.forEach(item => {
+            const p = document.createElement('p');
+            p.textContent = item.textContent.replace('✕', '').trim();
+            preview.appendChild(p);
+        });
+    } else if (field === 'transport') {
+        const checked = document.querySelectorAll(`input[name="transport-day${dayNum}"]:checked`);
+        checked.forEach(cb => {
+            const p = document.createElement('p');
+            p.textContent = cb.value;
+            preview.appendChild(p);
+        });
+    } else if (field === 'accommodation') {
+        const val = document.getElementById(`accommodation-day${dayNum}`)?.value.trim();
+        if (val) preview.innerHTML = `<p>${val}</p>`;
+    } else if (field === 'cost') {
+        const val = document.getElementById(`cost-day${dayNum}`)?.value.trim();
+        if (val) preview.innerHTML = `<p>$${val}</p>`;
+    } else if (field === 'rented') {
+        const val = document.getElementById(`rented-items-day${dayNum}`)?.value.trim();
+        if (val) preview.innerHTML = `<p>${val}</p>`;
+    } else if (field === 'photo') {
+        const val = document.getElementById(`file-name-day${dayNum}`)?.textContent;
+        if (val && val !== 'No file chosen') preview.innerHTML = `<p>${val}</p>`;
+    }
+}
     </script>
 
     <script>
