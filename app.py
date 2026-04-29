@@ -299,6 +299,14 @@ def register():
         flash("Please fill in all fields.", "register_error")
         return redirect(url_for('login_page'))
 
+    if "@" not in email or "." not in email:
+        flash("Please enter a valid email.", "register_error")
+        return redirect(url_for('login_page'))
+
+    if not phone.isdigit() or len(phone) < 8 or len(phone) > 15:
+        flash("Please enter a valid phone number.", "register_error")
+        return redirect(url_for('login_page'))
+
     if password != confirm_password:
         flash("Passwords do not match.", "register_error")
         return redirect(url_for('login_page'))
