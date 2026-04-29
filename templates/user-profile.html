@@ -1,85 +1,164 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <link rel="stylesheet" href="../static/styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <style>
+        .bio-editing {
+            outline: 2px solid #e43d12;
+            border-radius: 5px;
+            padding: 8px;
+        }
+    </style>
 </head>
-<style>
-    .bio-editing {
-    outline: 2px solid #e43d12;
-    border-radius: 5px;
-    padding: 8px;
-    }
-</style>
 
 <body>
-     <!--Navigation bar-->
-    <div class ="navigation-bar">
-        <ul>
-            <li><a href="{{ url_for('user_profile') }}">Your Profile</a></li>
-            <li><a href="{{ url_for('itinerary_create') }}">Create Itinerary</a></li>
-            <li><a href="{{ url_for('dms') }}">Messages</a></li>
-            <li><a href="{{url_for('feed')}}">Feed</a></li>
-            <li><a href="{{ url_for('search') }}">Search</a></li>
-            <li><a href="#">Notifications</a></li>
-            <li><a href="#">Log Out</a></li>
-        </ul>
-    </div>
-
-    <!-- Website Title -->
-    <div class="page-wrapper">
-        <div class="middle-column">
-            <h1>Website Name</h1>
-
-    <!-- Profile Section -->
-        <div class="profile-section">
-            <div class="profile-pic"></div>
-            <h2 class="username">Username</h2>
-        </div>
-
-    <!-- Bio -->
-   <div class="bio-wrapper">
-        <p class="bio" id="bio-text">
-            Biography Biography Biography...
-        </p>
-        <span class="tooltip-text">Double-click to edit</span>
-    </div>
-
-    <!-- Itineraries -->
-        <h2>Your Itineraries</h2>
-
-<div class="itinerary-container">
-    <a class="card-link" href="{{ url_for('itinerary_display', itinerary_id=1) }}">
-        <div class="itinerary-card">
-            <div class="overlay-text">Itinerary Title</div>
-        </div>
-    </a>
-    <a class="card-link" href="{{ url_for('itinerary_display', itinerary_id=1) }}">
-        <div class="itinerary-card">
-            <div class="overlay-text">Itinerary Title</div>
-        </div>
-    </a>
-    <a class="card-link" href="{{ url_for('itinerary_display', itinerary_id=1) }}">
-        <div class="itinerary-card">
-            <div class="overlay-text">Itinerary Title</div>
-        </div>
-    </a>
+<!--Navigation bar-->
+<div class="navigation-bar">
+    <ul>
+        <li><a href="{{ url_for('user_profile') }}">Your Profile</a></li>
+        <li><a href="{{ url_for('itinerary_create') }}">Create Itinerary</a></li>
+        <li><a href="{{ url_for('dms') }}">Messages</a></li>
+        <li><a href="{{ url_for('feed') }}">Feed</a></li>
+        <li><a href="{{ url_for('search') }}">Search</a></li>
+        <li><a href="#">Notifications</a></li>
+        <li><a href="{{ url_for('logout') }}">Log Out</a></li>
+    </ul>
 </div>
+
+<!-- Website Title -->
+<div class="page-wrapper">
+    <div class="middle-column">
+        <h1>Website Name</h1>
+
+        <!-- Profile Section -->
+        <div class="profile-section">
+            <div class="profile-pic" id="profile-pic-container">
+                {% if user.avatar_url %}
+                <img src="{{ url_for('static', filename='uploads/' + user.avatar_url) }}" id="profile-img">
+                {% else %}
+                <div class="profile-pic-placeholder"></div>
+                {% endif %}
+
+                {% if is_own_profile %}
+                <label for="avatar-upload" class="avatar-upload-label">Change Photo</label>
+                <input type="file" id="avatar-upload" accept="image/*" style="display:none;">
+                {% endif %}
+            </div>
+
+            <h2 class="username">{{ user.username }}</h2>
         </div>
 
-    </div>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
-    <script>
-        $('#bio-text').dblclick(function() {
-            $(this).attr('contenteditable', 'true');
-            $(this).focus();
-            $(this).addClass('bio-editing');
-        });
+        <!-- Bio -->
+        <br>
+        <div class="bio-wrapper">
+            <p class="bio" id="bio-text">
+                {% if user.bio %}
+                {{ user.bio }}
+                {% elif is_own_profile %}
+                Double-click to add a bio...
+                {% else %}
+                No bio yet.
+                {% endif %}
+            </p>
 
-        $('#bio-text').on('blur', function() {
-            $(this).attr('contenteditable', 'false');
-            $(this).removeClass('bio-editing');
-            // later: save to database via AJAX here
-        });
-    </script>
+            {% if is_own_profile %}
+            <span class="tooltip-text">Double-click to edit</span>
+            {% endif %}
+        </div>
+
+        <!-- Profile Tabs -->
+        <div class="profile-tabs">
+
+            <!-- My itineraries -->
+            <button class="profile-tab active" onclick="showProfileTab('itineraries')">
+                <i class="fa-regular fa-border-all"></i>
+            </button>
+
+            {% if is_own_profile %}
+            <!-- Saved -->
+            <button class="profile-tab" onclick="showProfileTab('saved')">
+                <i class="fa-solid fa-bookmark"></i>
+            </button>
+            {% endif %}
+
+        </div>
+
+        <!-- My Itineraries Section -->
+        <div id="itineraries-section" class="profile-tab-content">
+            <h2>{{ user.username }}'s Itineraries</h2>
+
+            <div class="itinerary-container">
+                <a class="card-link" href="{{ url_for('itinerary_display', itinerary_id=1) }}">
+                    <div class="itinerary-card">
+                        <div class="overlay-text">Itinerary Title</div>
+                    </div>
+                </a>
+
+                <a class="card-link" href="{{ url_for('itinerary_display', itinerary_id=2) }}">
+                    <div class="itinerary-card">
+                        <div class="overlay-text">Itinerary Title</div>
+                    </div>
+                </a>
+
+                <a class="card-link" href="{{ url_for('itinerary_display', itinerary_id=3) }}">
+                    <div class="itinerary-card">
+                        <div class="overlay-text">Itinerary Title</div>
+                    </div>
+                </a>
+            </div>
+        </div>
+
+        {% if is_own_profile %}
+        <!-- Saved Section -->
+        <div id="saved-section" class="profile-tab-content hidden">
+            <h2>Saved</h2>
+
+            <div class="itinerary-container">
+                {% if saved_items %}
+                {% for saved in saved_items %}
+                <a class="card-link" href="{{ url_for('itinerary_display', itinerary_id=saved.itinerary_id) }}">
+                    <div class="itinerary-card">
+                        <div class="overlay-text">Saved Itinerary {{ saved.itinerary_id }}</div>
+                    </div>
+                </a>
+                {% endfor %}
+                {% else %}
+                <p>No saved itineraries yet.</p>
+                {% endif %}
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+{% if is_own_profile %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+<script src="{{ url_for('static', filename='user-profile.js') }}"></script>
+{% endif %}
+
+<script>
+    function showProfileTab(tabName) {
+        const itinerarySection = document.getElementById("itineraries-section");
+        const savedSection = document.getElementById("saved-section");
+        const tabs = document.querySelectorAll(".profile-tab");
+
+        itinerarySection.classList.add("hidden");
+
+        if (savedSection) {
+            savedSection.classList.add("hidden");
+        }
+
+        tabs.forEach(tab => tab.classList.remove("active"));
+
+        if (tabName === "itineraries") {
+            itinerarySection.classList.remove("hidden");
+            tabs[0].classList.add("active");
+        } else if (tabName === "saved" && savedSection) {
+            savedSection.classList.remove("hidden");
+            tabs[1].classList.add("active");
+        }
+    }
+</script>
 </body>
 </html>

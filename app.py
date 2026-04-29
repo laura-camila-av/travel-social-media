@@ -2,11 +2,15 @@ from flask import Flask, render_template, request, redirect, url_for, session, f
 from sqlalchemy import or_, and_
 from flask_sqlalchemy import SQLAlchemy
 from werkzeug.security import generate_password_hash, check_password_hash
+import os
 
 app = Flask(__name__)
 app.config["SECRET_KEY"] = "change-this-to-a-random-secret-key"
 app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///users.db"
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
+app.config['UPLOAD_FOLDER'] = os.path.join(os.path.dirname(__file__), 'static', 'uploads')
+app.config['ALLOWED_EXTENSIONS'] = {'png', 'jpg', 'jpeg', 'gif'}
+
 
 db = SQLAlchemy(app)
 
@@ -17,7 +21,15 @@ class User(db.Model):
     phone = db.Column(db.String(20), nullable=False)
     password_hash = db.Column(db.String(255), nullable=False)
     username = db.Column(db.String(50), unique=True, nullable=True)
+    bio = db.Column(db.Text, nullable=True)
+    avatar_url = db.Column(db.String(255), nullable=True)
+    interest_1 = db.Column(db.String(25), nullable=True)
+    interest_2 = db.Column(db.String(25), nullable=True)
+    interest_3 = db.Column(db.String(25), nullable=True)
+    interest_4 = db.Column(db.String(25), nullable=True)
+    interest_5 = db.Column(db.String(25), nullable=True)
 
+    
     def set_password(self, password):
         self.password_hash = generate_password_hash(password)
 
@@ -31,10 +43,59 @@ class Message(db.Model):
     text = db.Column(db.Text, nullable=False)
     created_at = db.Column(db.DateTime, server_default=db.func.now())
 
+class Like(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    itinerary_id = db.Column(db.Integer, nullable=False)
+    created_at = db.Column(db.DateTime, server_default=db.func.now())
 
-@app.before_request
-def create_tables():
-    db.create_all()
+    __table_args__ = (
+        db.UniqueConstraint('user_id', 'itinerary_id', name='unique_user_itinerary_like'),
+    )
+
+class SavedItinerary(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    itinerary_id = db.Column(db.Integer, nullable=False)
+    created_at = db.Column(db.DateTime, server_default=db.func.now())
+
+    __table_args__ = (
+        db.UniqueConstraint('user_id', 'itinerary_id', name='unique_user_saved_itinerary'),
+    )
+
+@app.route('/save-bio', methods=['POST'])
+def save_bio():
+    user_id = session.get("user_id")
+    if not user_id:
+        return jsonify({"error": "Not logged in"}), 401
+    
+    data = request.get_json()
+    bio_text = data.get("bio", "").strip()
+    
+    user = User.query.get(user_id)
+    user.bio = bio_text
+    db.session.commit()
+    
+    return jsonify({"success": True})
+@app.route('/save-interests', methods=['POST'])
+def save_interests():
+    user_id = session.get("user_id")
+    if not user_id:
+        return jsonify({"error": "Not logged in"}), 401
+    
+    data = request.get_json()
+    interests = data.get("interests", [])
+    
+    user = User.query.get(user_id)
+    user.interest_1 = interests[0] if len(interests) > 0 else None
+    user.interest_2 = interests[1] if len(interests) > 1 else None
+    user.interest_3 = interests[2] if len(interests) > 2 else None
+    user.interest_4 = interests[3] if len(interests) > 3 else None
+    user.interest_5 = interests[4] if len(interests) > 4 else None
+    
+    db.session.commit()
+    
+    return jsonify({"success": True})
 
 
 @app.route('/')
@@ -45,10 +106,91 @@ def homepage():
 @app.route('/profile')
 def user_profile():
     user_id = session.get("user_id")
+
     if not user_id:
         return redirect(url_for('login_page'))
-    user = User.query.get(user_id)
-    return render_template('user-profile.html', user=user)
+
+    user = User.query.get_or_404(user_id)
+
+    interests = [
+        user.interest_1,
+        user.interest_2,
+        user.interest_3,
+        user.interest_4,
+        user.interest_5
+    ]
+    interests = [interest for interest in interests if interest]
+
+    saved_items = SavedItinerary.query.filter_by(user_id=user_id).all()
+
+    return render_template(
+        'user-profile.html',
+        user=user,
+        interests=interests,
+        saved_items=saved_items,
+        is_own_profile=True
+    )
+
+
+@app.route('/user/<int:user_id>')
+def view_user_profile(user_id):
+    current_user_id = session.get("user_id")
+
+    if not current_user_id:
+        return redirect(url_for('login_page'))
+
+    user = User.query.get_or_404(user_id)
+
+    if user.id == current_user_id:
+        return redirect(url_for('user_profile'))
+
+    interests = [
+        user.interest_1,
+        user.interest_2,
+        user.interest_3,
+        user.interest_4,
+        user.interest_5
+    ]
+    interests = [interest for interest in interests if interest]
+
+    saved_items = []
+
+    return render_template(
+        'user-profile.html',
+        user=user,
+        interests=interests,
+        saved_items=saved_items,
+        is_own_profile=False
+    )
+
+def allowed_file(filename):
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in app.config['ALLOWED_EXTENSIONS']
+
+@app.route('/upload-avatar', methods=['POST'])
+def upload_avatar():
+    user_id = session.get("user_id")
+    if not user_id:
+        return jsonify({"error": "Not logged in"}), 401
+
+    if 'avatar' not in request.files:
+        return jsonify({"error": "No file provided"}), 400
+
+    file = request.files['avatar']
+
+    if file.filename == '':
+        return jsonify({"error": "No file selected"}), 400
+
+    if file and allowed_file(file.filename):
+        filename = f"avatar_{user_id}.{file.filename.rsplit('.', 1)[1].lower()}"
+        file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+        
+        user = User.query.get(user_id)
+        user.avatar_url = filename
+        db.session.commit()
+        
+        return jsonify({"success": True, "filename": filename})
+
+    return jsonify({"error": "File type not allowed"}), 400
 
 @app.route('/create')
 def itinerary_create():
@@ -56,13 +198,85 @@ def itinerary_create():
 
 @app.route('/search')
 def search():
-    return render_template('search_page.html')
+    user_id = session.get("user_id")
+
+    if not user_id:
+        return redirect(url_for('login_page'))
+
+    q = request.args.get('q', '').strip()
+
+    users = []
+    if q:
+        users = User.query.filter(
+            User.id != user_id,
+            User.username.isnot(None),
+            User.username.ilike(f'%{q}%')
+        ).all()
+
+    return render_template(
+        'search_page.html',
+        q=q,
+        users=users
+    )
 
 
 @app.route('/itinerary/<int:itinerary_id>')
 def itinerary_display(itinerary_id):
-    return render_template('itinerary-display.html')
+    user_id = session.get("user_id")
 
+    like_count = Like.query.filter_by(itinerary_id=itinerary_id).count()
+    user_liked = False
+    user_saved = False
+
+    if user_id:
+        user_liked = Like.query.filter_by(
+            user_id=user_id,
+            itinerary_id=itinerary_id
+        ).first() is not None
+
+        user_saved = SavedItinerary.query.filter_by(
+            user_id=user_id,
+            itinerary_id=itinerary_id
+        ).first() is not None
+
+    return render_template(
+        'itinerary-display.html',
+        itinerary_id=itinerary_id,
+        like_count=like_count,
+        user_liked=user_liked,
+        user_saved=user_saved
+    )
+
+
+
+@app.route('/api/save/<int:itinerary_id>', methods=['POST'])
+def toggle_save(itinerary_id):
+    user_id = session.get("user_id")
+
+    if not user_id:
+        return jsonify({"error": "Not logged in"}), 401
+
+    existing_save = SavedItinerary.query.filter_by(
+        user_id=user_id,
+        itinerary_id=itinerary_id
+    ).first()
+
+    if existing_save:
+        db.session.delete(existing_save)
+        saved = False
+    else:
+        new_save = SavedItinerary(
+            user_id=user_id,
+            itinerary_id=itinerary_id
+        )
+        db.session.add(new_save)
+        saved = True
+
+    db.session.commit()
+
+    return jsonify({
+        "saved": saved
+    })
 
 @app.route('/feed')
 def feed():
@@ -271,6 +485,39 @@ def api_send_message():
     db.session.commit()
 
     return jsonify({"success": True})
+
+@app.route('/api/like/<int:itinerary_id>', methods=['POST'])
+def toggle_like(itinerary_id):
+    user_id = session.get("user_id")
+
+    if not user_id:
+        return jsonify({"error": "Not logged in"}), 401
+
+    existing_like = Like.query.filter_by(
+        user_id=user_id,
+        itinerary_id=itinerary_id
+    ).first()
+
+    if existing_like:
+        db.session.delete(existing_like)
+        liked = False
+    else:
+        new_like = Like(
+            user_id=user_id,
+            itinerary_id=itinerary_id
+        )
+        db.session.add(new_like)
+        liked = True
+
+    db.session.commit()
+
+    like_count = Like.query.filter_by(itinerary_id=itinerary_id).count()
+
+    return jsonify({
+        "liked": liked,
+        "like_count": like_count
+    })
+
 @app.route('/logout')
 def logout():
     session.clear()
@@ -278,5 +525,10 @@ def logout():
 
 
 if __name__ == '__main__':
+    os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
+
+    with app.app_context():
+        db.create_all()
+
     app.run(debug=True)
 
