@@ -313,7 +313,11 @@ def feed():
 
 @app.route('/login', methods=['GET'])
 def login_page():
-    return render_template('loginpage.html')
+    return render_template(
+        'loginpage.html',
+        register_email=session.get("register_email", ""),
+        register_phone=session.get("register_phone", "")
+    )
 
 
 @app.route('/register', methods=['POST'])
@@ -322,31 +326,33 @@ def register():
     phone = request.form.get('phone', '').strip()
     password = request.form.get('password', '').strip()
     confirm_password = request.form.get('confirm_password', '').strip()
+    session["register_email"] = email
+    session["register_phone"] = phone
 
     if not email or not phone or not password or not confirm_password:
         flash("Please fill in all fields.", "register_error")
-        return redirect(url_for('login_page'))
+        return redirect(url_for('login_page', form='register'))
 
     if "@" not in email or "." not in email:
         flash("Please enter a valid email.", "register_error")
-        return redirect(url_for('login_page'))
+        return redirect(url_for('login_page', form='register'))
 
     if not phone.isdigit() or len(phone) < 8 or len(phone) > 15:
         flash("Please enter a valid phone number.", "register_error")
-        return redirect(url_for('login_page'))
+        return redirect(url_for('login_page', form='register'))
 
     if password != confirm_password:
         flash("Passwords do not match.", "register_error")
-        return redirect(url_for('login_page'))
+        return redirect(url_for('login_page', form='register'))
 
     if len(password) < 6:
         flash("Password must be at least 6 characters.", "register_error")
-        return redirect(url_for('login_page'))
+        return redirect(url_for('login_page', form='register'))
 
-    existing_user = User.query.filter_by(email=email).first()
-    if existing_user:
-        flash("An account with that email already exists.", "register_error")
-        return redirect(url_for('login_page'))
+    existing_email = User.query.filter_by(email=email).first()
+    if existing_email:
+        flash("Another account already exists with this email.", "register_error")
+        return redirect(url_for('login_page', form='register'))
 
     new_user = User(email=email, phone=phone)
     new_user.set_password(password)
@@ -354,7 +360,8 @@ def register():
     db.session.commit()
 
     session["user_id"] = new_user.id
-
+    session.pop("register_email", None)
+    session.pop("register_phone", None)
     # First time signup -> choose username
     return redirect(url_for('choose_username'))
 

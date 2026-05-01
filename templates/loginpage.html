@@ -6,7 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Login / Register</title>
 </head>
-<body class="login-page-body">
+<body class="login-page-body" data-active-form="{{ request.args.get('form', 'login') }}">
   <div class="login-page-container">
     <div class="login-page-tabs">
       <button class="login-page-tab-btn active" type="button" onclick="showForm('login')">Login</button>
@@ -49,12 +49,12 @@
 
         <div class="login-page-input-group">
           <label for="registerEmail">Email</label>
-          <input type="email" id="registerEmail" name="email" placeholder="Enter email" required />
+          <input type="email" id="registerEmail" name="email" value="{{ register_email }}" placeholder="Enter email" required />
         </div>
 
         <div class="login-page-input-group">
           <label for="registerPhone">Phone</label>
-          <input type="tel" id="registerPhone" name="phone" placeholder="Enter phone number" required />
+          <input type="tel" id="registerPhone" name="phone" value="{{ register_phone }}" placeholder="Enter phone number" required />
         </div>
 
         <div class="login-page-input-group">
@@ -142,6 +142,12 @@
       registerForm.classList.add("login-page-hidden");
       forgotForm.classList.remove("login-page-hidden");
       tabButtons.forEach(btn => btn.classList.remove("active"));
+    }
+    const activeForm = document.body.dataset.activeForm;
+    if (activeForm === "register") {
+      showForm("register");
+    } else if (activeForm === "forgot") {
+      showForgotPassword();
     }
   </script>
 </body>
