@@ -6,136 +6,156 @@
   <title>DMs</title>
 
   <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
-    <link rel="stylesheet" href="../static/styles.css">
 </head>
 
 <body class="dms-body">
 
-  <div class="navigation-bar">
-    <ul>
-      <li><a href="{{ url_for('user_profile') }}">Your Profile</a></li>
-      <li><a href="{{ url_for('itinerary_create') }}">Create Itinerary</a></li>
-      <li><a href="{{ url_for('dms') }}">Messages</a></li>
-      <li><a href="{{ url_for('feed') }}">Feed</a></li>
-      <li><a href="{{ url_for('search') }}">Search</a></li>
-      <li><a href="#">Notifications</a></li>
-      <li><a href="#">Log Out</a></li>
-    </ul>
+<div class="navigation-bar">
+  <ul>
+    <li><a href="{{ url_for('user_profile') }}">Your Profile</a></li>
+    <li><a href="{{ url_for('itinerary_create') }}">Create Itinerary</a></li>
+    <li><a href="{{ url_for('dms') }}">Messages</a></li>
+    <li><a href="{{ url_for('feed') }}">Feed</a></li>
+    <li><a href="{{ url_for('search') }}">Search</a></li>
+    <li><a href="#">Notifications</a></li>
+    <li><a href="{{ url_for('logout') }}">Log Out</a></li>
+  </ul>
+</div>
+
+<div class="page-wrapper" style="width: calc(100% - 200px);">
+
+  <div class="dms-sidebar">
+    <h2 class="dms-sidebar-title">Users</h2>
+    <div id="userList"></div>
   </div>
 
-  <div class="page-wrapper" style="width: calc(100% - 200px);">
+  <div class="dms-chat-area">
+    <div class="dms-chat-header" id="chatHeader">Select a user</div>
 
-    <div class="dms-sidebar">
-      <h2 class="dms-sidebar-title">Users</h2>
-      <div id="userList"></div>
+    <div class="dms-messages" id="messages">
+      <div class="dms-empty">Choose someone to start chatting.</div>
     </div>
 
-    <div class="dms-chat-area">
-      <div class="dms-chat-header" id="chatHeader">Select a user</div>
-
-      <div class="dms-messages" id="messages">
-        <div class="dms-empty">Choose someone to start chatting.</div>
-      </div>
-
-      <form class="dms-composer" id="messageForm">
-        <input type="text" id="messageInput" placeholder="Type a message..." required />
-        <button type="submit">Send</button>
-      </form>
-    </div>
-
+    <form class="dms-composer" id="messageForm">
+      <input type="text" id="messageInput" placeholder="Select a user first..." required disabled />
+      <button type="submit" id="sendButton" disabled>Send</button>
+    </form>
   </div>
 
-  <script>
-    const userList = document.getElementById("userList");
-    const chatHeader = document.getElementById("chatHeader");
-    const messagesDiv = document.getElementById("messages");
-    const messageForm = document.getElementById("messageForm");
-    const messageInput = document.getElementById("messageInput");
+</div>
 
-    let selectedUserId = null;
+<script>
+  const userList = document.getElementById("userList");
+  const chatHeader = document.getElementById("chatHeader");
+  const messagesDiv = document.getElementById("messages");
+  const messageForm = document.getElementById("messageForm");
+  const messageInput = document.getElementById("messageInput");
+  const sendButton = document.getElementById("sendButton");
 
-    async function loadUsers() {
-      const response = await fetch("/api/users");
-      const users = await response.json();
+  let selectedUserId = null;
 
-      userList.innerHTML = "";
+  async function loadUsers() {
+    const response = await fetch("/api/users");
+    const users = await response.json();
 
-      if (users.length === 0) {
-        userList.innerHTML = '<div class="dms-empty">No other users found.</div>';
-        return;
-      }
+    userList.innerHTML = "";
 
-      users.forEach((user) => {
-        const userEl = document.createElement("div");
-        userEl.className = "user";
-        userEl.textContent = user.username || user.email || "Unnamed user";
+    if (users.length === 0) {
+      userList.innerHTML = '<div class="dms-empty">No other users found.</div>';
+      return;
+    }
 
-        userEl.addEventListener("click", async () => {
-          selectedUserId = user.id;
-          chatHeader.textContent = "Chat with " + (user.username || user.email);
-          await loadMessages();
+    users.forEach((user) => {
+      const userEl = document.createElement("div");
+      userEl.className = "user";
+      userEl.textContent = user.username || user.email || "Unnamed user";
+
+      userEl.addEventListener("click", async () => {
+        selectedUserId = user.id;
+
+        document.querySelectorAll(".user").forEach(el => {
+          el.classList.remove("active-user");
         });
+        userEl.classList.add("active-user");
 
-        userList.appendChild(userEl);
-      });
-    }
+        chatHeader.textContent = "Chat with " + (user.username || user.email);
 
-    async function loadMessages() {
-      if (!selectedUserId) return;
+        messageInput.disabled = false;
+        sendButton.disabled = false;
+        messageInput.placeholder = "Type a message...";
+        messageInput.focus();
 
-      const response = await fetch(`/api/messages/${selectedUserId}`);
-      const messages = await response.json();
-
-      messagesDiv.innerHTML = "";
-
-      if (messages.length === 0) {
-        messagesDiv.innerHTML = '<div class="dms-empty">No messages yet.</div>';
-        return;
-      }
-
-      messages.forEach((msg) => {
-        const msgEl = document.createElement("div");
-
-        msgEl.className = "dms-message " + (msg.is_mine ? "dms-mine" : "dms-theirs");
-
-        msgEl.textContent = msg.text;
-        messagesDiv.appendChild(msgEl);
-      });
-
-      messagesDiv.scrollTop = messagesDiv.scrollHeight;
-    }
-
-    messageForm.addEventListener("submit", async (e) => {
-      e.preventDefault();
-
-      const text = messageInput.value.trim();
-      if (!text || !selectedUserId) return;
-
-      const response = await fetch("/api/messages", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-          receiver_id: selectedUserId,
-          text: text
-        })
-      });
-
-      if (response.ok) {
-        messageInput.value = "";
         await loadMessages();
-      }
+      });
+
+      userList.appendChild(userEl);
+    });
+  }
+
+  async function loadMessages() {
+    if (!selectedUserId) return;
+
+    const response = await fetch(`/api/messages/${selectedUserId}`);
+    const messages = await response.json();
+
+    messagesDiv.innerHTML = "";
+
+    if (messages.length === 0) {
+      messagesDiv.innerHTML = '<div class="dms-empty">No messages yet.</div>';
+      return;
+    }
+
+    messages.forEach((msg) => {
+      const msgEl = document.createElement("div");
+      msgEl.className = "dms-message " + (msg.is_mine ? "dms-mine" : "dms-theirs");
+      msgEl.textContent = msg.text;
+      messagesDiv.appendChild(msgEl);
     });
 
-    loadUsers();
+    messagesDiv.scrollTop = messagesDiv.scrollHeight;
+  }
 
-    setInterval(() => {
-      if (selectedUserId) {
-        loadMessages();
-      }
-    }, 3000);
-  </script>
+  messageForm.addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    const text = messageInput.value.trim();
+
+    if (!selectedUserId) {
+      alert("Please select a user first.");
+      return;
+    }
+
+    if (!text) {
+      return;
+    }
+
+    const response = await fetch("/api/messages", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        receiver_id: selectedUserId,
+        text: text
+      })
+    });
+
+    if (response.ok) {
+      messageInput.value = "";
+      await loadMessages();
+    } else {
+      alert("Message failed to send.");
+    }
+  });
+
+  loadUsers();
+
+  setInterval(() => {
+    if (selectedUserId) {
+      loadMessages();
+    }
+  }, 3000);
+</script>
 
 </body>
 </html>

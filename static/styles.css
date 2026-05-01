@@ -1250,4 +1250,18 @@ a:hover, a:active {
     font-size: 16px;
     font-weight: 500;
 }
-/* User search results styling END */
+
+/* DM improvement styling START */
+
+.user.active-user {
+    background-color: #e43d12;
+    color: #faf6c3;
+}
+
+.dms-composer input:disabled,
+.dms-composer button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* DM improvement styling END */
