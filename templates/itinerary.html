@@ -4,7 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Create Itinerary</title>
-    <link rel="stylesheet" href="../static/styles.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 </head>
 <body>
     <div class="navigation-bar">
@@ -26,64 +27,57 @@
             <h2>Plan your trip day by day</h2>
             <p>Enter your trip details, then generate the required number of day sections.</p>
 
-            <div class="itinerary-top-actions">
-    <button type="button" class="btn btn-itinerary-form" id="open-guide-btn">How this form works</button>
-    <button type="button" class="btn btn-itinerary-form" id="save-draft-btn">Save Progress</button>
-    <button type="button" class="btn btn-itinerary-form" id="clear-draft-btn">Clear Saved Draft</button>
-</div>
+            <div id="guide-modal" class="modal-overlay hidden">
+                <div class="modal-box">
+                    <h2>How to use this form</h2>
+                    <ol class="guide-list">
+                        <li>Enter your trip title, name, destination, start date, and end date.</li>
+                        <li>Click <strong>Generate Itinerary Days</strong>.</li>
+                        <li>Fill in each day with activities, dining, cost, transport, accommodation, photo, and captions.</li>
+                        <li>Click <strong>Save Progress</strong> any time to continue later.</li>
+                        <li>When finished, submit the itinerary.</li>
+                    </ol>
+                    <button type="button" class="btn btn-itinerary-form" id="close-guide-btn">Close</button>
+                </div>
+            </div>
 
-<div id="guide-modal" class="modal-overlay hidden">
-    <div class="modal-box">
-        <h2>How to use this form</h2>
-        <ol class="guide-list">
-            <li>Enter your trip title, name, destination, start date, and end date.</li>
-            <li>Click <strong>Generate Itinerary Days</strong>.</li>
-            <li>Fill in each day with activities, dining, cost, transport, accommodation, photo, and captions.</li>
-            <li>Click <strong>Save Progress</strong> any time to continue later.</li>
-            <li>When finished, submit the itinerary.</li>
-        </ol>
-        <button type="button" class="btn btn-itinerary-form" id="close-guide-btn">Close</button>
-    </div>
-</div>
+            <form id="itinerary-form" action="#" method="post" enctype="multipart/form-data">
+                <div id="trip-details-section">
+                    <h2>Trip Details</h2>
 
-<form id="itinerary-form" action="#" method="post" enctype="multipart/form-data">
-    <div id="trip-details-section">
-        <h2>Trip Details</h2>
+                    <label for="trip-title">Itinerary Title</label><br>
+                    <input type="text" id="trip-title" name="trip-title" required><br><br>
 
-        <label for="trip-title">Itinerary Title</label><br>
-        <input type="text" id="trip-title" name="trip-title" required><br><br>
+                    <label for="creator-name">Your Name</label><br>
+                    <input type="text" id="creator-name" name="creator-name" required><br><br>
 
-        <label for="creator-name">Your Name</label><br>
-        <input type="text" id="creator-name" name="creator-name" required><br><br>
+                    <label for="destination">Destination</label><br>
+                    <input type="text" id="destination" name="destination" required><br><br>
 
-        <label for="destination">Destination</label><br>
-        <input type="text" id="destination" name="destination" required><br><br>
+                    <label for="start-date">Start Date</label><br>
+                    <input type="date" id="start-date" name="start-date" required><br><br>
 
-        <label for="start-date">Start Date</label><br>
-        <input type="date" id="start-date" name="start-date" required><br><br>
+                    <label for="end-date">End Date</label><br>
+                    <input type="date" id="end-date" name="end-date" required><br><br>
 
-        <label for="end-date">End Date</label><br>
-        <input type="date" id="end-date" name="end-date" required><br><br>
+                    <button type="button" onclick="generateDays()" class="btn btn-itinerary-form">Generate Itinerary Days</button>
+                </div>
 
-        <button type="button" onclick="generateDays()" class="btn btn-itinerary-form">Generate Itinerary Days</button>
-    </div>
+                <div id="budget-section">
+                    <label for="trip-budget">Trip Budget</label><br>
+                    <input type="number" id="trip-budget" name="trip-budget" min="0" step="0.01" placeholder="Enter your total budget"><br><br>
 
-    <div id="budget-section">
-        <label for="trip-budget">Trip Budget</label><br>
-        <input type="number" id="trip-budget" name="trip-budget" min="0" step="0.01" placeholder="Enter your total budget"><br><br>
+                    <div id="budget-summary" class="budget-summary hidden">
+                        <p><strong>Budget:</strong> $<span id="budget-total">0.00</span></p>
+                        <p><strong>Spent so far:</strong> $<span id="budget-spent">0.00</span></p>
+                        <p><strong>Remaining:</strong> $<span id="budget-remaining">0.00</span></p>
+                    </div><br>
+                </div>
 
-        <div id="budget-summary" class="budget-summary hidden">
-            <p><strong>Budget:</strong> $<span id="budget-total">0.00</span></p>
-            <p><strong>Spent so far:</strong> $<span id="budget-spent">0.00</span></p>
-            <p><strong>Remaining:</strong> $<span id="budget-remaining">0.00</span></p>
-        </div><br>
-    </div>
+                <div id="days-container"></div>
 
-    <div id="days-container"></div>
-
-    <button type="submit" class="btn btn-itinerary-form" id="submit-btn" style="display:none;">Submit Itinerary</button>
-
-</form>
+                <button type="submit" class="btn btn-itinerary-form" id="submit-btn" style="display:none;">Submit Itinerary</button>
+            </form>
         </div>
     </div>
 
@@ -117,411 +111,578 @@
                 const daySection = document.createElement("section");
                 daySection.classList.add("day-section");
 
-                daySection.innerHTML = `
-                    <h2>Day ${i}</h2>
+daySection.innerHTML = `
+    <div class="field-grid" id="field-grid-day${i}">
 
-                    <label>Activities</label><br>
-                    <div class="activity-input-area" id="activity-input-area-day${i}">
-                        <ul class="activity-list" id="activity-list-day${i}"></ul>
-                        <input type="text" class="activity-input" id="activity-input-day${i}" placeholder="Type an activity and press Enter">
-                    </div>
-                    <div class="activity-details-grid" id="activity-details-day${i}"></div><br><br>
+        <div class="itinerary-detail-box" id="tile-activities-day${i}" onclick="expandField('activities', ${i})">
+            <div class="detail-icon-panel">
+                <i class="fa-solid fa-camera"></i>
+            </div>
+            <div class="detail-content">
+                <div class="tile-preview" id="preview-activities-day${i}"></div>
+            </div>
+        </div>
 
-                    <label>Dining</label><br>
-                    <div class="activity-input-area" id="dining-input-area-day${i}">
-                        <ul class="activity-list" id="dining-list-day${i}"></ul>
-                        <input type="text" class="activity-input" id="dining-input-day${i}" placeholder="Type a restaurant and press Enter">
-                    </div>
-                    <div class="activity-details-grid" id="dining-details-day${i}"></div><br><br>
+        <div class="itinerary-detail-box" id="tile-dining-day${i}" onclick="expandField('dining', ${i})">
+            <div class="detail-icon-panel">
+                <i class="fa-solid fa-utensils"></i>
+            </div>
+            <div class="detail-content">
+            <div class="tile-preview" id="preview-dining-day${i}"></div>
+            </div>
+        </div>
+        <div class="itinerary-detail-box" id="tile-transport-day${i}" onclick="expandField('transport', ${i})">
+             <div class="detail-icon-panel">
+            <i class="fa-solid fa-car"></i>
+            </div>
+            <div class="detail-content">
+            <div class="tile-preview" id="preview-transport-day${i}"></div>
+             </div>
+        </div>
+        <div class="itinerary-detail-box" id="tile-accommodation-day${i}" onclick="expandField('accommodation', ${i})">
+            <div class="detail-icon-panel">
+            <i class="fa-solid fa-bed"></i>
+            </div>
+            <div class="detail-content">
+            <div class="tile-preview" id="preview-accommodation-day${i}"></div>
+            </div>
+        </div>
+        <div class="itinerary-detail-box" id="tile-cost-day${i}" onclick="expandField('cost', ${i})">
+            <div class="detail-icon-panel">
+            <i class="fa-solid fa-dollar-sign"></i>
+            </div>
+            <div class="detail-content">
+            <div class="tile-preview" id="preview-cost-day${i}"></div>
+            </div>
+        </div>
+        <div class="itinerary-detail-box" id="tile-rented-day${i}" onclick="expandField('rented', ${i})">
+            <div class="detail-icon-panel">
+            <i class="fa-solid fa-person-skiing"></i>
+            </div>
+            <div class="detail-content">
+            <div class="tile-preview" id="preview-rented-day${i}"></div>
+            </div>
+        </div>
+        <div class="itinerary-detail-box" id="tile-photo-day${i}" onclick="expandField('photo', ${i})">
+            <div class="detail-icon-panel">
+            <i class="fa-solid fa-image"></i>
+            </div>
+            <div class="detail-content">
+            <div class="tile-preview" id="preview-photo-day${i}"></div>
+            </div>
+        </div>
+    </div>
 
-                    <label for="cost-day${i}">Total Cost</label><br>
-                    <input type="number" id="cost-day${i}" name="cost-day${i}" min="0" step="0.01" required><br><br>
+<div class="field-expanded hidden" id="expanded-day${i}">
+    <div class="field-expanded-header">
+        <button type="button" class="exit-field-btn" onclick="exitField(${i})">Exit field</button>
+        <div>
+            <button type="button" class="btn btn-itinerary-form" onclick="saveDraft()">Save Progress</button>
+            <button type="button" class="btn btn-itinerary-form" onclick="localStorage.removeItem('itineraryDraft'); alert('Draft cleared.')">Clear Draft</button>
+        </div>
+    </div>
+    <div class="expanded-content" id="expanded-content-day${i}"></div>
+</div>
 
-                    <label for="rented-items-day${i}">Rented Items</label><br>
-                    <input type="text" id="rented-items-day${i}" name="rented-items-day${i}"><br><br>
 
-                <label>Transport Taken</label><br>
-                <div class="checkbox-group">
-                    <label><input type="checkbox" id="transport-day${i}-car" name="transport-day${i}" value="Rented a car"> Rented a car</label>
-                    <label><input type="checkbox" id="transport-day${i}-taxi" name="transport-day${i}" value="Taxi"> Taxi</label>
-                    <label><input type="checkbox" id="transport-day${i}-rideshare" name="transport-day${i}" value="Rideshare (Uber, Gojek, Didi)"> Rideshare (Uber, Gojek, Didi)</label>
-                    <label><input type="checkbox" id="transport-day${i}-bus" name="transport-day${i}" value="Bus"> Bus</label>
-                    <label><input type="checkbox" id="transport-day${i}-train" name="transport-day${i}" value="Train"> Train</label>
-                    <label><input type="checkbox" id="transport-day${i}-tram" name="transport-day${i}" value="Tram"> Tram</label>
-                    <label><input type="checkbox" id="transport-day${i}-metro" name="transport-day${i}" value="Subway/Metro"> Subway/Metro</label>
-                    <label><input type="checkbox" id="transport-day${i}-ferry" name="transport-day${i}" value="Ferry/Boat"> Ferry/Boat</label>
-                    <label><input type="checkbox" id="transport-day${i}-flight" name="transport-day${i}" value="Domestic flight"> Domestic flight</label>
-                    <label><input type="checkbox" id="transport-day${i}-tuktuk" name="transport-day${i}" value="Tuk tuk"> Tuk tuk</label>
-                    <label><input type="checkbox" id="transport-day${i}-scooter" name="transport-day${i}" value="Rented a motorbike/scooter"> Rented a motorbike/scooter</label>
-                    <label><input type="checkbox" id="transport-day${i}-other" name="transport-day${i}" value="Other"> Other</label>
-                </div><br>
 
-                    <label for="accommodation-day${i}">Accommodation (Optional)</label><br>
-                    <input type="text" id="accommodation-day${i}" name="accommodation-day${i}"><br><br>
-
-                    <label for="photos-day${i}">Upload Photo</label><br>
-                    <label for="photos-day${i}" class="btn btn-itinerary-form">Choose File</label>
-                    <input type="file" id="photos-day${i}" name="photos-day${i}" accept="image/*" class="file-input">
-                    <span id="file-name-day${i}" class="file-name">No file chosen</span><br><br>
-
-                    <label for="caption-day${i}">Photo Caption</label><br>
-                    <textarea id="caption-day${i}" name="caption-day${i}" rows="3"></textarea><br><br>
-                `;
+    <div class="field-forms hidden" id="forms-day${i}">
+        <div id="form-activities-day${i}">
+            <div class="activity-input-area" id="activity-input-area-day${i}">
+                <ul class="activity-list" id="activity-list-day${i}"></ul>
+                <input type="text" class="activity-input" id="activity-input-day${i}" placeholder="Type an activity and press Enter">
+            </div>
+            <div class="activity-details-grid" id="activity-details-day${i}"></div>
+        </div>
+        <div id="form-dining-day${i}">
+            <div class="activity-input-area" id="dining-input-area-day${i}">
+                <ul class="activity-list" id="dining-list-day${i}"></ul>
+                <input type="text" class="activity-input" id="dining-input-day${i}" placeholder="Type a restaurant and press Enter">
+            </div>
+            <div class="activity-details-grid" id="dining-details-day${i}"></div>
+        </div>
+        <div id="form-transport-day${i}">
+            <div class="checkbox-group">
+                <label><input type="checkbox" name="transport-day${i}" value="Rented a car"> Rented a car</label>
+                <label><input type="checkbox" name="transport-day${i}" value="Taxi"> Taxi</label>
+                <label><input type="checkbox" name="transport-day${i}" value="Rideshare (Uber, Gojek, Didi)"> Rideshare (Uber, Gojek, Didi)</label>
+                <label><input type="checkbox" name="transport-day${i}" value="Bus"> Bus</label>
+                <label><input type="checkbox" name="transport-day${i}" value="Train"> Train</label>
+                <label><input type="checkbox" name="transport-day${i}" value="Tram"> Tram</label>
+                <label><input type="checkbox" name="transport-day${i}" value="Subway/Metro"> Subway/Metro</label>
+                <label><input type="checkbox" name="transport-day${i}" value="Ferry/Boat"> Ferry/Boat</label>
+                <label><input type="checkbox" name="transport-day${i}" value="Domestic flight"> Domestic flight</label>
+                <label><input type="checkbox" name="transport-day${i}" value="Tuk tuk"> Tuk tuk</label>
+                <label><input type="checkbox" name="transport-day${i}" value="Rented a motorbike/scooter"> Rented a motorbike/scooter</label>
+                <label><input type="checkbox" name="transport-day${i}" value="Other"> Other</label>
+            </div>
+        </div>
+        <div id="form-accommodation-day${i}">
+            <input type="text" id="accommodation-day${i}" name="accommodation-day${i}" placeholder="Enter accommodation name and address">
+        </div>
+        <div id="form-cost-day${i}">
+            <input type="number" id="cost-day${i}" name="cost-day${i}" min="0" step="0.01" placeholder="Enter total cost for the day">
+        </div>
+        <div id="form-rented-day${i}">
+            <input type="text" id="rented-items-day${i}" name="rented-items-day${i}" placeholder="Enter any rented items">
+        </div>
+        <div id="form-photo-day${i}">
+            <label for="photos-day${i}" class="btn btn-itinerary-form">Choose File</label>
+            <input type="file" id="photos-day${i}" name="photos-day${i}" accept="image/*" class="file-input">
+            <span id="file-name-day${i}" class="file-name">No file chosen</span><br><br>
+            <textarea id="caption-day${i}" name="caption-day${i}" rows="3" placeholder="Enter a caption for your photo"></textarea>
+        </div>
+    </div>
+`;
 
                 daysContainer.appendChild(daySection);
 
-            const fileInput = daySection.querySelector(`#photos-day${i}`);
-            const fileName = daySection.querySelector(`#file-name-day${i}`);
+                const fileInput = daySection.querySelector(`#photos-day${i}`);
+                const fileName = daySection.querySelector(`#file-name-day${i}`);
 
-            fileInput.addEventListener("change", function () {
-            if (this.files.length > 0) {
-                fileName.textContent = this.files[0].name;
-            } else {
-             fileName.textContent = "No file chosen";
+                fileInput.addEventListener("change", function () {
+                    if (this.files.length > 0) {
+                        fileName.textContent = this.files[0].name;
+                    } else {
+                        fileName.textContent = "No file chosen";
+                    }
+                    saveDraft();
+                });
+
+                setupActivityInput(i);
+                setupDiningInput(i);
+                setupAutoSaveForGeneratedFields();
             }
-            saveDraft();
+
+            totalDays = dayCount;
+
+            const navBar = document.createElement('div');
+            navBar.classList.add('day-nav-bar');
+            navBar.id = 'day-nav-bar';
+
+            for (let j = 1; j <= dayCount; j++) {
+                const btn = document.createElement('button');
+                btn.type = 'button';
+                btn.classList.add('day-nav-btn');
+                btn.textContent = j;
+                btn.onclick = () => showDay(j);
+                navBar.appendChild(btn);
+            }
+
+        daysContainer.insertBefore(navBar, daysContainer.firstChild);
+        showDay(1);
+
+        // only show submit on last day
+        document.getElementById("submit-btn").style.display = "none";
+        }
+
+        function setupActivityInput(dayNum) {
+            const input = document.getElementById(`activity-input-day${dayNum}`);
+            const list = document.getElementById(`activity-list-day${dayNum}`);
+            const grid = document.getElementById(`activity-details-day${dayNum}`);
+            let activityCount = 0;
+
+            input.addEventListener("keydown", function(e) {
+                if (e.key === "Enter") {
+                    e.preventDefault();
+                    const value = this.value.trim();
+                    if (value === "") return;
+
+                    activityCount++;
+                    const id = `detail-day${dayNum}-act${activityCount}`;
+
+                    const li = document.createElement("li");
+                    li.innerHTML = `${value} <span class="remove-activity" onclick="removeActivity('${id}', this); saveDraft();">✕</span>`;
+                    list.appendChild(li);
+
+                    const box = document.createElement("div");
+                    box.classList.add("activity-detail-box");
+                    box.id = id;
+                    box.innerHTML = `
+                        <p class="activity-detail-title">${value}</p>
+                        <textarea id="${id}-textarea" placeholder="Enter details for ${value}..." rows="3"></textarea>
+                    `;
+                    grid.appendChild(box);
+
+                    box.querySelector("textarea").addEventListener("input", saveDraft);
+
+                    this.value = "";
+                    saveDraft();
+                }
             });
-            setupActivityInput(i);
-            setupDiningInput(i);
-            setupAutoSaveForGeneratedFields();
-            }
-        document.getElementById("submit-btn").style.display = "block";
         }
-    function setupActivityInput(dayNum) {
-    const input = document.getElementById(`activity-input-day${dayNum}`);
-    const list = document.getElementById(`activity-list-day${dayNum}`);
-    const grid = document.getElementById(`activity-details-day${dayNum}`);
-    let activityCount = 0;
 
-    input.addEventListener("keydown", function(e) {
-        if (e.key === "Enter") {
-            e.preventDefault();
-            const value = this.value.trim();
-            if (value === "") return;
-
-            activityCount++;
-            const id = `detail-day${dayNum}-act${activityCount}`;
-
-            const li = document.createElement("li");
-            li.innerHTML = `${value} <span class="remove-activity" onclick="removeActivity('${id}', this); saveDraft();">✕</span>`;
-            list.appendChild(li);
-
-            const box = document.createElement("div");
-            box.classList.add("activity-detail-box");
-            box.id = id;
-            box.innerHTML = `
-                <p class="activity-detail-title">${value}</p>
-                <textarea id="${id}-textarea" placeholder="Enter details for ${value}..." rows="3"></textarea>
-            `;
-            grid.appendChild(box);
-
-            box.querySelector("textarea").addEventListener("input", saveDraft);
-
-            this.value = "";
-            saveDraft();
+        function removeActivity(boxId, span) {
+            document.getElementById(boxId).remove();
+            span.parentElement.remove();
         }
-    });
+
+        function setupDiningInput(dayNum) {
+            const input = document.getElementById(`dining-input-day${dayNum}`);
+            const list = document.getElementById(`dining-list-day${dayNum}`);
+            const grid = document.getElementById(`dining-details-day${dayNum}`);
+            let diningCount = 0;
+
+            input.addEventListener("keydown", function(e) {
+                if (e.key === "Enter") {
+                    e.preventDefault();
+                    const value = this.value.trim();
+                    if (value === "") return;
+
+                    diningCount++;
+                    const id = `dining-detail-day${dayNum}-item${diningCount}`;
+
+                    const li = document.createElement("li");
+                    li.innerHTML = `${value} <span class="remove-activity" onclick="removeActivity('${id}', this); saveDraft();">✕</span>`;
+                    list.appendChild(li);
+
+                    const box = document.createElement("div");
+                    box.classList.add("activity-detail-box");
+                    box.id = id;
+                    box.innerHTML = `
+                        <p class="activity-detail-title">${value}</p>
+                        <textarea id="${id}-textarea" placeholder="Enter details for ${value}..." rows="3"></textarea>
+                    `;
+                    grid.appendChild(box);
+
+                    box.querySelector("textarea").addEventListener("input", saveDraft);
+
+                    this.value = "";
+                    saveDraft();
+                }
+            });
+        }
+
+        function expandField(field, dayNum) {
+    const grid = document.getElementById(`field-grid-day${dayNum}`);
+    const expanded = document.getElementById(`expanded-day${dayNum}`);
+    const content = document.getElementById(`expanded-content-day${dayNum}`);
+    const formContent = document.getElementById(`form-${field}-day${dayNum}`);
+
+    grid.classList.add('hidden');
+    expanded.classList.remove('hidden');
+
+    content.innerHTML = '';
+    content.appendChild(formContent.cloneNode(true));
+
+    // re-attach event listeners for activity/dining inputs
+    if (field === 'activities') setupActivityInput(dayNum);
+    if (field === 'dining') setupDiningInput(dayNum);
+
+    expanded.dataset.currentField = field;
 }
 
-    function removeActivity(boxId, span) {
-        document.getElementById(boxId).remove();
-        span.parentElement.remove();
+function exitField(dayNum) {
+    const grid = document.getElementById(`field-grid-day${dayNum}`);
+    const expanded = document.getElementById(`expanded-day${dayNum}`);
+    const field = expanded.dataset.currentField;
+
+    updateTilePreview(field, dayNum);
+
+    grid.classList.remove('hidden');
+    expanded.classList.add('hidden');
+    saveDraft();
+}
+
+function updateTilePreview(field, dayNum) {
+    const preview = document.getElementById(`preview-${field}-day${dayNum}`);
+    preview.innerHTML = '';
+
+    if (field === 'activities') {
+        const items = document.querySelectorAll(`#activity-list-day${dayNum} li`);
+        items.forEach(item => {
+            const p = document.createElement('p');
+            p.textContent = item.textContent.replace('✕', '').trim();
+            preview.appendChild(p);
+        });
+    } else if (field === 'dining') {
+        const items = document.querySelectorAll(`#dining-list-day${dayNum} li`);
+        items.forEach(item => {
+            const p = document.createElement('p');
+            p.textContent = item.textContent.replace('✕', '').trim();
+            preview.appendChild(p);
+        });
+    } else if (field === 'transport') {
+        const checked = document.querySelectorAll(`input[name="transport-day${dayNum}"]:checked`);
+        checked.forEach(cb => {
+            const p = document.createElement('p');
+            p.textContent = cb.value;
+            preview.appendChild(p);
+        });
+    } else if (field === 'accommodation') {
+        const val = document.getElementById(`accommodation-day${dayNum}`)?.value.trim();
+        if (val) preview.innerHTML = `<p>${val}</p>`;
+    } else if (field === 'cost') {
+        const val = document.getElementById(`cost-day${dayNum}`)?.value.trim();
+        if (val) preview.innerHTML = `<p>$${val}</p>`;
+    } else if (field === 'rented') {
+        const val = document.getElementById(`rented-items-day${dayNum}`)?.value.trim();
+        if (val) preview.innerHTML = `<p>${val}</p>`;
+    } else if (field === 'photo') {
+        const val = document.getElementById(`file-name-day${dayNum}`)?.textContent;
+        if (val && val !== 'No file chosen') preview.innerHTML = `<p>${val}</p>`;
     }
-
-function setupDiningInput(dayNum) {
-    const input = document.getElementById(`dining-input-day${dayNum}`);
-    const list = document.getElementById(`dining-list-day${dayNum}`);
-    const grid = document.getElementById(`dining-details-day${dayNum}`);
-    let diningCount = 0;
-
-    input.addEventListener("keydown", function(e) {
-        if (e.key === "Enter") {
-            e.preventDefault();
-            const value = this.value.trim();
-            if (value === "") return;
-
-            diningCount++;
-            const id = `dining-detail-day${dayNum}-item${diningCount}`;
-
-            const li = document.createElement("li");
-            li.innerHTML = `${value} <span class="remove-activity" onclick="removeActivity('${id}', this); saveDraft();">✕</span>`;
-            list.appendChild(li);
-
-            const box = document.createElement("div");
-            box.classList.add("activity-detail-box");
-            box.id = id;
-            box.innerHTML = `
-                <p class="activity-detail-title">${value}</p>
-                <textarea id="${id}-textarea" placeholder="Enter details for ${value}..." rows="3"></textarea>
-            `;
-            grid.appendChild(box);
-
-            box.querySelector("textarea").addEventListener("input", saveDraft);
-
-            this.value = "";
-            saveDraft();
-        }
-    });
 }
-
     </script>
+
     <script>
-const STORAGE_KEY = "itineraryDraft";
+        const STORAGE_KEY = "itineraryDraft";
 
-document.addEventListener("DOMContentLoaded", function () {
-    setupGuideModal();
-    setupDraftButtons();
-    restoreDraft();
-    setupAutoSaveForTripDetails();
-});
+        document.addEventListener("DOMContentLoaded", function () {
+            setupGuideModal();
+            setupDraftButtons();
+            restoreDraft();
+            setupAutoSaveForTripDetails();
+        });
 
-function setupGuideModal() {
-    const openBtn = document.getElementById("open-guide-btn");
-    const closeBtn = document.getElementById("close-guide-btn");
-    const modal = document.getElementById("guide-modal");
+        function setupGuideModal() {
+            const closeBtn = document.getElementById("close-guide-btn");
+            const modal = document.getElementById("guide-modal");
 
-    openBtn.addEventListener("click", function () {
-        modal.classList.remove("hidden");
-    });
+            closeBtn.addEventListener("click", function () {
+                modal.classList.add("hidden");
+            });
 
-    closeBtn.addEventListener("click", function () {
-        modal.classList.add("hidden");
-    });
-
-    modal.addEventListener("click", function (e) {
-        if (e.target === modal) {
-            modal.classList.add("hidden");
+            modal.addEventListener("click", function (e) {
+                if (e.target === modal) {
+                    modal.classList.add("hidden");
+                }
+            });
         }
-    });
-}
 
-function setupDraftButtons() {
-    document.getElementById("save-draft-btn").addEventListener("click", saveDraft);
+        function setupDraftButtons() {
+            // buttons now live in the day headers, nothing needed here
+        }
 
-    document.getElementById("clear-draft-btn").addEventListener("click", function () {
-        localStorage.removeItem(STORAGE_KEY);
-        alert("Saved draft cleared.");
-    });
-}
+        function setupAutoSaveForTripDetails() {
+            const tripFieldIds = [
+                "trip-title",
+                "creator-name",
+                "destination",
+                "trip-budget",
+                "start-date",
+                "end-date"
+            ];
 
-function setupAutoSaveForTripDetails() {
-    const tripFieldIds = [
-        "trip-title",
-        "creator-name",
-        "destination",
-        "trip-budget",
-        "start-date",
-        "end-date"
-    ];
+            tripFieldIds.forEach(id => {
+                const field = document.getElementById(id);
+                if (field) {
+                    field.addEventListener("input", function () {
+                        saveDraft();
+                        updateBudgetSummary();
+                    });
+                    field.addEventListener("change", function () {
+                        saveDraft();
+                        updateBudgetSummary();
+                    });
+                }
+            });
+        }
 
-    tripFieldIds.forEach(id => {
-        const field = document.getElementById(id);
-        if (field) {
-            field.addEventListener("input", function () {
-                saveDraft();
+        function collectDraftData() {
+            const draft = {
+                tripTitle: document.getElementById("trip-title").value,
+                creatorName: document.getElementById("creator-name").value,
+                destination: document.getElementById("destination").value,
+                tripBudget: document.getElementById("trip-budget").value,
+                startDate: document.getElementById("start-date").value,
+                endDate: document.getElementById("end-date").value,
+                tripDetailsHidden: document.getElementById("trip-details-section").style.display === "none",
+                submitVisible: document.getElementById("submit-btn").style.display === "block",
+                days: []
+            };
+
+            const daySections = document.querySelectorAll(".day-section");
+
+            daySections.forEach((section, index) => {
+                const dayNum = index + 1;
+
+                const transports = [];
+                document.querySelectorAll(`input[name="transport-day${dayNum}"]:checked`).forEach(cb => {
+                    transports.push(cb.value);
+                });
+
+                const activityDetails = [];
+                document.querySelectorAll(`#activity-details-day${dayNum} .activity-detail-box`).forEach(box => {
+                    const title = box.querySelector(".activity-detail-title").textContent.trim();
+                    const textarea = box.querySelector("textarea");
+                    activityDetails.push({ title: title, text: textarea ? textarea.value : "" });
+                });
+
+                const diningDetails = [];
+                document.querySelectorAll(`#dining-details-day${dayNum} .activity-detail-box`).forEach(box => {
+                    const title = box.querySelector(".activity-detail-title").textContent.trim();
+                    const textarea = box.querySelector("textarea");
+                    diningDetails.push({ title: title, text: textarea ? textarea.value : "" });
+                });
+
+                draft.days.push({
+                    cost: document.getElementById(`cost-day${dayNum}`)?.value || "",
+                    rentedItems: document.getElementById(`rented-items-day${dayNum}`)?.value || "",
+                    accommodation: document.getElementById(`accommodation-day${dayNum}`)?.value || "",
+                    caption: document.getElementById(`caption-day${dayNum}`)?.value || "",
+                    fileName: document.getElementById(`file-name-day${dayNum}`)?.textContent || "No file chosen",
+                    transports: transports,
+                    activityDetails: activityDetails,
+                    diningDetails: diningDetails
+                });
+            });
+
+            return draft;
+        }
+
+        function saveDraft() {
+            const draft = collectDraftData();
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(draft));
+        }
+
+        function restoreDraft() {
+            const saved = localStorage.getItem(STORAGE_KEY);
+            if (!saved) return;
+
+            const draft = JSON.parse(saved);
+
+            document.getElementById("trip-title").value = draft.tripTitle || "";
+            document.getElementById("creator-name").value = draft.creatorName || "";
+            document.getElementById("destination").value = draft.destination || "";
+            document.getElementById("trip-budget").value = draft.tripBudget || "";
+            document.getElementById("start-date").value = draft.startDate || "";
+            document.getElementById("end-date").value = draft.endDate || "";
+
+            if (draft.startDate && draft.endDate && draft.days && draft.days.length > 0) {
+                generateDays();
+
+                if (draft.tripDetailsHidden) {
+                    document.getElementById("trip-details-section").style.display = "none";
+                }
+                if (draft.submitVisible) {
+                    document.getElementById("submit-btn").style.display = "block";
+                }
+
+                draft.days.forEach((day, index) => {
+                    const dayNum = index + 1;
+                    const costField = document.getElementById(`cost-day${dayNum}`);
+                    const rentedField = document.getElementById(`rented-items-day${dayNum}`);
+                    const accommodationField = document.getElementById(`accommodation-day${dayNum}`);
+                    const captionField = document.getElementById(`caption-day${dayNum}`);
+                    const fileNameField = document.getElementById(`file-name-day${dayNum}`);
+
+                    if (costField) costField.value = day.cost || "";
+                    if (rentedField) rentedField.value = day.rentedItems || "";
+                    if (accommodationField) accommodationField.value = day.accommodation || "";
+                    if (captionField) captionField.value = day.caption || "";
+                    if (fileNameField) fileNameField.textContent = day.fileName || "No file chosen";
+
+                    (day.transports || []).forEach(value => {
+                        const checkbox = Array.from(document.querySelectorAll(`input[name="transport-day${dayNum}"]`))
+                            .find(cb => cb.value === value);
+                        if (checkbox) checkbox.checked = true;
+                    });
+
+                    restoreDynamicList(dayNum, "activity", day.activityDetails || []);
+                    restoreDynamicList(dayNum, "dining", day.diningDetails || []);
+                });
+
+                setupAutoSaveForGeneratedFields();
                 updateBudgetSummary();
-        });
-
-            field.addEventListener("change", function () {
-                saveDraft();
-                updateBudgetSummary();
-        });
+            }
         }
+
+        function restoreDynamicList(dayNum, type, items) {
+            const list = document.getElementById(`${type}-list-day${dayNum}`);
+            const grid = document.getElementById(`${type}-details-day${dayNum}`);
+            if (!list || !grid) return;
+
+            grid.innerHTML = "";
+            list.innerHTML = "";
+
+            items.forEach((item, index) => {
+                const id = `${type}-detail-day${dayNum}-restored${index + 1}`;
+                const li = document.createElement("li");
+                li.innerHTML = `${item.title} <span class="remove-activity" onclick="removeActivity('${id}', this); saveDraft();">✕</span>`;
+                list.appendChild(li);
+
+                const box = document.createElement("div");
+                box.classList.add("activity-detail-box");
+                box.id = id;
+                box.innerHTML = `
+                    <p class="activity-detail-title">${item.title}</p>
+                    <textarea rows="3">${item.text || ""}</textarea>
+                `;
+                grid.appendChild(box);
+                box.querySelector("textarea").addEventListener("input", saveDraft);
+            });
+        }
+
+        function setupAutoSaveForGeneratedFields() {
+            document.querySelectorAll("#days-container input, #days-container textarea").forEach(field => {
+                field.addEventListener("input", function () {
+                    saveDraft();
+                    updateBudgetSummary();
+                });
+                field.addEventListener("change", function () {
+                    saveDraft();
+                    updateBudgetSummary();
+                });
+            });
+        }
+
+        function updateBudgetSummary() {
+            const budgetInput = document.getElementById("trip-budget");
+            const summaryBox = document.getElementById("budget-summary");
+            const totalEl = document.getElementById("budget-total");
+            const spentEl = document.getElementById("budget-spent");
+            const remainingEl = document.getElementById("budget-remaining");
+
+            if (!budgetInput || !summaryBox) return;
+
+            const totalBudget = parseFloat(budgetInput.value) || 0;
+            let spent = 0;
+
+            document.querySelectorAll('[id^="cost-day"]').forEach(input => {
+                spent += parseFloat(input.value) || 0;
+            });
+
+            const remaining = totalBudget - spent;
+
+            if (totalBudget > 0) {
+                summaryBox.classList.remove("hidden");
+            } else {
+                summaryBox.classList.add("hidden");
+            }
+
+            totalEl.textContent = totalBudget.toFixed(2);
+            spentEl.textContent = spent.toFixed(2);
+            remainingEl.textContent = remaining.toFixed(2);
+
+            if (remaining < 0) {
+                remainingEl.style.color = "red";
+            } else {
+                remainingEl.style.color = "";
+            }
+        }
+
+        let currentDay = 1;
+        let totalDays = 0;
+
+        function showDay(dayNum) {
+    document.querySelectorAll('.day-section').forEach((section, index) => {
+        section.style.display = index + 1 === dayNum ? 'block' : 'none';
     });
-}
+    currentDay = dayNum;
+    updateDayNav();
 
-function collectDraftData() {
-    const draft = {
-        tripTitle: document.getElementById("trip-title").value,
-        creatorName: document.getElementById("creator-name").value,
-        destination: document.getElementById("destination").value,
-        tripBudget: document.getElementById("trip-budget").value,
-        startDate: document.getElementById("start-date").value,
-        endDate: document.getElementById("end-date").value,
-        tripDetailsHidden: document.getElementById("trip-details-section").style.display === "none",
-        submitVisible: document.getElementById("submit-btn").style.display === "block",
-        days: []
-    };
-
-    const daySections = document.querySelectorAll(".day-section");
-
-    daySections.forEach((section, index) => {
-        const dayNum = index + 1;
-
-        const transports = [];
-        document.querySelectorAll(`input[name="transport-day${dayNum}"]:checked`).forEach(cb => {
-            transports.push(cb.value);
-        });
-
-        const activityDetails = [];
-        document.querySelectorAll(`#activity-details-day${dayNum} .activity-detail-box`).forEach(box => {
-            const title = box.querySelector(".activity-detail-title").textContent.trim();
-            const textarea = box.querySelector("textarea");
-            activityDetails.push({
-                title: title,
-                text: textarea ? textarea.value : ""
-            });
-        });
-
-        const diningDetails = [];
-        document.querySelectorAll(`#dining-details-day${dayNum} .activity-detail-box`).forEach(box => {
-            const title = box.querySelector(".activity-detail-title").textContent.trim();
-            const textarea = box.querySelector("textarea");
-            diningDetails.push({
-                title: title,
-                text: textarea ? textarea.value : ""
-            });
-        });
-
-        draft.days.push({
-            cost: document.getElementById(`cost-day${dayNum}`)?.value || "",
-            rentedItems: document.getElementById(`rented-items-day${dayNum}`)?.value || "",
-            accommodation: document.getElementById(`accommodation-day${dayNum}`)?.value || "",
-            caption: document.getElementById(`caption-day${dayNum}`)?.value || "",
-            fileName: document.getElementById(`file-name-day${dayNum}`)?.textContent || "No file chosen",
-            transports: transports,
-            activityDetails: activityDetails,
-            diningDetails: diningDetails
-        });
-    });
-
-    return draft;
-}
-
-function saveDraft() {
-    const draft = collectDraftData();
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(draft));
-}
-
-function restoreDraft() {
-    const saved = localStorage.getItem(STORAGE_KEY);
-    if (!saved) return;
-
-    const draft = JSON.parse(saved);
-
-    document.getElementById("trip-title").value = draft.tripTitle || "";
-    document.getElementById("creator-name").value = draft.creatorName || "";
-    document.getElementById("destination").value = draft.destination || "";
-    document.getElementById("trip-budget").value = draft.tripBudget || "";
-    document.getElementById("start-date").value = draft.startDate || "";
-    document.getElementById("end-date").value = draft.endDate || "";
-
-    if (draft.startDate && draft.endDate && draft.days && draft.days.length > 0) {
-        generateDays();
-
-        if (draft.tripDetailsHidden) {
-            document.getElementById("trip-details-section").style.display = "none";
-        }
-
-        if (draft.submitVisible) {
-            document.getElementById("submit-btn").style.display = "block";
-        }
-
-        draft.days.forEach((day, index) => {
-            const dayNum = index + 1;
-
-            const costField = document.getElementById(`cost-day${dayNum}`);
-            const rentedField = document.getElementById(`rented-items-day${dayNum}`);
-            const accommodationField = document.getElementById(`accommodation-day${dayNum}`);
-            const captionField = document.getElementById(`caption-day${dayNum}`);
-            const fileNameField = document.getElementById(`file-name-day${dayNum}`);
-
-            if (costField) costField.value = day.cost || "";
-            if (rentedField) rentedField.value = day.rentedItems || "";
-            if (accommodationField) accommodationField.value = day.accommodation || "";
-            if (captionField) captionField.value = day.caption || "";
-            if (fileNameField) fileNameField.textContent = day.fileName || "No file chosen";
-
-            (day.transports || []).forEach(value => {
-                const checkbox = Array.from(document.querySelectorAll(`input[name="transport-day${dayNum}"]`))
-                    .find(cb => cb.value === value);
-                if (checkbox) checkbox.checked = true;
-            });
-
-            restoreDynamicList(dayNum, "activity", day.activityDetails || []);
-            restoreDynamicList(dayNum, "dining", day.diningDetails || []);
-        });
-
-        setupAutoSaveForGeneratedFields();
-        updateBudgetSummary();
+    const submitBtn = document.getElementById("submit-btn");
+    if (submitBtn) {
+        submitBtn.style.display = dayNum === totalDays ? 'block' : 'none';
     }
 }
 
-function restoreDynamicList(dayNum, type, items) {
-    const list = document.getElementById(`${type}-list-day${dayNum}`);
-    const grid = document.getElementById(`${type}-details-day${dayNum}`);
-    if (!list || !grid) return;
-
-    grid.innerHTML = "";
-    list.innerHTML = "";
-
-    items.forEach((item, index) => {
-        const id = `${type}-detail-day${dayNum}-restored${index + 1}`;
-
-        const li = document.createElement("li");
-        li.innerHTML = `${item.title} <span class="remove-activity" onclick="removeActivity('${id}', this); saveDraft();">✕</span>`;
-        list.appendChild(li);
-
-        const box = document.createElement("div");
-box.classList.add("activity-detail-box");
-box.id = id;
-box.innerHTML = `
-    <p class="activity-detail-title">${item.title}</p>
-    <textarea rows="3">${item.text || ""}</textarea>
-`;
-grid.appendChild(box);
-
-box.querySelector("textarea").addEventListener("input", saveDraft);
-    });
-}
-
-function setupAutoSaveForGeneratedFields() {
-    document.querySelectorAll("#days-container input, #days-container textarea").forEach(field => {
-        field.addEventListener("input", function () {
-            saveDraft();
-            updateBudgetSummary();
-        });
-
-        field.addEventListener("change", function () {
-            saveDraft();
-            updateBudgetSummary();
-        });
-    });
-}
-function updateBudgetSummary() {
-    const budgetInput = document.getElementById("trip-budget");
-    const summaryBox = document.getElementById("budget-summary");
-    const totalEl = document.getElementById("budget-total");
-    const spentEl = document.getElementById("budget-spent");
-    const remainingEl = document.getElementById("budget-remaining");
-
-    if (!budgetInput || !summaryBox) return;
-
-    const totalBudget = parseFloat(budgetInput.value) || 0;
-    let spent = 0;
-
-    document.querySelectorAll('[id^="cost-day"]').forEach(input => {
-        spent += parseFloat(input.value) || 0;
-    });
-
-    const remaining = totalBudget - spent;
-
-    if (totalBudget > 0) {
-        summaryBox.classList.remove("hidden");
-    } else {
-        summaryBox.classList.add("hidden");
-    }
-
-    totalEl.textContent = totalBudget.toFixed(2);
-    spentEl.textContent = spent.toFixed(2);
-    remainingEl.textContent = remaining.toFixed(2);
-
-    if (remaining < 0) {
-        remainingEl.style.color = "red";
-    } else {
-        remainingEl.style.color = "";
-    }
-}
-</script>
+        function updateDayNav() {
+            document.querySelectorAll('.day-nav-btn').forEach((btn, index) => {
+                btn.classList.toggle('active', index + 1 === currentDay);
+            });
+        }
+    </script>
 </body>
 </html>
