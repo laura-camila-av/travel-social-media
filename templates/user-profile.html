@@ -13,18 +13,9 @@
 </head>
 
 <body>
-<!--Navigation bar-->
-<div class="navigation-bar">
-    <ul>
-        <li><a href="{{ url_for('user_profile') }}">Your Profile</a></li>
-        <li><a href="{{ url_for('itinerary_create') }}">Create Itinerary</a></li>
-        <li><a href="{{ url_for('dms') }}">Messages</a></li>
-        <li><a href="{{ url_for('feed') }}">Feed</a></li>
-        <li><a href="{{ url_for('search') }}">Search</a></li>
-        <li><a href="#">Notifications</a></li>
-        <li><a href="#" id="logoutLink">Log Out</a></li>
-    </ul>
-</div>
+
+    <!--Navigation bar-->
+    {% include 'navbar.html' %}
 
 <!-- Website Title -->
 <div class="page-wrapper">
@@ -162,34 +153,5 @@
         }
     }
 </script>
-
-<div id="logoutModal" class="modal hidden">
-  <div class="modal-box">
-    <p>Are you sure you want to log out?</p>
-    <button type="button" onclick="confirmLogout()">Yes</button>
-    <button type="button" onclick="closeModal()">Cancel</button>
-  </div>
-</div>
-
-<script>
-document.addEventListener("DOMContentLoaded", function () {
-    const logoutLink = document.getElementById("logoutLink");
-    const logoutModal = document.getElementById("logoutModal");
-
-    logoutLink.addEventListener("click", function (e) {
-        e.preventDefault();
-        logoutModal.classList.remove("hidden");
-    });
-});
-
-function closeModal() {
-    document.getElementById("logoutModal").classList.add("hidden");
-}
-
-function confirmLogout() {
-    window.location.href = "{{ url_for('logout') }}";
-}
-</script>
-
 </body>
 </html>
