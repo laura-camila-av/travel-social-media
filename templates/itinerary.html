@@ -59,6 +59,16 @@
         <label for="destination">Destination</label><br>
         <input type="text" id="destination" name="destination" required><br><br>
 
+        <label for="travel-style">Travel Style</label><br>
+        <select id="travel-style" name="travel-style" required>
+            <option value="">Select a travel style</option>
+            <option value="Backpacker">Backpacker</option>
+            <option value="Solo">Solo</option>
+            <option value="Beach">Beach</option>
+            <option value="Cultural">Cultural</option>
+            <option value="Luxury">Luxury</option>
+        </select><br><br>
+
         <label for="start-date">Start Date</label><br>
         <input type="date" id="start-date" name="start-date" required><br><br>
 
@@ -309,6 +319,7 @@ function setupAutoSaveForTripDetails() {
         "trip-title",
         "creator-name",
         "destination",
+        "travel-style",
         "trip-budget",
         "start-date",
         "end-date"
@@ -335,6 +346,7 @@ function collectDraftData() {
         tripTitle: document.getElementById("trip-title").value,
         creatorName: document.getElementById("creator-name").value,
         destination: document.getElementById("destination").value,
+        travelStyle: document.getElementById("travel-style").value,
         tripBudget: document.getElementById("trip-budget").value,
         startDate: document.getElementById("start-date").value,
         endDate: document.getElementById("end-date").value,
@@ -402,6 +414,7 @@ function restoreDraft() {
     document.getElementById("trip-title").value = draft.tripTitle || "";
     document.getElementById("creator-name").value = draft.creatorName || "";
     document.getElementById("destination").value = draft.destination || "";
+    document.getElementById("travel-style").value = draft.travelStyle || "";
     document.getElementById("trip-budget").value = draft.tripBudget || "";
     document.getElementById("start-date").value = draft.startDate || "";
     document.getElementById("end-date").value = draft.endDate || "";
