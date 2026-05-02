@@ -1,0 +1,47 @@
+<!-- NAVBAR -->
+<div class="navigation-bar">
+    <ul>
+        <li><a href="{{ url_for('user_profile') }}">Your Profile</a></li>
+        <li><a href="{{ url_for('itinerary_create') }}">Create Itinerary</a></li>
+        <li><a href="{{ url_for('dms') }}">Messages</a></li>
+        <li><a href="{{ url_for('feed') }}">Feed</a></li>
+        <li><a href="{{ url_for('search') }}">Search</a></li>
+        <li><a href="#">Notifications</a></li>
+        <li><a href="#" id="logoutLink">Log Out</a></li>
+    </ul>
+</div>
+
+<!-- LOGOUT MODAL -->
+<div id="logoutModal" class="modal hidden">
+    <div class="modal-box">
+        <p>Are you sure you want to log out?</p>
+
+        <div class="modal-buttons">
+            <button class="btn-confirm" onclick="confirmLogout()">Yes</button>
+            <button class="btn-cancel" onclick="closeModal()">Cancel</button>
+        </div>
+    </div>
+</div>
+
+<!-- LOGOUT SCRIPT -->
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const logoutLink = document.getElementById("logoutLink");
+    const modal = document.getElementById("logoutModal");
+
+    if (logoutLink && modal) {
+        logoutLink.addEventListener("click", function (e) {
+            e.preventDefault(); // stop instant logout
+            modal.classList.remove("hidden"); // show popup
+        });
+    }
+});
+
+function closeModal() {
+    document.getElementById("logoutModal").classList.add("hidden");
+}
+
+function confirmLogout() {
+    window.location.href = "{{ url_for('logout') }}";
+}
+</script>

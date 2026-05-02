@@ -10,24 +10,8 @@
 
 <body class="dms-body">
 
-<div class="navigation-bar">
-  <ul>
-    <li><a href="{{ url_for('user_profile') }}">Your Profile</a></li>
-    <li><a href="{{ url_for('itinerary_create') }}">Create Itinerary</a></li>
-    <li><a href="{{ url_for('dms') }}">Messages</a></li>
-    <li><a href="{{ url_for('feed') }}">Feed</a></li>
-    <li><a href="{{ url_for('search') }}">Search</a></li>
-    <li><a href="#">Notifications</a></li>
-    <li><a href="{{ url_for('logout') }}">Log Out</a></li>
-  </ul>
-</div>
-
-<div class="page-wrapper" style="width: calc(100% - 200px);">
-
-  <div class="dms-sidebar">
-    <h2 class="dms-sidebar-title">Users</h2>
-    <div id="userList"></div>
-  </div>
+  <!--Navigation bar-->
+  {% include 'navbar.html' %}
 
   <div class="dms-chat-area">
     <div class="dms-chat-header" id="chatHeader">Select a user</div>

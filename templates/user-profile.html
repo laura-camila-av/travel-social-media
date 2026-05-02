@@ -13,18 +13,9 @@
 </head>
 
 <body>
-<!--Navigation bar-->
-<div class="navigation-bar">
-    <ul>
-        <li><a href="{{ url_for('user_profile') }}">Your Profile</a></li>
-        <li><a href="{{ url_for('itinerary_create') }}">Create Itinerary</a></li>
-        <li><a href="{{ url_for('dms') }}">Messages</a></li>
-        <li><a href="{{ url_for('feed') }}">Feed</a></li>
-        <li><a href="{{ url_for('search') }}">Search</a></li>
-        <li><a href="#">Notifications</a></li>
-        <li><a href="{{ url_for('logout') }}">Log Out</a></li>
-    </ul>
-</div>
+
+    <!--Navigation bar-->
+    {% include 'navbar.html' %}
 
 <!-- Website Title -->
 <div class="page-wrapper">
@@ -134,7 +125,6 @@
         {% endif %}
     </div>
 </div>
-
 {% if is_own_profile %}
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
 <script src="{{ url_for('static', filename='user-profile.js') }}"></script>

@@ -1188,6 +1188,7 @@ a:hover, a:active {
     transform: scale(1.1);
 }
 
+
 /* User search results styling START */
 
 .user-search-results {
@@ -1228,40 +1229,93 @@ a:hover, a:active {
 .user-result-placeholder {
     background-color: black;
 }
+/* logout */
+.modal {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.4);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+}
 
+.modal-box {
+    background: #fffdf4;
+    padding: 20px;
+    border-radius: 12px;
+    text-align: center;
+    border: 2px solid #e43d12;
+    width: 260px;     
+    max-width: 80%; 
+}
+
+.modal-buttons {
+    margin-top: 15px;
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+}
+
+.btn-confirm {
+    background: #e43d12;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+.btn-cancel {
+    background: transparent;
+    border: 2px solid #e43d12;
+    color: #e43d12;
+    padding: 8px 16px;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+.btn-confirm:hover {
+    background: #c5300f;
+}
+
+.btn-cancel:hover {
+    background: #e43d12;
+    color: white;
+}
+
+.hidden {
+    display: none !important;
+}
+
+.modal.hidden {
+    display: none !important;
+}
+/* EMPTY STATE CENTERING */
 .empty-state {
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    grid-column: 1 / -1; /* spans full grid */
-    margin: 60px 0;
-    color: #a6643c;
     text-align: center;
+    width: 100%;
+    min-height: 220px;
+    margin: 40px auto;
+    color: #a6643c;
 }
 
 .empty-state i {
-    font-size: 50px;
-    margin-bottom: 15px;
+    font-size: 42px;
+    margin-bottom: 12px;
     color: #e43d12;
 }
 
 .empty-state p {
-    font-size: 16px;
-    font-weight: 500;
+    margin: 0;
+    font-weight: bold;
 }
 
-/* DM improvement styling START */
-
-.user.active-user {
-    background-color: #e43d12;
-    color: #faf6c3;
+/* Make empty state span across the whole itinerary grid */
+.itinerary-container .empty-state {
+    grid-column: 1 / -1;
 }
-
-.dms-composer input:disabled,
-.dms-composer button:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-}
-
-/* DM improvement styling END */
