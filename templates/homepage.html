@@ -10,10 +10,16 @@
 </style>
 
 <body>
-    <h1><strong>Website Name</strong> </h1>
-    <img src="{{ url_for('static', filename='logo.png') }}" class="logo">
+    
+<div class="homepage-header">
+    <h1><strong>Website Name</strong></h1>
+    <div class="account-buttons">
+        <a href="/login?form=register">Sign up</a>
+        <a href="/login?form=login">Log in</a>
+    </div>
+</div>
 
-     <h1><strong>Discover your next adventure here....</strong> </h1>
+     <h1><strong>Real trips. Real students. Real advice.</strong> </h1>
 
 <h2>Trending Itineraries</h2>
 
@@ -73,7 +79,7 @@
 
     </div>
 
-<h2>Join for free and enjoy these features</h2>
+<h2>What you get when you join for free</h2>
 
 <div class="trending-itinerary-container">
     <div class="feature-detail-box">
@@ -148,11 +154,6 @@
 
 <h2>About</h2>
 <p> aboutabout about about aboutabout about about aboutabout about about about about about aboutabout about about </p>
-
-<div class="account-buttons">
-    <a href="/login?form=register">Sign up</a>
-    <a href="/login?form=login">Log in</a>
-</div>
 
 </body>
 
