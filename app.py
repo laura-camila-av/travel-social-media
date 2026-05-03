@@ -564,7 +564,7 @@ def toggle_like(itinerary_id):
 @app.route('/logout')
 def logout():
     session.clear()
-    return redirect(url_for('login_page'))
+    return redirect(url_for('homepage'))
 
 
 if __name__ == '__main__':
