@@ -67,7 +67,41 @@ class Itinerary(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(120), nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+
+    creator_name = db.Column(db.String(100), nullable=False)
+    destination = db.Column(db.String(120), nullable=False)
+    travel_style = db.Column(db.String(50), nullable=True)
+    budget = db.Column(db.Float, nullable=True)
+
+    start_date = db.Column(db.Date, nullable=False)
+    end_date = db.Column(db.Date, nullable=False)
+
     created_at = db.Column(db.DateTime, server_default=db.func.now())
+
+    days = db.relationship(
+        'ItineraryDay',
+        backref='itinerary',
+        cascade='all, delete-orphan',
+        lazy=True
+    )
+
+class ItineraryDay(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    itinerary_id = db.Column(db.Integer, db.ForeignKey('itinerary.id'), nullable=False)
+
+    day_number = db.Column(db.Integer, nullable=False)
+
+    total_cost = db.Column(db.Float, nullable=True)
+    rented_items = db.Column(db.String(255), nullable=True)
+    transport_taken = db.Column(db.Text, nullable=True)
+    accommodation = db.Column(db.String(255), nullable=True)
+
+    photo_filename = db.Column(db.String(255), nullable=True)
+    caption = db.Column(db.Text, nullable=True)
+
+    activity_details = db.Column(db.Text, nullable=True)
+    dining_details = db.Column(db.Text, nullable=True)
+
     
 @app.route('/save-bio', methods=['POST'])
 def save_bio():
