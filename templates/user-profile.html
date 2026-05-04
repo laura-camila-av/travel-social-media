@@ -37,7 +37,29 @@
                 {% endif %}
             </div>
 
-            <h2 class="username">{{ user.username }}</h2>
+            <div class="profile-info">
+                <h2 class="username">{{ user.username }}</h2>
+
+                <div class="follow-stats">
+                    <span id="follower-count">{{ follower_count }}</span> followers
+                    <span class="follow-divider">|</span>
+                    <span>{{ following_count }}</span> following
+                </div>
+
+                {% if not is_own_profile %}
+                <button
+                        type="button"
+                        id="follow-button"
+                        class="follow-button {% if is_following %}following{% endif %}"
+                        data-user-id="{{ user.id }}">
+                    {% if is_following %}
+                    Unfollow
+                    {% else %}
+                    Follow
+                    {% endif %}
+                </button>
+                {% endif %}
+            </div>
         </div>
 
         <!-- Bio -->
@@ -153,5 +175,39 @@
         }
     }
 </script>
+    {% if not is_own_profile %}
+    <script>
+        const followButton = document.getElementById("follow-button");
+
+        if (followButton) {
+            followButton.addEventListener("click", async function () {
+                const userId = this.dataset.userId;
+
+                const response = await fetch(`/api/follow/${userId}`, {
+                    method: "POST"
+                });
+
+                const data = await response.json();
+
+                if (!response.ok) {
+                    alert(data.error || "Failed to update follow status.");
+                    return;
+                }
+
+                const followerCount = document.getElementById("follower-count");
+
+                if (data.following) {
+                    followButton.textContent = "Unfollow";
+                    followButton.classList.add("following");
+                } else {
+                    followButton.textContent = "Follow";
+                    followButton.classList.remove("following");
+                }
+
+                followerCount.textContent = data.follower_count;
+            });
+        }
+    </script>
+    {% endif %}
 </body>
 </html>
