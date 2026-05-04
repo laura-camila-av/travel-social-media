@@ -519,6 +519,53 @@ a:hover, a:active {
 
 
 /*User Profile Styling START*/
+.profile-info {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+.follow-stats {
+    margin-left: 40px;
+    margin-top: -25px;
+    margin-bottom: 12px;
+    font-size: 14px;
+    color: #555;
+}
+
+.follow-divider {
+    margin: 0 8px;
+    color: #a6643c;
+}
+
+.follow-button {
+    margin-left: 40px;
+    width: 130px;
+    height: 40px;
+    border: 2px solid #e43d12;
+    border-radius: 10px;
+    background-color: transparent;
+    color: #e43d12;
+    font-weight: bold;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.follow-button:hover {
+    background-color: #e43d12;
+    color: #faf6c3;
+}
+
+.follow-button.following {
+    background-color: #e43d12;
+    color: #faf6c3;
+}
+
+.follow-button.following:hover {
+    background-color: transparent;
+    color: #e43d12;
+}
+
 .profile-section {
     display: flex;
     align-items: center;
