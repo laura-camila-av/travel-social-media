@@ -102,6 +102,17 @@ class ItineraryDay(db.Model):
     activity_details = db.Column(db.Text, nullable=True)
     dining_details = db.Column(db.Text, nullable=True)
 
+class Follow(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+
+    follower_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    following_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+
+    created_at = db.Column(db.DateTime, server_default=db.func.now())
+
+    __table_args__ = (
+        db.UniqueConstraint('follower_id', 'following_id', name='unique_user_follow'),
+    )
     
 @app.route('/save-bio', methods=['POST'])
 def save_bio():
@@ -164,13 +175,19 @@ def user_profile():
     user_itineraries = Itinerary.query.filter_by(user_id=user_id).all()
     saved_items = SavedItinerary.query.filter_by(user_id=user_id).all()
 
+    follower_count = Follow.query.filter_by(following_id=user_id).count()
+    following_count = Follow.query.filter_by(follower_id=user_id).count()
+
     return render_template(
         'user-profile.html',
         user=user,
         interests=interests,
         user_itineraries=user_itineraries,
         saved_items=saved_items,
-        is_own_profile=True
+        is_own_profile=True,
+        is_following=False,
+        follower_count=follower_count,
+        following_count=following_count
     )
 
 
@@ -195,14 +212,29 @@ def view_user_profile(user_id):
     ]
     interests = [interest for interest in interests if interest]
 
+    user_itineraries = Itinerary.query.filter_by(user_id=user_id).all()
     saved_items = []
+
+    existing_follow = Follow.query.filter_by(
+        follower_id=current_user_id,
+        following_id=user_id
+    ).first()
+
+    is_following = existing_follow is not None
+
+    follower_count = Follow.query.filter_by(following_id=user_id).count()
+    following_count = Follow.query.filter_by(follower_id=user_id).count()
 
     return render_template(
         'user-profile.html',
         user=user,
         interests=interests,
+        user_itineraries=user_itineraries,
         saved_items=saved_items,
-        is_own_profile=False
+        is_own_profile=False,
+        is_following=is_following,
+        follower_count=follower_count,
+        following_count=following_count
     )
 
 def allowed_file(filename):
@@ -595,6 +627,92 @@ def toggle_like(itinerary_id):
         "like_count": like_count
     })
 
+@app.route('/api/follow/<int:user_id>', methods=['POST'])
+def toggle_follow(user_id):
+    current_user_id = session.get("user_id")
+
+    if not current_user_id:
+        return jsonify({"error": "Not logged in"}), 401
+
+    if current_user_id == user_id:
+        return jsonify({"error": "You cannot follow yourself"}), 400
+
+    target_user = User.query.get(user_id)
+    if not target_user:
+        return jsonify({"error": "User not found"}), 404
+
+    existing_follow = Follow.query.filter_by(
+        follower_id=current_user_id,
+        following_id=user_id
+    ).first()
+
+    if existing_follow:
+        db.session.delete(existing_follow)
+        is_following = False
+    else:
+        new_follow = Follow(
+            follower_id=current_user_id,
+            following_id=user_id
+        )
+        db.session.add(new_follow)
+        is_following = True
+
+    db.session.commit()
+
+    follower_count = Follow.query.filter_by(following_id=user_id).count()
+
+    return jsonify({
+        "following": is_following,
+        "follower_count": follower_count
+    })
+
+@app.route('/followers/<int:user_id>')
+def followers_page(user_id):
+    current_user_id = session.get("user_id")
+
+    if not current_user_id:
+        return redirect(url_for('login_page'))
+
+    user = User.query.get_or_404(user_id)
+
+    followers = db.session.query(User).join(
+        Follow,
+        Follow.follower_id == User.id
+    ).filter(
+        Follow.following_id == user_id
+    ).all()
+
+    return render_template(
+        'follow-list.html',
+        user=user,
+        users=followers,
+        list_type='followers'
+    )
+
+
+@app.route('/following/<int:user_id>')
+def following_page(user_id):
+    current_user_id = session.get("user_id")
+
+    if not current_user_id:
+        return redirect(url_for('login_page'))
+
+    user = User.query.get_or_404(user_id)
+
+    following = db.session.query(User).join(
+        Follow,
+        Follow.following_id == User.id
+    ).filter(
+        Follow.follower_id == user_id
+    ).all()
+
+    return render_template(
+        'follow-list.html',
+        user=user,
+        users=following,
+        list_type='following'
+    )
+
 @app.route('/logout')
 def logout():
     session.clear()
@@ -608,4 +726,3 @@ if __name__ == '__main__':
         db.create_all()
 
     app.run(debug=True)
-

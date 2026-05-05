@@ -519,6 +519,53 @@ a:hover, a:active {
 
 
 /*User Profile Styling START*/
+.profile-info {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+.follow-stats {
+    margin-left: 40px;
+    margin-top: -25px;
+    margin-bottom: 12px;
+    font-size: 14px;
+    color: #555;
+}
+
+.follow-divider {
+    margin: 0 8px;
+    color: #a6643c;
+}
+
+.follow-button {
+    margin-left: 40px;
+    width: 130px;
+    height: 40px;
+    border: 2px solid #e43d12;
+    border-radius: 10px;
+    background-color: transparent;
+    color: #e43d12;
+    font-weight: bold;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.follow-button:hover {
+    background-color: #e43d12;
+    color: #faf6c3;
+}
+
+.follow-button.following {
+    background-color: #e43d12;
+    color: #faf6c3;
+}
+
+.follow-button.following:hover {
+    background-color: transparent;
+    color: #e43d12;
+}
+
 .profile-section {
     display: flex;
     align-items: center;
@@ -1445,3 +1492,75 @@ a:hover, a:active {
 .itinerary-container .empty-state {
     grid-column: 1 / -1;
 }
+
+/* Follow list styling START */
+
+.follow-stat-link,
+.follow-stat-link:link,
+.follow-stat-link:visited {
+    border: none;
+    padding: 0;
+    color: #555;
+    text-decoration: none;
+    display: inline;
+}
+
+.follow-stat-link:hover {
+    background-color: transparent;
+    color: #e43d12;
+    text-decoration: underline;
+}
+
+.follow-list-container {
+    max-width: 700px;
+    margin: 30px auto;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+.follow-list-card,
+.follow-list-card:link,
+.follow-list-card:visited {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    border: 2px solid #e43d12;
+    border-radius: 14px;
+    padding: 14px 18px;
+    background-color: #fffdf4;
+    color: black;
+    text-decoration: none;
+    text-align: left;
+}
+
+.follow-list-card:hover {
+    background-color: #e43d12;
+    color: #faf6c3;
+}
+
+.follow-list-avatar,
+.follow-list-placeholder {
+    width: 58px;
+    height: 58px;
+    border-radius: 50%;
+    object-fit: cover;
+    flex-shrink: 0;
+}
+
+.follow-list-placeholder {
+    background-color: black;
+}
+
+.follow-list-info h2 {
+    margin: 0;
+    color: inherit;
+    font-size: 20px;
+}
+
+.follow-list-info p {
+    margin: 4px 0 0 0;
+    font-size: 14px;
+}
+
+/* Follow list styling END */

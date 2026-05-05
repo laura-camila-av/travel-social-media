@@ -9,9 +9,15 @@
 </head>
 
 <body class="dms-body">
-
   <!--Navigation bar-->
   {% include 'navbar.html' %}
+
+<div class="page-wrapper" style="width: calc(100% - 200px);">
+
+  <div class="dms-sidebar">
+    <h2 class="dms-sidebar-title">Users</h2>
+    <div id="userList"></div>
+  </div>
 
   <div class="dms-chat-area">
     <div class="dms-chat-header" id="chatHeader">Select a user</div>

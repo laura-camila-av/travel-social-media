@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+
+<body>
+
+{% include 'navbar.html' %}
+
+<div class="page-wrapper">
+    <div class="middle-column">
+
+        {% if list_type == 'followers' %}
+        <h1>{{ user.username }}'s Followers</h1>
+        {% else %}
+        <h1>{{ user.username }} is Following</h1>
+        {% endif %}
+
+        {% if users %}
+        <div class="follow-list-container">
+            {% for u in users %}
+            <a class="follow-list-card" href="{{ url_for('view_user_profile', user_id=u.id) }}">
+                {% if u.avatar_url %}
+                <img src="{{ url_for('static', filename='uploads/' + u.avatar_url) }}" class="follow-list-avatar">
+                {% else %}
+                <div class="follow-list-placeholder"></div>
+                {% endif %}
+
+                <div class="follow-list-info">
+                    <h2>@{{ u.username }}</h2>
+                    <p>{{ u.bio if u.bio else 'No bio yet.' }}</p>
+                </div>
+            </a>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="empty-state">
+            <i class="fa-solid fa-user-group"></i>
+
+            {% if list_type == 'followers' %}
+            <p>No followers yet.</p>
+            {% else %}
+            <p>Not following anyone yet.</p>
+            {% endif %}
+        </div>
+        {% endif %}
+
+    </div>
+</div>
+
+</body>
+</html>
