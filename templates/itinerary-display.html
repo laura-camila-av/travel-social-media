@@ -10,148 +10,132 @@
 
     <!--Navigation bar-->
     {% include 'navbar.html' %}
-       
+   
     <div class="page-wrapper">
-        <div class="middle-column">
-    
-            <h2>Itinerary Title</h2>
-            <div class="creator-section">
-                <div class="creator-pic"></div>
-                <p>@Creator_username</p>
-            </div>
-            <div class="main-image"></div>
-            <div class="action-buttons">
-                <!-- LIKE COLUMN -->
-                <div class="like-group">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-lg-8 middle-column">
+                <h2>Itinerary Title</h2>
+                <div class="creator-section">
+                    <div class="creator-pic"></div>
+                    <p>@Creator_username</p>
+                </div>
+                <div class="main-image"></div>
+                <div class="action-buttons">
+                    <div class="like-group">
+                        <button 
+                            id="likeButton" 
+                            class="like-button {% if user_liked %}liked{% endif %}" 
+                            type="button"
+                            data-itinerary-id="{{ itinerary_id }}"
+                        >
+                            <i id="likeIcon" class="{% if user_liked %}fa-solid{% else %}fa-regular{% endif %} fa-heart"></i>
+                        </button>
+                        <span id="likeCount">
+                            {{ like_count }} {% if like_count == 1 %}like{% else %}likes{% endif %}
+                        </span>
+                    </div>
                     <button 
-                        id="likeButton" 
-                        class="like-button {% if user_liked %}liked{% endif %}" 
+                        id="saveButton"
+                        class="save-button {% if user_saved %}saved{% endif %}"
                         type="button"
                         data-itinerary-id="{{ itinerary_id }}"
                     >
-                        <i id="likeIcon" class="{% if user_liked %}fa-solid{% else %}fa-regular{% endif %} fa-heart"></i>
+                        <i id="saveIcon" class="{% if user_saved %}fa-solid{% else %}fa-regular{% endif %} fa-bookmark"></i>
                     </button>
-
-                    <span id="likeCount">
-                        {{ like_count }} {% if like_count == 1 %}like{% else %}likes{% endif %}
-                    </span>
                 </div>
-                <!-- SAVE BUTTON -->
-                <button 
-                    id="saveButton"
-                    class="save-button {% if user_saved %}saved{% endif %}"
-                    type="button"
-                    data-itinerary-id="{{ itinerary_id }}"
-                >
-                    <i id="saveIcon" class="{% if user_saved %}fa-solid{% else %}fa-regular{% endif %} fa-bookmark"></i>
-                </button>
-            </div>
-            <div class="day-thumbnails">
-    
-            <div class="day-card">
-            <div class="overlay-text">Day 2</div>
-            </div>
-
-            <div class="day-card">
-            <div class="overlay-text">Day 3</div>
-            </div>
-
-            <div class="day-card">
-            <div class="overlay-text">Day 4</div>
-        </div>
-
-        <div class="day-card">
-            <div class="overlay-text">Day 5</div>
-        </div>
-
-        </div>
-        
-    </div>
-   <div class="right-column">
-    <div class="itinerary-detail-box">
-        <div class="detail-icon-panel">
-            <i class="fa-solid fa-bed"></i>
-        </div>
-        <div class="detail-content">
-            <p>Hotel name, 123 Hotel address, hotel location.</p>
-        </div>
-
-    </div>
-
-    <div class="itinerary-detail-box" id="activities-box">
-        <div class="detail-icon-panel">
-            <i class="fa-solid fa-camera"></i>
-        </div>
-        <div class="detail-content">
-            <div class="activities-content">
-                <div class="activities-collapsed">
-                    <p style="font-size: 20px; margin: 2px 0;">Hiking at Mount Fuji</p>
-                    <p style="font-size: 20px; margin: 2px 0;">Visit Senso-ji Temple</p>
-                    <p style="font-size: 20px; margin: 2px 0;">Shibuya Crossing</p>
-                    <p style="font-size: 20px; margin: 2px 0;">TeamLab Planets</p>
+                <div class="day-thumbnails">
+                    <div class="day-card"><div class="overlay-text">Day 2</div></div>
+                    <div class="day-card"><div class="overlay-text">Day 3</div></div>
+                    <div class="day-card"><div class="overlay-text">Day 4</div></div>
+                    <div class="day-card"><div class="overlay-text">Day 5</div></div>
                 </div>
-                <div class="activities-expanded" style="display: none;">
-                    <p class="activity-name" style="font-size: 20px; margin: 0;"></p>
-                    <p class="activity-desc" style="font-size: 15px; margin: 5px 0;"></p>
-                    <div class="activities-arrows">
-                        <i class="fa-solid fa-arrow-left" id="prev-activity"></i>
-                        <div class="dot-indicator" id="activity-dots"></div>
-                        <i class="fa-solid fa-arrow-right" id="next-activity"></i>
+            </div>
+
+            <div class="col-lg-4 right-column">
+                <div class="itinerary-detail-box">
+                    <div class="detail-icon-panel">
+                        <i class="fa-solid fa-bed"></i>
+                    </div>
+                    <div class="detail-content">
+                        <p>Hotel name, 123 Hotel address, hotel location.</p>
+                    </div>
+                </div>
+
+                <div class="itinerary-detail-box" id="activities-box">
+                    <div class="detail-icon-panel">
+                        <i class="fa-solid fa-camera"></i>
+                    </div>
+                    <div class="detail-content">
+                        <div class="activities-content">
+                            <div class="activities-collapsed">
+                                <p style="font-size: 20px; margin: 2px 0;">Hiking at Mount Fuji</p>
+                                <p style="font-size: 20px; margin: 2px 0;">Visit Senso-ji Temple</p>
+                                <p style="font-size: 20px; margin: 2px 0;">Shibuya Crossing</p>
+                                <p style="font-size: 20px; margin: 2px 0;">TeamLab Planets</p>
+                            </div>
+                            <div class="activities-expanded" style="display: none;">
+                                <p class="activity-name" style="font-size: 20px; margin: 0;"></p>
+                                <p class="activity-desc" style="font-size: 15px; margin: 5px 0;"></p>
+                                <div class="activities-arrows">
+                                    <i class="fa-solid fa-arrow-left" id="prev-activity"></i>
+                                    <div class="dot-indicator" id="activity-dots"></div>
+                                    <i class="fa-solid fa-arrow-right" id="next-activity"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="itinerary-detail-box" id="dining-box">
+                    <div class="detail-icon-panel">
+                        <i class="fa-solid fa-utensils"></i>
+                    </div>
+                    <div class="detail-content">
+                        <div class="dining-collapsed">
+                            <p style="font-size: 20px; margin: 2px 0;">Ichiran Ramen</p>
+                            <p style="font-size: 20px; margin: 2px 0;">Tsukiji Outer Market</p>
+                            <p style="font-size: 20px; margin: 2px 0;">Shibuya Stream Bar</p>
+                            <p style="font-size: 20px; margin: 2px 0;">Conveyor Belt Sushi</p>
+                        </div>
+                        <div class="dining-expanded" style="display: none;">
+                            <p class="dining-name" style="font-size: 20px; margin: 0;"></p>
+                            <p class="dining-desc" style="font-size: 15px; margin: 5px 0;"></p>
+                            <div class="activities-arrows">
+                                <i class="fa-solid fa-arrow-left" id="prev-dining"></i>
+                                <div class="dot-indicator" id="dining-dots"></div>
+                                <i class="fa-solid fa-arrow-right" id="next-dining"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="itinerary-detail-box" id="transport-box">
+                    <div class="detail-icon-panel">
+                        <i class="fa-solid fa-car"></i>
+                    </div>
+                    <div class="detail-content">
+                        <div class="transport-collapsed">
+                            <p style="font-size: 20px; margin: 2px 0;">Train</p>
+                            <p style="font-size: 20px; margin: 2px 0;">Uber</p>
+                        </div>
+                        <div class="transport-expanded" style="display: none;">
+                            <p class="transport-name" style="font-size: 20px; margin: 0;"></p>
+                            <p class="transport-desc" style="font-size: 15px; margin: 5px 0;"></p>
+                            <div class="activities-arrows">
+                                <i class="fa-solid fa-arrow-left" id="prev-transport"></i>
+                                <div class="dot-indicator" id="transport-dots"></div>
+                                <i class="fa-solid fa-arrow-right" id="next-transport"></i>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
-    </div>
 
-    <div class="itinerary-detail-box" id="dining-box">
-        <div class="detail-icon-panel">
-            <i class="fa-solid fa-utensils"></i>
-        </div>
-        <div class="detail-content">
-            <div class="dining-collapsed">
-                <p style="font-size: 20px; margin: 2px 0;">Ichiran Ramen</p>
-                <p style="font-size: 20px; margin: 2px 0;">Tsukiji Outer Market</p>
-                <p style="font-size: 20px; margin: 2px 0;">Shibuya Stream Bar</p>
-                <p style="font-size: 20px; margin: 2px 0;">Conveyor Belt Sushi</p>
-            </div>
-            <div class="dining-expanded" style="display: none;">
-                <p class="dining-name" style="font-size: 20px; margin: 0;"></p>
-                <p class="dining-desc" style="font-size: 15px; margin: 5px 0;"></p>
-                <div class="activities-arrows">
-                    <i class="fa-solid fa-arrow-left" id="prev-dining"></i>
-                    <div class="dot-indicator" id="dining-dots"></div>
-                    <i class="fa-solid fa-arrow-right" id="next-dining"></i>
-                </div>
-            </div>
         </div>
     </div>
-    <div class="itinerary-detail-box" id="transport-box">
-        <div class="detail-icon-panel">
-            <i class="fa-solid fa-car"></i>
-        </div>
-        <div class="detail-content"> 
-            <div class="activities-content">
-            <div class="transport-collapsed">
-                <p style="font-size: 20px; margin: 2px 0;">Train</p>
-                <p style="font-size: 20px; margin: 2px 0;">Uber</p>
-            </div>
-            <div class="transport-expanded" style="display: none;">
-                <p class="transport-name" style="font-size: 20px; margin: 0;"></p>
-                <p class="transport-desc" style="font-size: 15px; margin: 5px 0;"></p>
-                <div class="activities-arrows">
-                    <i class="fa-solid fa-arrow-left" id="prev-transport"></i>
-                    <div class="dot-indicator" id="transport-dots"></div>
-                    <i class="fa-solid fa-arrow-right" id="next-transport"></i>
-                </div>
-            </div>
-        </div>
-    </div>
+</div>
 
-</div>
-</div>
-        
-    
-</div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
 <script src="{{ url_for('static', filename='itinerary-display.js') }}"></script>
 <script>
