@@ -633,6 +633,53 @@ def toggle_follow(user_id):
         "follower_count": follower_count
     })
 
+@app.route('/followers/<int:user_id>')
+def followers_page(user_id):
+    current_user_id = session.get("user_id")
+
+    if not current_user_id:
+        return redirect(url_for('login_page'))
+
+    user = User.query.get_or_404(user_id)
+
+    followers = db.session.query(User).join(
+        Follow,
+        Follow.follower_id == User.id
+    ).filter(
+        Follow.following_id == user_id
+    ).all()
+
+    return render_template(
+        'follow-list.html',
+        user=user,
+        users=followers,
+        list_type='followers'
+    )
+
+
+@app.route('/following/<int:user_id>')
+def following_page(user_id):
+    current_user_id = session.get("user_id")
+
+    if not current_user_id:
+        return redirect(url_for('login_page'))
+
+    user = User.query.get_or_404(user_id)
+
+    following = db.session.query(User).join(
+        Follow,
+        Follow.following_id == User.id
+    ).filter(
+        Follow.follower_id == user_id
+    ).all()
+
+    return render_template(
+        'follow-list.html',
+        user=user,
+        users=following,
+        list_type='following'
+    )
+
 @app.route('/logout')
 def logout():
     session.clear()
@@ -646,4 +693,3 @@ if __name__ == '__main__':
         db.create_all()
 
     app.run(debug=True)
-
