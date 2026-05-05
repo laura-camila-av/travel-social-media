@@ -41,9 +41,15 @@
                 <h2 class="username">{{ user.username }}</h2>
 
                 <div class="follow-stats">
-                    <span id="follower-count">{{ follower_count }}</span> followers
+                    <a class="follow-stat-link" href="{{ url_for('followers_page', user_id=user.id) }}">
+                        <span id="follower-count">{{ follower_count }}</span> followers
+                    </a>
+
                     <span class="follow-divider">|</span>
-                    <span>{{ following_count }}</span> following
+
+                    <a class="follow-stat-link" href="{{ url_for('following_page', user_id=user.id) }}">
+                        <span>{{ following_count }}</span> following
+                    </a>
                 </div>
 
                 {% if not is_own_profile %}
