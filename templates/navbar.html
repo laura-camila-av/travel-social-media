@@ -1,15 +1,88 @@
 <!-- NAVBAR -->
-<div class="navigation-bar">
-    <ul>
-        <li><a href="{{ url_for('user_profile') }}">Your Profile</a></li>
-        <li><a href="{{ url_for('itinerary_create') }}">Create Itinerary</a></li>
-        <li><a href="{{ url_for('dms') }}">Messages</a></li>
-        <li><a href="{{ url_for('feed') }}">Feed</a></li>
-        <li><a href="{{ url_for('search') }}">Search</a></li>
-        <li><a href="#">Notifications</a></li>
-        <li><a href="#" id="logoutLink">Log Out</a></li>
+<nav class="navigation-bar" id="sideNav">
+    <button class="nav-toggle-btn" id="navToggle">
+        <i class="fa-solid fa-bars"></i>
+    </button>
+    <ul class="nav-links">
+        <li>
+            <a href="{{ url_for('user_profile') }}">
+                <i class="fa-solid fa-user"></i>
+                <span class="nav-label">Your Profile</span>
+            </a>
+        </li>
+        <li>
+            <a href="{{ url_for('itinerary_create') }}">
+                <i class="fa-solid fa-plus"></i>
+                <span class="nav-label">Create Itinerary</span>
+            </a>
+        </li>
+        <li>
+            <a href="{{ url_for('dms') }}">
+                <i class="fa-solid fa-message"></i>
+                <span class="nav-label">Messages</span>
+            </a>
+        </li>
+        <li>
+            <a href="{{ url_for('feed') }}">
+                <i class="fa-solid fa-compass"></i>
+                <span class="nav-label">Feed</span>
+            </a>
+        </li>
+        <li>
+            <a href="{{ url_for('search') }}">
+                <i class="fa-solid fa-magnifying-glass"></i>
+                <span class="nav-label">Search</span>
+            </a>
+        </li>
+        <li>
+            <a href="#">
+                <i class="fa-solid fa-bell"></i>
+                <span class="nav-label">Notifications</span>
+            </a>
+        </li>
+        <li>
+            <a href="{{ url_for('logout') }}" id="logoutLink">
+                <i class="fa-solid fa-right-from-bracket"></i>
+                <span class="nav-label">Log Out</span>
+            </a>
+        </li>
     </ul>
+</nav>
+
+<div id="logoutModal" class="modal hidden">
+    <div class="modal-box">
+        <p>Are you sure you want to log out?</p>
+        <div class="modal-buttons">
+            <button class="btn-confirm" onclick="confirmLogout()">Yes</button>
+            <button class="btn-cancel" onclick="closeModal()">Cancel</button>
+        </div>
+    </div>
 </div>
+
+<script>
+document.getElementById('navToggle').addEventListener('click', function() {
+    document.getElementById('sideNav').classList.toggle('expanded');
+});
+
+document.addEventListener("DOMContentLoaded", function () {
+    const logoutLink = document.getElementById("logoutLink");
+    const modal = document.getElementById("logoutModal");
+    if (logoutLink && modal) {
+        logoutLink.addEventListener("click", function (e) {
+            e.preventDefault();
+            modal.classList.remove("hidden");
+        });
+    }
+});
+
+function closeModal() {
+    document.getElementById("logoutModal").classList.add("hidden");
+}
+
+function confirmLogout() {
+    window.location.href = "{{ url_for('logout') }}";
+}
+</script>
 
 <!-- LOGOUT MODAL -->
 <div id="logoutModal" class="modal hidden">
