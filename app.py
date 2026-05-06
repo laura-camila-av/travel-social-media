@@ -3,6 +3,7 @@ from sqlalchemy import or_, and_
 from flask_sqlalchemy import SQLAlchemy
 from werkzeug.security import generate_password_hash, check_password_hash
 import os
+from datetime import timedelta
 
 app = Flask(__name__)
 app.config["SECRET_KEY"] = "change-this-to-a-random-secret-key"
@@ -10,7 +11,7 @@ app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///users.db"
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 app.config['UPLOAD_FOLDER'] = os.path.join(os.path.dirname(__file__), 'static', 'uploads')
 app.config['ALLOWED_EXTENSIONS'] = {'png', 'jpg', 'jpeg', 'gif'}
-
+app.permanent_session_lifetime = timedelta(days=10)
 
 db = SQLAlchemy(app)
 
@@ -128,6 +129,7 @@ def save_bio():
     db.session.commit()
     
     return jsonify({"success": True})
+
 @app.route('/save-interests', methods=['POST'])
 def save_interests():
     user_id = session.get("user_id")
@@ -151,6 +153,8 @@ def save_interests():
 
 @app.route('/')
 def homepage():
+    if "user_id" in session:
+        return redirect(url_for('feed'))
     return render_template('homepage.html')
 
 
@@ -449,7 +453,12 @@ def login():
     if user is None or not user.check_password(password):
         flash("Invalid credentials.", "login_error")
         return redirect(url_for('login_page'))
-
+    
+    save_login = request.form.get("save_login")
+    if save_login:
+        session.permanent = True
+    else:
+        session.permanent = False
     session["user_id"] = user.id
 
     if not user.username:
@@ -726,3 +735,5 @@ if __name__ == '__main__':
         db.create_all()
 
     app.run(debug=True)
+
+    #704 lines of code
