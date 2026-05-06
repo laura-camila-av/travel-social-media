@@ -11,7 +11,7 @@ app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///users.db"
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 app.config['UPLOAD_FOLDER'] = os.path.join(os.path.dirname(__file__), 'static', 'uploads')
 app.config['ALLOWED_EXTENSIONS'] = {'png', 'jpg', 'jpeg', 'gif'}
-
+app.permanent_session_lifetime = timedelta(days=10)
 
 db = SQLAlchemy(app)
 
@@ -96,6 +96,7 @@ def save_bio():
     db.session.commit()
     
     return jsonify({"success": True})
+
 @app.route('/save-interests', methods=['POST'])
 def save_interests():
     user_id = session.get("user_id")
@@ -420,7 +421,11 @@ def login():
         flash("Invalid credentials.", "login_error")
         return redirect(url_for('login_page'))
     
-    session.permanent = True
+    save_login = request.form.get("save_login")
+    if save_login:
+        session.permanent = True
+    else:
+        session.permanent = False
     session["user_id"] = user.id
 
     if not user.username:

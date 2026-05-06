@@ -1488,12 +1488,12 @@ a:hover, a:active {
     font-weight: bold;
 }
 
-/* Make empty state span across the whole itinerary grid */
+
 .itinerary-container .empty-state {
     grid-column: 1 / -1;
 }
 
-/* Follow list styling START */
+/* follow list styling START */
 
 .follow-stat-link,
 .follow-stat-link:link,
@@ -1563,4 +1563,16 @@ a:hover, a:active {
     font-size: 14px;
 }
 
-/* Follow list styling END */
+/* follow list styling END */
+
+/* remember password row */
+.remember-row label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: normal;
+}
+
+.remember-row input {
+    width: auto;
+}
