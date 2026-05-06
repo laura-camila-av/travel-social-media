@@ -382,10 +382,6 @@ a:hover, a:active {
     display: none;
 }
 
-.hidden {
-    display: none !important;
-}
-
 .activity-list {
     list-style: disc;
     padding-left: 20px;
@@ -444,15 +440,8 @@ a:hover, a:active {
     margin: 30px auto;
 }
 
-
-.itinerary-card {
-    width: 100%;
-    aspect-ratio: 1 / 1;
-    background-color: black;
-}
-
 .itinerary-card:hover {
-    opacity: 0.85;
+    filter: brightness(70%);
     cursor: pointer;
 }
 
@@ -468,10 +457,6 @@ a:hover, a:active {
     background-color: black;
     position: relative;
     overflow: hidden;
-}
-
-.itinerary-card:hover {
-    filter: brightness(70%);
 }
 
 /* action buttons */
@@ -1313,9 +1298,6 @@ a:hover, a:active {
     line-height: 1.7;
 }
 
-.hidden {
-    display: none;
-}
 
 #submit-btn {
     display: block;
@@ -1413,7 +1395,7 @@ a:hover, a:active {
     z-index: 1000;
 }
 
-.modal-box {
+.logout-modal-box {
     background: #fffdf4;
     padding: 20px;
     border-radius: 12px;
@@ -1423,7 +1405,7 @@ a:hover, a:active {
     max-width: 80%; 
 }
 
-.modal-buttons {
+.logout-modal-buttons {
     margin-top: 15px;
     display: flex;
     justify-content: center;
