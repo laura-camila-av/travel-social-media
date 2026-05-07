@@ -1601,3 +1601,80 @@ a:hover, a:active {
 .remember-row input {
     width: auto;
 }
+
+/*notifications styling start*/
+.notifications-container {
+    max-width: 700px;
+    margin: 30px auto;
+}
+
+.notification-card {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 15px;
+    border: 2px solid #e43d12;
+    border-radius: 14px;
+    padding: 14px 18px;
+    margin-bottom: 14px;
+    background: #fffdf4;
+    cursor: pointer;
+}
+
+.notification-card:hover {
+    background: #fff7dc;
+}
+
+.notification-left {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.notification-left p {
+    margin: 0;
+    color: #222;
+}
+
+.notification-avatar,
+.notification-avatar-placeholder {
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.notification-avatar-placeholder {
+    background: black;
+}
+
+.notification-actions {
+    display: flex;
+    gap: 8px;
+}
+
+.notification-btn {
+    border: 2px solid #e43d12;
+    border-radius: 8px;
+    padding: 8px 12px;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.follow-back-btn {
+    background: #e43d12;
+    color: white;
+}
+
+.remove-btn {
+    background: transparent;
+    color: #e43d12;
+}
+
+.following-btn {
+    background: #ddd;
+    color: #555;
+    border-color: #aaa;
+    cursor: default;
+}
+/*notification styling end*/
