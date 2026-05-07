@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <title>Notifications</title>
+</head>
+
+<body>
+    {% include 'navbar.html' %}
+
+    <div class="page-wrapper">
+        <div class="middle-column">
+            <h1>Notifications</h1>
+
+            <div class="notifications-container">
+                {% if notifications %}
+                    {% for notification in notifications %}
+                        <div class="notification-card" onclick="goToProfile('{{ notification.follower.id }}')">
+                            <div class="notification-left">
+                                {% if notification.follower.avatar_url %}
+                                    <img 
+                                        src="{{ url_for('static', filename='uploads/' + notification.follower.avatar_url) }}" 
+                                        class="notification-avatar"
+                                    >
+                                {% else %}
+                                    <div class="notification-avatar-placeholder"></div>
+                                {% endif %}
+
+                                <p>
+                                    <strong>{{ notification.follower.username }}</strong>
+                                    followed you
+                                </p>
+                            </div>
+
+                            <div class="notification-actions" onclick="event.stopPropagation()">
+                                {% if notification.is_following_back %}
+                                    <button class="notification-btn following-btn" disabled>
+                                        Following
+                                    </button>
+                                {% else %}
+                                    <button 
+                                        class="notification-btn follow-back-btn"
+                                        onclick="followBack('{{ notification.follower.id }}', this)"
+                                    >
+                                        Follow back
+                                    </button>
+                                {% endif %}
+
+                                <button 
+                                    class="notification-btn remove-btn"
+                                    onclick="removeFollower('{{ notification.follower.id }}', this)"
+                                >
+                                    Remove
+                                </button>
+                            </div>
+                        </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="empty-state">
+                        <i class="fa-solid fa-bell"></i>
+                        <p>No notifications yet</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function goToProfile(userId) {
+            window.location.href = `/user/${userId}`;
+        }
+
+        async function followBack(userId, button) {
+            const response = await fetch(`/api/follow/${userId}`, {
+                method: "POST"
+            });
+
+            if (response.ok) {
+                button.textContent = "Following";
+                button.disabled = true;
+                button.classList.remove("follow-back-btn");
+                button.classList.add("following-btn");
+            }
+        }
+
+        async function removeFollower(userId, button) {
+            const response = await fetch(`/api/remove-follower/${userId}`, {
+                method: "POST"
+            });
+
+            if (response.ok) {
+                const card = button.closest(".notification-card");
+                card.remove();
+            }
+        }
+    </script>
+</body>
+</html>
