@@ -4,16 +4,18 @@ from flask_sqlalchemy import SQLAlchemy
 from werkzeug.security import generate_password_hash, check_password_hash
 import os
 from datetime import timedelta
+from flask_migrate import Migrate
 
 app = Flask(__name__)
-app.config["SECRET_KEY"] = "change-this-to-a-random-secret-key"
 app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///users.db"
+app.config["SECRET_KEY"] = "change-this-to-a-random-secret-key"
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 app.config['UPLOAD_FOLDER'] = os.path.join(os.path.dirname(__file__), 'static', 'uploads')
 app.config['ALLOWED_EXTENSIONS'] = {'png', 'jpg', 'jpeg', 'gif'}
 app.permanent_session_lifetime = timedelta(days=10)
 
 db = SQLAlchemy(app)
+migrate = Migrate(app, db)
 
 
 class User(db.Model):
@@ -722,6 +724,56 @@ def following_page(user_id):
         list_type='following'
     )
 
+@app.route('/notifications')
+def notifications():
+    current_user_id = session.get("user_id")
+
+    if not current_user_id:
+        return redirect(url_for('login_page'))
+
+    follower_records = Follow.query.filter_by(
+        following_id=current_user_id
+    ).order_by(Follow.created_at.desc()).all()
+
+    notifications = []
+
+    for record in follower_records:
+        follower = User.query.get(record.follower_id)
+
+        if follower:
+            is_following_back = Follow.query.filter_by(
+                follower_id=current_user_id,
+                following_id=follower.id
+            ).first() is not None
+
+            notifications.append({
+                "follower": follower,
+                "is_following_back": is_following_back
+            })
+
+    return render_template(
+        'notifications.html',
+        notifications=notifications
+    )
+
+@app.route('/api/remove-follower/<int:follower_id>', methods=['POST'])
+def remove_follower(follower_id):
+    current_user_id = session.get("user_id")
+
+    if not current_user_id:
+        return jsonify({"error": "Not logged in"}), 401
+
+    follow_record = Follow.query.filter_by(
+        follower_id=follower_id,
+        following_id=current_user_id
+    ).first()
+
+    if follow_record:
+        db.session.delete(follow_record)
+        db.session.commit()
+
+    return jsonify({"success": True})
+
 @app.route('/logout')
 def logout():
     session.clear()
@@ -735,5 +787,3 @@ if __name__ == '__main__':
         db.create_all()
 
     app.run(debug=True)
-
-    #704 lines of code
