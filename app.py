@@ -44,8 +44,9 @@ class Message(db.Model):
     sender_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     receiver_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     text = db.Column(db.Text, nullable=False)
-    created_at = db.Column(db.DateTime, server_default=db.func.now())
     reaction = db.Column(db.String(10), nullable=True)
+    is_read = db.Column(db.Boolean, default=False)
+    created_at = db.Column(db.DateTime, server_default=db.func.now())
 
 class Like(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -558,20 +559,37 @@ def api_users():
 
     users = User.query.filter(User.id != user_id).all()
 
-    return jsonify([
-        {
+    result = []
+
+    for user in users:
+        unread_count = Message.query.filter_by(
+            sender_id=user.id,
+            receiver_id=user_id,
+            is_read=False
+        ).count()
+
+        result.append({
             "id": user.id,
             "email": user.email,
-            "username": user.username
-        }
-        for user in users
-    ])
+            "username": user.username,
+            "unread_count": unread_count
+        })
+
+    return jsonify(result)
 
 @app.route('/api/messages/<int:other_user_id>')
 def api_get_messages(other_user_id):
     user_id = session.get("user_id")
     if not user_id:
         return jsonify([]), 401
+
+    Message.query.filter_by(
+        sender_id=other_user_id,
+        receiver_id=user_id,
+        is_read=False
+    ).update({"is_read": True})
+
+    db.session.commit()
 
     messages = Message.query.filter(
         or_(

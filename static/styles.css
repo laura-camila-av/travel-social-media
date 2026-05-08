@@ -1139,13 +1139,15 @@ a:hover, a:active {
 }
 
 .user {
-  padding: 12px;
-  border-radius: 12px;
-  cursor: pointer;
-  margin-bottom: 10px;
-  background: #faf6c3;
-  border: 1.5px solid #e43d12;
-  transition: 0.2s;
+    padding: 12px;
+    border-radius: 12px;
+    cursor: pointer;
+    margin-bottom: 10px;
+    background: #faf6c3;
+    border: 1.5px solid #e43d12;
+    transition: 0.2s;
+
+    justify-content: space-between;
 }
 
 .user:hover {
@@ -1303,6 +1305,16 @@ a:hover, a:active {
   background: #e43d12;
   color: #faf6c3;
 }
+/*unread message*/
+.unread-dot {
+  width: 10px;
+  height: 10px;
+  background-color: #e43d12;
+  border-radius: 50%;
+  display: inline-block;
+  flex-shrink: 0;
+}
+
 
 /*Feed Page Styling Start*/
 .card-info {
