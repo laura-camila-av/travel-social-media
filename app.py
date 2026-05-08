@@ -45,6 +45,7 @@ class Message(db.Model):
     receiver_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     text = db.Column(db.Text, nullable=False)
     created_at = db.Column(db.DateTime, server_default=db.func.now())
+    reaction = db.Column(db.String(10), nullable=True)
 
 class Like(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -585,7 +586,8 @@ def api_get_messages(other_user_id):
             "text": msg.text,
             "sender_id": msg.sender_id,
             "receiver_id": msg.receiver_id,
-            "is_mine": msg.sender_id == user_id
+            "is_mine": msg.sender_id == user_id,
+            "reaction": msg.reaction
         }
         for msg in messages
     ])
@@ -614,6 +616,40 @@ def api_send_message():
     db.session.commit()
 
     return jsonify({"success": True})
+
+@app.route('/api/messages/<int:message_id>/react', methods=['POST'])
+def react_to_message(message_id):
+    user_id = session.get("user_id")
+
+    if not user_id:
+        return jsonify({"error": "Not logged in"}), 401
+
+    data = request.get_json()
+    reaction = data.get("reaction", "").strip()
+
+    allowed_reactions = ["❤️", "😂", "😮", "😢", "👍"]
+
+    if reaction not in allowed_reactions:
+        return jsonify({"error": "Invalid reaction"}), 400
+
+    message = Message.query.get_or_404(message_id)
+
+    # Only sender or receiver can react to the message
+    if message.sender_id != user_id and message.receiver_id != user_id:
+        return jsonify({"error": "Not allowed"}), 403
+
+    # If same reaction clicked again, remove it
+    if message.reaction == reaction:
+        message.reaction = None
+    else:
+        message.reaction = reaction
+
+    db.session.commit()
+
+    return jsonify({
+        "success": True,
+        "reaction": message.reaction
+    })
 
 @app.route('/api/like/<int:itinerary_id>', methods=['POST'])
 def toggle_like(itinerary_id):

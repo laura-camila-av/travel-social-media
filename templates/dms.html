@@ -96,10 +96,42 @@
     }
 
     messages.forEach((msg) => {
+      const wrapper = document.createElement("div");
+      wrapper.className = "dms-message-wrapper " + (msg.is_mine ? "mine-wrapper" : "theirs-wrapper");
+
       const msgEl = document.createElement("div");
       msgEl.className = "dms-message " + (msg.is_mine ? "dms-mine" : "dms-theirs");
-      msgEl.textContent = msg.text;
-      messagesDiv.appendChild(msgEl);
+
+      const textEl = document.createElement("span");
+      textEl.textContent = msg.text;
+      msgEl.appendChild(textEl);
+
+      if (msg.reaction) {
+        const reactionEl = document.createElement("span");
+        reactionEl.className = "message-reaction";
+        reactionEl.textContent = msg.reaction;
+        msgEl.appendChild(reactionEl);
+      }
+
+      const reactionBar = document.createElement("div");
+      reactionBar.className = "reaction-bar";
+
+      ["❤️", "😂", "😮", "😢", "👍"].forEach((emoji) => {
+        const reactionBtn = document.createElement("button");
+        reactionBtn.type = "button";
+        reactionBtn.className = "reaction-btn";
+        reactionBtn.textContent = emoji;
+
+        reactionBtn.addEventListener("click", async () => {
+          await reactToMessage(msg.id, emoji);
+        });
+
+        reactionBar.appendChild(reactionBtn);
+      });
+
+      wrapper.appendChild(msgEl);
+      wrapper.appendChild(reactionBar);
+      messagesDiv.appendChild(wrapper);
     });
 
     messagesDiv.scrollTop = messagesDiv.scrollHeight;
@@ -145,6 +177,22 @@
       loadMessages();
     }
   }, 3000);
+
+  async function reactToMessage(messageId, reaction) {
+    const response = await fetch(`/api/messages/${messageId}/react`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        reaction: reaction
+      })
+    });
+
+    if (response.ok) {
+      await loadMessages();
+    }
+  }
 </script>
 
 </body>
