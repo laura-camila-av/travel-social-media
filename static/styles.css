@@ -1635,3 +1635,44 @@ a:hover, a:active {
     cursor: default;
 }
 /*notification styling end*/
+
+/* itinerary form start */
+.tile-title {
+    margin: 0 0 6px 0;
+    font-size: 18px;
+    font-weight: bold;
+    color: white;
+    text-align: left;
+}
+
+.tile-hint {
+    margin: 0 0 10px 0;
+    font-size: 13px;
+    color: rgba(255, 255, 255, 0.9);
+    text-align: left;
+}
+
+.tile-preview p {
+    margin: 4px 0;
+    font-size: 13px;
+    color: white;
+    text-align: left;
+}
+
+.expanded-field-intro {
+    margin-bottom: 18px;
+    text-align: center;
+}
+
+.expanded-field-intro h3 {
+    margin: 0 0 8px 0;
+    font-size: 28px;
+    color: #a6643c;
+}
+
+.expanded-field-intro p {
+    margin: 0;
+    font-size: 15px;
+    color: #333;
+}
+/* itienrary start end */

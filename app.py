@@ -272,14 +272,18 @@ def upload_avatar():
 
     return jsonify({"error": "File type not allowed"}), 400
 
-@app.route('/create')
+@app.route('/create', methods=['GET', 'POST'])
 def itinerary_create():
     user_id = session.get("user_id")
     if not user_id:
         return redirect(url_for('login_page'))
 
     if request.method == 'POST':
-        title = request.form.get('title', '').strip()
+        title = request.form.get('trip-title', '').strip()
+        creator_name = request.form.get('creator-name', '').strip()
+        destination = request.form.get('destination', '').strip()
+        travel_style = request.form.get('travel-style', '').strip()
+        budget = request.form.get('trip-budget', '').strip()
 
         if not title:
             flash("Please enter a title.", "error")
@@ -287,14 +291,19 @@ def itinerary_create():
 
         new_itinerary = Itinerary(
             title=title,
-            user_id=user_id
+            user_id=user_id,
+            creator_name=creator_name,
+            destination=destination,
+            travel_style=travel_style,
+            budget=float(budget) if budget else None
         )
 
         db.session.add(new_itinerary)
         db.session.commit()
 
         return redirect(url_for('user_profile'))
-    return render_template('itinerary.html')
+
+    return render_template('newitens.html')
 
 @app.route('/search')
 def search():
