@@ -1117,7 +1117,7 @@ a:hover, a:active {
   color: red;
 }
 
-    /* dms page styling */
+/* dms page styling */
 .dms-body {
   margin: 0;
   height: 100vh;
@@ -1245,6 +1245,63 @@ a:hover, a:active {
   padding: 20px;
   color: #777;
   text-align: center;
+}
+/* message reactions */
+.dms-message-wrapper {
+  display: flex;
+  flex-direction: column;
+  max-width: 60%;
+}
+
+.mine-wrapper {
+  align-self: flex-end;
+  align-items: flex-end;
+}
+
+.theirs-wrapper {
+  align-self: flex-start;
+  align-items: flex-start;
+}
+
+.dms-message-wrapper .dms-message {
+  max-width: 100%;
+  position: relative;
+  margin-bottom: 12px;
+}
+
+.message-reaction {
+  position: absolute;
+  bottom: -14px;
+  right: 8px;
+  background: #fffdf4;
+  border: 1px solid #e43d12;
+  border-radius: 50%;
+  padding: 2px 5px;
+  font-size: 13px;
+}
+
+.reaction-bar {
+  display: none;
+  gap: 5px;
+  margin-top: 2px;
+}
+
+.dms-message-wrapper:hover .reaction-bar {
+  display: flex;
+}
+
+.reaction-btn {
+  border: 1px solid #e43d12;
+  background: #fffdf4;
+  border-radius: 20px;
+  cursor: pointer;
+  padding: 3px 6px;
+  font-size: 13px;
+}
+
+.reaction-btn:hover {
+  background: #e43d12;
+  color: #faf6c3;
 }
 
 /*Feed Page Styling Start*/
