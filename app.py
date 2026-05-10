@@ -5,10 +5,14 @@ from werkzeug.security import generate_password_hash, check_password_hash
 import os
 from datetime import timedelta
 from flask_migrate import Migrate
+from flask_wtf.csrf import CSRFProtect
+from dotenv import load_dotenv
+load_dotenv()
 
 app = Flask(__name__)
-app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///users.db"
-app.config["SECRET_KEY"] = "change-this-to-a-random-secret-key"
+app.config["SECRET_KEY"] = os.environ.get("SECRET_KEY")
+app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get("DATABASE_URL", "sqlite:///users.db")
+csrf = CSRFProtect(app)
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 app.config['UPLOAD_FOLDER'] = os.path.join(os.path.dirname(__file__), 'static', 'uploads')
 app.config['ALLOWED_EXTENSIONS'] = {'png', 'jpg', 'jpeg', 'gif'}
@@ -44,6 +48,8 @@ class Message(db.Model):
     sender_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     receiver_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     text = db.Column(db.Text, nullable=False)
+    reaction = db.Column(db.String(10), nullable=True)
+    is_read = db.Column(db.Boolean, default=False)
     created_at = db.Column(db.DateTime, server_default=db.func.now())
 
 class Like(db.Model):
@@ -557,20 +563,37 @@ def api_users():
 
     users = User.query.filter(User.id != user_id).all()
 
-    return jsonify([
-        {
+    result = []
+
+    for user in users:
+        unread_count = Message.query.filter_by(
+            sender_id=user.id,
+            receiver_id=user_id,
+            is_read=False
+        ).count()
+
+        result.append({
             "id": user.id,
             "email": user.email,
-            "username": user.username
-        }
-        for user in users
-    ])
+            "username": user.username,
+            "unread_count": unread_count
+        })
+
+    return jsonify(result)
 
 @app.route('/api/messages/<int:other_user_id>')
 def api_get_messages(other_user_id):
     user_id = session.get("user_id")
     if not user_id:
         return jsonify([]), 401
+
+    Message.query.filter_by(
+        sender_id=other_user_id,
+        receiver_id=user_id,
+        is_read=False
+    ).update({"is_read": True})
+
+    db.session.commit()
 
     messages = Message.query.filter(
         or_(
@@ -585,7 +608,8 @@ def api_get_messages(other_user_id):
             "text": msg.text,
             "sender_id": msg.sender_id,
             "receiver_id": msg.receiver_id,
-            "is_mine": msg.sender_id == user_id
+            "is_mine": msg.sender_id == user_id,
+            "reaction": msg.reaction
         }
         for msg in messages
     ])
@@ -614,6 +638,40 @@ def api_send_message():
     db.session.commit()
 
     return jsonify({"success": True})
+
+@app.route('/api/messages/<int:message_id>/react', methods=['POST'])
+def react_to_message(message_id):
+    user_id = session.get("user_id")
+
+    if not user_id:
+        return jsonify({"error": "Not logged in"}), 401
+
+    data = request.get_json()
+    reaction = data.get("reaction", "").strip()
+
+    allowed_reactions = ["❤️", "😂", "😮", "😢", "👍"]
+
+    if reaction not in allowed_reactions:
+        return jsonify({"error": "Invalid reaction"}), 400
+
+    message = Message.query.get_or_404(message_id)
+
+    # Only sender or receiver can react to the message
+    if message.sender_id != user_id and message.receiver_id != user_id:
+        return jsonify({"error": "Not allowed"}), 403
+
+    # If same reaction clicked again, remove it
+    if message.reaction == reaction:
+        message.reaction = None
+    else:
+        message.reaction = reaction
+
+    db.session.commit()
+
+    return jsonify({
+        "success": True,
+        "reaction": message.reaction
+    })
 
 @app.route('/api/like/<int:itinerary_id>', methods=['POST'])
 def toggle_like(itinerary_id):

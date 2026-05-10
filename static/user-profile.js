@@ -1,3 +1,6 @@
+const csrfToken = document.querySelector(
+  'meta[name="csrf-token"]'
+).content;
 $('#bio-text').dblclick(function() {
     $(this).attr('contenteditable', 'true');
     $(this).focus();
@@ -14,6 +17,9 @@ $('#bio-text').dblclick(function() {
         $.ajax({
             url: '/save-bio',
             method: 'POST',
+            headers: {
+                "X-CSRFToken": csrfToken
+            },
             contentType: 'application/json',
             data: JSON.stringify({ bio: bioText }),
             success: function() {
@@ -35,6 +41,9 @@ $('#avatar-upload').change(function() {
     $.ajax({
         url: '/upload-avatar',
         method: 'POST',
+        headers: {
+            "X-CSRFToken": csrfToken
+        },
         data: formData,
         processData: false,
         contentType: false,
@@ -62,6 +71,9 @@ function collectAndSaveInterests() {
     $.ajax({
         url: '/save-interests',
         method: 'POST',
+        headers: {
+            "X-CSRFToken": csrfToken
+        },
         contentType: 'application/json',
         data: JSON.stringify({ interests: interests }),
         success: function() {
