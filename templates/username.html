@@ -13,6 +13,7 @@
       <p class="username-page-text">Pick a username that other users will see.</p>
 
       <form method="POST" action="/username">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
         <div class="username-page-input-group">
           <label for="username">Username</label>
           <input type="text" id="username" name="username" placeholder="Enter username" required>

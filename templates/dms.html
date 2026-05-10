@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="csrf-token" content="{{ csrf_token() }}">
   <title>DMs</title>
 
   <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
@@ -41,7 +42,7 @@
   const messageForm = document.getElementById("messageForm");
   const messageInput = document.getElementById("messageInput");
   const sendButton = document.getElementById("sendButton");
-
+  const csrfToken = document.querySelector('meta[name="csrf-token"]').content;
   let selectedUserId = null;
 
   async function loadUsers() {
@@ -163,7 +164,8 @@
     const response = await fetch("/api/messages", {
       method: "POST",
       headers: {
-        "Content-Type": "application/json"
+        "Content-Type": "application/json",
+        "X-CSRFToken": csrfToken
       },
       body: JSON.stringify({
         receiver_id: selectedUserId,
@@ -191,7 +193,8 @@
     const response = await fetch(`/api/messages/${messageId}/react`, {
       method: "POST",
       headers: {
-        "Content-Type": "application/json"
+        "Content-Type": "application/json",
+        "X-CSRFToken": csrfToken
       },
       body: JSON.stringify({
         reaction: reaction

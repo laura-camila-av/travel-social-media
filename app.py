@@ -5,10 +5,12 @@ from werkzeug.security import generate_password_hash, check_password_hash
 import os
 from datetime import timedelta
 from flask_migrate import Migrate
+from flask_wtf.csrf import CSRFProtect
 
 app = Flask(__name__)
 app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///users.db"
 app.config["SECRET_KEY"] = "change-this-to-a-random-secret-key"
+csrf = CSRFProtect(app)
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 app.config['UPLOAD_FOLDER'] = os.path.join(os.path.dirname(__file__), 'static', 'uploads')
 app.config['ALLOWED_EXTENSIONS'] = {'png', 'jpg', 'jpeg', 'gif'}
