@@ -785,7 +785,6 @@ a:hover, a:active {
     height: 100%;
     background-color: #e43d12;
     z-index: 100;
-    overflow: hidden;
     transition: width 0.3s ease;
 }
 
@@ -845,9 +844,34 @@ a:hover, a:active {
     }
 }
 
+.navigation-bar:not(.expanded) .nav-links li {
+    position: relative;
+}
+
+.navigation-bar:not(.expanded) .nav-label {
+    opacity: 0;
+    position: absolute;
+    left: 54px; /* just outside the nav edge */
+    top: 50%;
+    transform: translateY(-50%);
+    background-color: #333;
+    color: white;
+    font-size: 13px;
+    padding: 4px 10px;
+    border-radius: 6px;
+    white-space: nowrap;
+    pointer-events: none;
+    transition: opacity 0.2s ease;
+}
+
+.navigation-bar:not(.expanded) .nav-links li:hover .nav-label {
+    opacity: 1;
+}
+
 .page-wrapper.nav-expanded {
     margin-left: 200px;
 }
+
 /*Itinerary display styling START*/
 .page-wrapper {
     margin-left: 50px; /* same as collapsed nav width */
