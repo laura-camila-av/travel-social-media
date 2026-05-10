@@ -75,6 +75,10 @@
                     </div><br>
                 </div>
 
+                <div class="top-form-actions">
+                    <button type="button" class="btn btn-itinerary-form" onclick="clearDraft()">Clear Draft</button>
+                </div>
+
                 <div id="days-container"></div>
 
                 <button type="submit" class="btn btn-itinerary-form" id="submit-btn" style="display:none;">Submit Itinerary</button>
@@ -123,7 +127,7 @@
                             <div class="detail-icon-panel"><i class="fa-solid fa-camera"></i></div>
                             <div class="detail-content">
                                 <h3 class="tile-title">Activities</h3>
-                                <p class="tile-hint">Add places and things you did</p>
+                                <p class="tile-hint" id="hint-activities-day${i}">Add places and things you did</p>
                                 <div class="tile-preview" id="preview-activities-day${i}"></div>
                             </div>
                         </div>
@@ -132,7 +136,7 @@
                             <div class="detail-icon-panel"><i class="fa-solid fa-utensils"></i></div>
                             <div class="detail-content">
                                 <h3 class="tile-title">Dining</h3>
-                                <p class="tile-hint">Add restaurants, cafes, or meals</p>
+                                <p class="tile-hint" id="hint-dining-day${i}">Add restaurants, cafes, or meals</p>
                                 <div class="tile-preview" id="preview-dining-day${i}"></div>
                             </div>
                         </div>
@@ -141,7 +145,7 @@
                             <div class="detail-icon-panel"><i class="fa-solid fa-car"></i></div>
                             <div class="detail-content">
                                 <h3 class="tile-title">Transport</h3>
-                                <p class="tile-hint">Choose how you travelled</p>
+                                <p class="tile-hint" id="hint-transport-day${i}">Choose how you travelled</p>
                                 <div class="tile-preview" id="preview-transport-day${i}"></div>
                             </div>
                         </div>
@@ -150,7 +154,7 @@
                             <div class="detail-icon-panel"><i class="fa-solid fa-bed"></i></div>
                             <div class="detail-content">
                                 <h3 class="tile-title">Accommodation</h3>
-                                <p class="tile-hint">Add hotel or stay details</p>
+                                <p class="tile-hint" id="hint-accommodation-day${i}">Add hotel or stay details</p>
                                 <div class="tile-preview" id="preview-accommodation-day${i}"></div>
                             </div>
                         </div>
@@ -159,7 +163,7 @@
                             <div class="detail-icon-panel"><i class="fa-solid fa-dollar-sign"></i></div>
                             <div class="detail-content">
                                 <h3 class="tile-title">Cost</h3>
-                                <p class="tile-hint">Enter total spent for this day</p>
+                                <p class="tile-hint" id="hint-cost-day${i}">Enter total spent for this day</p>
                                 <div class="tile-preview" id="preview-cost-day${i}"></div>
                             </div>
                         </div>
@@ -168,7 +172,7 @@
                             <div class="detail-icon-panel"><i class="fa-solid fa-person-skiing"></i></div>
                             <div class="detail-content">
                                 <h3 class="tile-title">Rented Items</h3>
-                                <p class="tile-hint">List anything you hired or rented</p>
+                                <p class="tile-hint" id="hint-rented-day${i}">List anything you hired or rented</p>
                                 <div class="tile-preview" id="preview-rented-day${i}"></div>
                             </div>
                         </div>
@@ -177,7 +181,7 @@
                             <div class="detail-icon-panel"><i class="fa-solid fa-image"></i></div>
                             <div class="detail-content">
                                 <h3 class="tile-title">Photo</h3>
-                                <p class="tile-hint">Upload an image and caption</p>
+                                <p class="tile-hint" id="hint-photo-day${i}">Upload an image and caption</p>
                                 <div class="tile-preview" id="preview-photo-day${i}"></div>
                             </div>
                         </div>
@@ -428,41 +432,47 @@
         }
 
         function updateTilePreview(field, dayNum) {
-            const preview = document.getElementById(`preview-${field}-day${dayNum}`);
-            preview.innerHTML = "";
+    const preview = document.getElementById(`preview-${field}-day${dayNum}`);
+    const hint = document.getElementById(`hint-${field}-day${dayNum}`);
 
-            if (field === "activities") {
-                document.querySelectorAll(`#activity-list-day${dayNum} li`).forEach(item => {
-                    const p = document.createElement("p");
-                    p.textContent = item.textContent.replace("✕", "").trim();
-                    preview.appendChild(p);
-                });
-            } else if (field === "dining") {
-                document.querySelectorAll(`#dining-list-day${dayNum} li`).forEach(item => {
-                    const p = document.createElement("p");
-                    p.textContent = item.textContent.replace("✕", "").trim();
-                    preview.appendChild(p);
-                });
-            } else if (field === "transport") {
-                document.querySelectorAll(`input[name="transport-day${dayNum}"]:checked`).forEach(cb => {
-                    const p = document.createElement("p");
-                    p.textContent = cb.value;
-                    preview.appendChild(p);
-                });
-            } else if (field === "accommodation") {
-                const val = document.getElementById(`accommodation-day${dayNum}`)?.value.trim();
-                if (val) preview.innerHTML = `<p>${val}</p>`;
-            } else if (field === "cost") {
-                const val = document.getElementById(`cost-day${dayNum}`)?.value.trim();
-                if (val) preview.innerHTML = `<p>$${val}</p>`;
-            } else if (field === "rented") {
-                const val = document.getElementById(`rented-items-day${dayNum}`)?.value.trim();
-                if (val) preview.innerHTML = `<p>${val}</p>`;
-            } else if (field === "photo") {
-                const val = document.getElementById(`file-name-day${dayNum}`)?.textContent;
-                if (val && val !== "No file chosen") preview.innerHTML = `<p>${val}</p>`;
-            }
-        }
+    preview.innerHTML = "";
+
+    if (field === "activities") {
+        document.querySelectorAll(`#activity-list-day${dayNum} li`).forEach(item => {
+            const p = document.createElement("p");
+            p.textContent = item.textContent.replace("✕", "").trim();
+            preview.appendChild(p);
+        });
+    } else if (field === "dining") {
+        document.querySelectorAll(`#dining-list-day${dayNum} li`).forEach(item => {
+            const p = document.createElement("p");
+            p.textContent = item.textContent.replace("✕", "").trim();
+            preview.appendChild(p);
+        });
+    } else if (field === "transport") {
+        document.querySelectorAll(`input[name="transport-day${dayNum}"]:checked`).forEach(cb => {
+            const p = document.createElement("p");
+            p.textContent = cb.value;
+            preview.appendChild(p);
+        });
+    } else if (field === "accommodation") {
+        const val = document.getElementById(`accommodation-day${dayNum}`)?.value.trim();
+        if (val) preview.innerHTML = `<p>${val}</p>`;
+    } else if (field === "cost") {
+        const val = document.getElementById(`cost-day${dayNum}`)?.value.trim();
+        if (val) preview.innerHTML = `<p>$${val}</p>`;
+    } else if (field === "rented") {
+        const val = document.getElementById(`rented-items-day${dayNum}`)?.value.trim();
+        if (val) preview.innerHTML = `<p>${val}</p>`;
+    } else if (field === "photo") {
+        const val = document.getElementById(`file-name-day${dayNum}`)?.textContent;
+        if (val && val !== "No file chosen") preview.innerHTML = `<p>${val}</p>`;
+    }
+
+    if (hint) {
+        hint.style.display = preview.innerHTML.trim() !== "" ? "none" : "block";
+    }
+}
 
         document.addEventListener("DOMContentLoaded", function () {
             setupGuideModal();
