@@ -561,7 +561,29 @@ def api_users():
     if not user_id:
         return jsonify([]), 401
 
-    users = User.query.filter(User.id != user_id).all()
+    #only users that the user follows or has received a message from
+    users = User.query.filter(
+    User.id != user_id,
+    or_(
+        User.id.in_(
+            db.session.query(Follow.following_id).filter_by(
+                follower_id=user_id
+            )
+        ),
+
+        User.id.in_(
+            db.session.query(Message.sender_id).filter(
+                Message.receiver_id == user_id
+            )
+        ),
+
+        User.id.in_(
+            db.session.query(Message.receiver_id).filter(
+                Message.sender_id == user_id
+            )
+        )
+    )
+    ).all()
 
     result = []
 
