@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <link rel="stylesheet" href="../static/styles.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css">
@@ -158,12 +159,16 @@
     const likeButton = document.getElementById("likeButton");
     const likeIcon = document.getElementById("likeIcon");
     const likeCount = document.getElementById("likeCount");
+    const csrfToken = document.querySelector('meta[name="csrf-token"]').content;
 
     likeButton.addEventListener("click", async function () {
         const itineraryId = likeButton.dataset.itineraryId;
 
         const response = await fetch(`/api/like/${itineraryId}`, {
-            method: "POST"
+            method: "POST",
+            headers: {
+                "X-CSRFToken": csrfToken
+            }
         });
 
         if (response.status === 401) {
@@ -197,7 +202,10 @@
             const itineraryId = saveButton.dataset.itineraryId;
 
             const response = await fetch(`/api/save/${itineraryId}`, {
-                method: "POST"
+                method: "POST",
+                headers: {
+                    "X-CSRFToken": csrfToken
+                }
             });
 
             if (response.status === 401) {

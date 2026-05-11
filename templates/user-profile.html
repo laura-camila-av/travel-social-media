@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css">
@@ -165,7 +166,6 @@
         const itinerarySection = document.getElementById("itineraries-section");
         const savedSection = document.getElementById("saved-section");
         const tabs = document.querySelectorAll(".profile-tab");
-
         itinerarySection.classList.add("hidden");
 
         if (savedSection) {
@@ -186,13 +186,16 @@
     {% if not is_own_profile %}
     <script>
         const followButton = document.getElementById("follow-button");
-
+        const csrfToken = document.querySelector('meta[name="csrf-token"]').content;
         if (followButton) {
             followButton.addEventListener("click", async function () {
                 const userId = this.dataset.userId;
 
                 const response = await fetch(`/api/follow/${userId}`, {
-                    method: "POST"
+                    method: "POST",
+                    headers: {
+                        "X-CSRFToken": csrfToken
+                    }
                 });
 
                 const data = await response.json();

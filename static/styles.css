@@ -781,11 +781,28 @@ a:hover, a:active {
     position: fixed;
     top: 0;
     left: 0;
+<<<<<<< collapsible-nav-bar
     width: 50px;
     height: 100%;
     background-color: #e43d12;
     z-index: 100;
     transition: width 0.3s ease;
+=======
+    width: 200px;
+    height: 100vh;
+    background-color: #e43d12;
+    display: flex;
+    flex-direction: column;
+    z-index: 1000;
+}
+.navigation-bar ul {
+    list-style-type: none;
+    margin: 0;
+    padding: 20px 0;
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+>>>>>>> main
 }
 
 .navigation-bar.expanded {
@@ -872,6 +889,25 @@ a:hover, a:active {
     margin-left: 200px;
 }
 
+<<<<<<< collapsible-nav-bar
+=======
+.navbar-logo {
+    margin-top: auto;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding-bottom: 0px;
+}
+.navbar-logo img {
+    width: 200px;
+    height: auto;
+    opacity: 0.95;
+    transition: 0.2s;
+}
+.navbar-logo img:hover {
+    transform: scale(1.05);
+}
+>>>>>>> main
 /*Itinerary display styling START*/
 .page-wrapper {
     margin-left: 50px; /* same as collapsed nav width */
@@ -1192,7 +1228,7 @@ a:hover, a:active {
   color: red;
 }
 
-    /* dms page styling */
+/* dms page styling */
 .dms-body {
   margin: 0;
   height: 100vh;
@@ -1214,13 +1250,15 @@ a:hover, a:active {
 }
 
 .user {
-  padding: 12px;
-  border-radius: 12px;
-  cursor: pointer;
-  margin-bottom: 10px;
-  background: #faf6c3;
-  border: 1.5px solid #e43d12;
-  transition: 0.2s;
+    padding: 12px;
+    border-radius: 12px;
+    cursor: pointer;
+    margin-bottom: 10px;
+    background: #faf6c3;
+    border: 1.5px solid #e43d12;
+    transition: 0.2s;
+
+    justify-content: space-between;
 }
 
 .user:hover {
@@ -1321,6 +1359,73 @@ a:hover, a:active {
   color: #777;
   text-align: center;
 }
+/* message reactions */
+.dms-message-wrapper {
+  display: flex;
+  flex-direction: column;
+  max-width: 60%;
+}
+
+.mine-wrapper {
+  align-self: flex-end;
+  align-items: flex-end;
+}
+
+.theirs-wrapper {
+  align-self: flex-start;
+  align-items: flex-start;
+}
+
+.dms-message-wrapper .dms-message {
+  max-width: 100%;
+  position: relative;
+  margin-bottom: 12px;
+}
+
+.message-reaction {
+  position: absolute;
+  bottom: -14px;
+  right: 8px;
+  background: #fffdf4;
+  border: 1px solid #e43d12;
+  border-radius: 50%;
+  padding: 2px 5px;
+  font-size: 13px;
+}
+
+.reaction-bar {
+  display: none;
+  gap: 5px;
+  margin-top: 2px;
+}
+
+.dms-message-wrapper:hover .reaction-bar {
+  display: flex;
+}
+
+.reaction-btn {
+  border: 1px solid #e43d12;
+  background: #fffdf4;
+  border-radius: 20px;
+  cursor: pointer;
+  padding: 3px 6px;
+  font-size: 13px;
+}
+
+.reaction-btn:hover {
+  background: #e43d12;
+  color: #faf6c3;
+}
+/*unread message*/
+.unread-dot {
+  width: 10px;
+  height: 10px;
+  background-color: #e43d12;
+  border-radius: 50%;
+  display: inline-block;
+  flex-shrink: 0;
+}
+
 
 /*Feed Page Styling Start*/
 .card-info {
