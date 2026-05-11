@@ -15,13 +15,13 @@ body {
 
 h1 {
     font-size:xx-large;
-    color: #e43d12 !important; /*bootstrap overrides these colours*/
+    color: #e43d12;
 
 }
 
 h2 {
     font-size: x-large;
-    color: #a6643c !important; /*bootstrap overrides these colours*/
+    color: #a6643c;
     
 }
 
@@ -781,13 +781,6 @@ a:hover, a:active {
     position: fixed;
     top: 0;
     left: 0;
-<<<<<<< collapsible-nav-bar
-    width: 50px;
-    height: 100%;
-    background-color: #e43d12;
-    z-index: 100;
-    transition: width 0.3s ease;
-=======
     width: 200px;
     height: 100vh;
     background-color: #e43d12;
@@ -802,95 +795,20 @@ a:hover, a:active {
     display: flex;
     flex-direction: column;
     flex: 1;
->>>>>>> main
 }
 
-.navigation-bar.expanded {
-    width: 200px;
-}
-
-.nav-toggle-btn {
-    background: none;
-    border: none;
+.navigation-bar li a {
+    display: block;
     color: white;
-    font-size: 20px;
-    padding: 16px 14px;
-    cursor: pointer;
-    width: 100%;
-    text-align: left;
-}
-
-.nav-links {
-    list-style: none;
-    margin: 0;
-    padding: 0;
-}
-
-.nav-links li a {
-    display: flex;
-    align-items: center;
-    gap: 14px;
-    color: white;
-    padding: 16px 14px;
+    padding: 20px 14px;
     text-decoration: none;
-    white-space: nowrap;
 }
 
-.nav-links li a:hover {
+.navigation-bar li a:hover {
     background-color: #e66240;
-}
-
-.nav-links li a i {
-    font-size: 18px;
-    min-width: 22px;
-    text-align: center;
-}
-
-.nav-label {
-    opacity: 0;
-    transition: opacity 0.2s ease;
-}
-
-.navigation-bar.expanded .nav-label {
-    opacity: 1;
-}
-
-@media (max-width: 768px) {
-    .navigation-bar {
-        display: none;
-    }
-}
-
-.navigation-bar:not(.expanded) .nav-links li {
-    position: relative;
-}
-
-.navigation-bar:not(.expanded) .nav-label {
-    opacity: 0;
-    position: absolute;
-    left: 54px; /* just outside the nav edge */
-    top: 50%;
-    transform: translateY(-50%);
-    background-color: #333;
     color: white;
-    font-size: 13px;
-    padding: 4px 10px;
-    border-radius: 6px;
-    white-space: nowrap;
-    pointer-events: none;
-    transition: opacity 0.2s ease;
 }
 
-.navigation-bar:not(.expanded) .nav-links li:hover .nav-label {
-    opacity: 1;
-}
-
-.page-wrapper.nav-expanded {
-    margin-left: 200px;
-}
-
-<<<<<<< collapsible-nav-bar
-=======
 .navbar-logo {
     margin-top: auto;
     display: flex;
@@ -907,15 +825,12 @@ a:hover, a:active {
 .navbar-logo img:hover {
     transform: scale(1.05);
 }
->>>>>>> main
 /*Itinerary display styling START*/
 .page-wrapper {
-    margin-left: 50px; /* same as collapsed nav width */
+    margin-left: 200px; /* same as nav width */
     display: flex;
     height: 100vh;
     overflow: hidden;
-    transition: margin-left 0.3s ease; /* smooth slide */
-    flex: 1;
 }
 
 .middle-column {
@@ -1565,7 +1480,7 @@ a:hover, a:active {
     background-color: black;
 }
 /* logout */
-.logout-modal {
+.modal {
     position: fixed;
     inset: 0;
     background: rgba(0,0,0,0.4);
@@ -1573,10 +1488,6 @@ a:hover, a:active {
     align-items: center;
     justify-content: center;
     z-index: 1000;
-}
-
-.logout-modal.hidden {
-    display: none !important;
 }
 
 .logout-modal-box {
