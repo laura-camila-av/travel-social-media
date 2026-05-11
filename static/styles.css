@@ -1770,4 +1770,25 @@ a:hover, a:active {
     font-size: 15px;
     color: #333;
 }
+
+.save-confirmation {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    background-color: #f03d0c;
+    color: white;
+    padding: 12px 18px;
+    border-radius: 10px;
+    font-size: 15px;
+    font-weight: bold;
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.2);
+    z-index: 2000;
+    opacity: 1;
+    transition: opacity 0.3s ease;
+}
+
+.save-confirmation.hidden {
+    display: none;
+}
+
 /* itienrary start end */
