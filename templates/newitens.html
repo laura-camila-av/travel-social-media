@@ -191,7 +191,7 @@
                         <div class="field-expanded-header">
                             <button type="button" class="exit-field-btn" onclick="exitField(${i})">Exit field</button>
                             <div>
-                                <button type="button" class="btn btn-itinerary-form" onclick="saveDraft()">Save Progress</button>
+                                <button type="button" class="btn btn-itinerary-form" onclick="manualSaveDraft()">Save Progress</button>
                                 <button type="button" class="btn btn-itinerary-form" onclick="clearDraft()">Clear Draft</button>
                             </div>
                         </div>
@@ -587,6 +587,25 @@
             localStorage.setItem(STORAGE_KEY, JSON.stringify(draft));
         }
 
+        let saveMessageTimeout;
+
+        function manualSaveDraft() {
+            saveDraft();
+            showSaveConfirmation();
+        }
+
+        function showSaveConfirmation() {
+            const confirmation = document.getElementById("save-confirmation");
+            if (!confirmation) return;
+
+            confirmation.classList.remove("hidden");
+
+            clearTimeout(saveMessageTimeout);
+            saveMessageTimeout = setTimeout(() => {
+                confirmation.classList.add("hidden");
+            }, 1500);
+        }
+
         function clearDraft() {
             localStorage.removeItem(STORAGE_KEY);
 
@@ -761,5 +780,8 @@
             });
         }
     </script>
+    <div id="save-confirmation" class="save-confirmation hidden">
+        Draft saved
+    </div>
 </body>
 </html>
