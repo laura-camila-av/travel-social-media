@@ -1196,7 +1196,23 @@ a:hover, a:active {
   font-weight: bold;
   color: #a6643c;
 }
+.chat-profile-link,
+.chat-profile-link:link,
+.chat-profile-link:visited,
+.chat-profile-link:active {
+    color: #e43d12;
+    text-decoration: none;
+    background: none;
+    border: none;
+    box-shadow: none;
+    display: inline;
+    margin: 0;
+    padding: 0;
+}
 
+.chat-profile-link:hover {
+    text-decoration: underline;
+}
 /* MESSAGES */
 .dms-messages {
   flex: 1;
