@@ -92,6 +92,7 @@
         let totalDays = 0;
         const STORAGE_KEY = "itineraryDraft";
         let selectedPhotosByDay = {};
+        let photoDataTransferByDay = {};
 
         function generateDays() {
             const startDateInput = document.getElementById("start-date").value;
@@ -253,6 +254,7 @@
                 const fileList = daySection.querySelector(`#file-list-day${i}`);
 
                 selectedPhotosByDay[i] = selectedPhotosByDay[i] || [];
+                photoDataTransferByDay[i] = photoDataTransferByDay[i] || new DataTransfer();
 
                 fileInput.addEventListener("change", function () {
                     if (this.files.length > 0) {
@@ -260,14 +262,14 @@
                             const alreadyExists = selectedPhotosByDay[i].some(existing => existing.name === file.name);
                             if (!alreadyExists) {
                                 selectedPhotosByDay[i].push(file);
+                                photoDataTransferByDay[i].items.add(file);
                             }
                         });
                     }
 
+                    fileInput.files = photoDataTransferByDay[i].files;
                     renderPhotoList(i);
                     saveDraft();
-
-                    this.value = "";
                 });
 
                 setupActivityInput(i);
@@ -813,6 +815,21 @@
             if (!selectedPhotosByDay[dayNum]) return;
 
             selectedPhotosByDay[dayNum].splice(fileIndex, 1);
+
+            const newTransfer = new DataTransfer();
+            selectedPhotosByDay[dayNum].forEach(file => {
+                if (file instanceof File) {
+                    newTransfer.items.add(file);
+                }
+            });
+
+            photoDataTransferByDay[dayNum] = newTransfer;
+
+            const fileInput = document.getElementById(`photos-day${dayNum}`);
+            if (fileInput) {
+                fileInput.files = photoDataTransferByDay[dayNum].files;
+            }
+
             renderPhotoList(dayNum);
             updateTilePreview("photo", dayNum);
             saveDraft();

@@ -105,11 +105,22 @@ class ItineraryDay(db.Model):
     transport_taken = db.Column(db.Text, nullable=True)
     accommodation = db.Column(db.String(255), nullable=True)
 
-    photo_filename = db.Column(db.String(255), nullable=True)
     caption = db.Column(db.Text, nullable=True)
 
     activity_details = db.Column(db.Text, nullable=True)
     dining_details = db.Column(db.Text, nullable=True)
+
+    photos = db.relationship(
+        'ItineraryPhoto',
+        backref='day',
+        cascade='all, delete-orphan',
+        lazy=True
+    )
+
+class ItineraryPhoto(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    itinerary_day_id = db.Column(db.Integer, db.ForeignKey('itinerary_day.id'), nullable=False)
+    filename = db.Column(db.String(255), nullable=False)
 
 class Follow(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -344,8 +355,6 @@ def itinerary_create():
             except ValueError:
                 total_cost = None
 
-            print("Saving day", day_num, total_cost, rented_items, accommodation, transport, caption)
-
             new_day = ItineraryDay(
                 itinerary_id=new_itinerary.id,
                 day_number=day_num,
@@ -356,13 +365,26 @@ def itinerary_create():
                 caption=caption or None,
                 activity_details=activity_details,
                 dining_details=dining_details,
-                photo_filename=None
             )
 
             db.session.add(new_day)
+            db.session.flush()
 
-        print("Saving itinerary:", title, destination, travel_style, budget)
-        print("Total days:", total_days)
+            photos = request.files.getlist(f'photos-day{day_num}')
+
+            for index, photo in enumerate(photos, start=1):
+                if photo and photo.filename and allowed_file(photo.filename):
+                    ext = photo.filename.rsplit('.', 1)[1].lower()
+                    filename = f"itinerary_{new_itinerary.id}_day{day_num}_{index}.{ext}"
+                    filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+                    photo.save(filepath)
+
+                    new_photo = ItineraryPhoto(
+                        itinerary_day_id=new_day.id,
+                        filename=filename
+                    )
+                    db.session.add(new_photo)
+
 
         db.session.commit()
         flash("Itinerary created successfully.", "success")
