@@ -146,7 +146,7 @@
                             <div class="detail-icon-panel"><i class="fa-solid fa-car"></i></div>
                             <div class="detail-content">
                                 <h3 class="tile-title">Transport</h3>
-                                <p class="tile-hint" id="hint-transport-day${i}">Choose how you travelled</p>
+                                <p class="tile-hint" id="hint-transport-day${i}">Type how you travelled</p>
                                 <div class="tile-preview" id="preview-transport-day${i}"></div>
                             </div>
                         </div>
@@ -217,20 +217,7 @@
                         </div>
 
                         <div id="form-transport-day${i}">
-                            <div class="checkbox-group">
-                                <label><input type="checkbox" name="transport-day${i}" value="Rented a car"> Rented a car</label>
-                                <label><input type="checkbox" name="transport-day${i}" value="Taxi"> Taxi</label>
-                                <label><input type="checkbox" name="transport-day${i}" value="Rideshare (Uber, Gojek, Didi)"> Rideshare (Uber, Gojek, Didi)</label>
-                                <label><input type="checkbox" name="transport-day${i}" value="Bus"> Bus</label>
-                                <label><input type="checkbox" name="transport-day${i}" value="Train"> Train</label>
-                                <label><input type="checkbox" name="transport-day${i}" value="Tram"> Tram</label>
-                                <label><input type="checkbox" name="transport-day${i}" value="Subway/Metro"> Subway/Metro</label>
-                                <label><input type="checkbox" name="transport-day${i}" value="Ferry/Boat"> Ferry/Boat</label>
-                                <label><input type="checkbox" name="transport-day${i}" value="Domestic flight"> Domestic flight</label>
-                                <label><input type="checkbox" name="transport-day${i}" value="Tuk tuk"> Tuk tuk</label>
-                                <label><input type="checkbox" name="transport-day${i}" value="Rented a motorbike/scooter"> Rented a motorbike/scooter</label>
-                                <label><input type="checkbox" name="transport-day${i}" value="Other"> Other</label>
-                            </div>
+                            <input type="text" id="transport-day${i}" name="transport-day${i}" placeholder="Enter transport used, e.g. Train, Taxi, Bus">
                         </div>
 
                         <div id="form-accommodation-day${i}">
@@ -406,7 +393,7 @@
             const hints = {
                 activities: "Type an activity and press Enter, then add notes for each activity.",
                 dining: "Type a restaurant or meal and press Enter, then add any extra notes.",
-                transport: "Select all transport methods you used on this day.",
+                transport: "Type the transport you used on this day, for example Train, Taxi, or Bus.",
                 accommodation: "Enter where you stayed for this day.",
                 cost: "Enter the total amount spent for this day.",
                 rented: "List any items you rented or hired.",
@@ -466,11 +453,8 @@
             preview.appendChild(p);
         });
     } else if (field === "transport") {
-        document.querySelectorAll(`input[name="transport-day${dayNum}"]:checked`).forEach(cb => {
-            const p = document.createElement("p");
-            p.textContent = cb.value;
-            preview.appendChild(p);
-        });
+        const val = document.getElementById(`transport-day${dayNum}`)?.value.trim();
+        if (val) preview.innerHTML = `<p>${val}</p>`;
     } else if (field === "accommodation") {
         const val = document.getElementById(`accommodation-day${dayNum}`)?.value.trim();
         if (val) preview.innerHTML = `<p>${val}</p>`;
@@ -567,11 +551,6 @@
             document.querySelectorAll(".day-section").forEach((section, index) => {
                 const dayNum = index + 1;
 
-                const transports = [];
-                document.querySelectorAll(`input[name="transport-day${dayNum}"]:checked`).forEach(cb => {
-                    transports.push(cb.value);
-                });
-
                 const activityDetails = [];
                 document.querySelectorAll(`#activity-details-day${dayNum} .activity-detail-box`).forEach(box => {
                     const title = box.querySelector(".activity-detail-title")?.textContent.trim() || "";
@@ -592,7 +571,7 @@
                     accommodation: document.getElementById(`accommodation-day${dayNum}`)?.value || "",
                     caption: document.getElementById(`caption-day${dayNum}`)?.value || "",
                     fileNames: (selectedPhotosByDay[dayNum] || []).map(file => file.name),
-                    transports,
+                    transport: document.getElementById(`transport-day${dayNum}`)?.value || "",
                     activityDetails,
                     diningDetails
                 });
@@ -677,11 +656,13 @@
                     const rentedField = document.getElementById(`rented-items-day${dayNum}`);
                     const accommodationField = document.getElementById(`accommodation-day${dayNum}`);
                     const captionField = document.getElementById(`caption-day${dayNum}`);
+                    const transportField = document.getElementById(`transport-day${dayNum}`);
 
                     if (costField) costField.value = day.cost || "";
                     if (rentedField) rentedField.value = day.rentedItems || "";
                     if (accommodationField) accommodationField.value = day.accommodation || "";
                     if (captionField) captionField.value = day.caption || "";
+                    if (transportField) transportField.value = day.transport || "";
                     selectedPhotosByDay[dayNum] = [];
 
                     if (day.fileNames && day.fileNames.length > 0) {
@@ -691,12 +672,6 @@
                     }
 
                     renderPhotoList(dayNum);
-
-                    (day.transports || []).forEach(value => {
-                        const checkbox = Array.from(document.querySelectorAll(`input[name="transport-day${dayNum}"]`))
-                            .find(cb => cb.value === value);
-                        if (checkbox) checkbox.checked = true;
-                    });
 
                     restoreDynamicList(dayNum, "activity", day.activityDetails || []);
                     restoreDynamicList(dayNum, "dining", day.diningDetails || []);
