@@ -90,6 +90,7 @@
         let currentDay = 1;
         let totalDays = 0;
         const STORAGE_KEY = "itineraryDraft";
+        let selectedPhotosByDay = {};
 
         function generateDays() {
             const startDateInput = document.getElementById("start-date").value;
@@ -245,10 +246,12 @@
                         </div>
 
                         <div id="form-photo-day${i}">
-                            <label for="photos-day${i}" class="btn btn-itinerary-form">Choose File</label>
-                            <input type="file" id="photos-day${i}" name="photos-day${i}" accept="image/*" class="file-input">
-                            <span id="file-name-day${i}" class="file-name">No file chosen</span><br><br>
-                            <textarea id="caption-day${i}" name="caption-day${i}" rows="3" placeholder="Enter a caption for your photo"></textarea>
+                            <label for="photos-day${i}" class="btn btn-itinerary-form">Choose Photos</label>
+                            <input type="file" id="photos-day${i}" name="photos-day${i}" accept="image/*" class="file-input" multiple>
+                            <div id="file-list-day${i}" class="file-list">
+                                <p class="file-placeholder">No files chosen</p>
+                            </div><br>
+                            <textarea id="caption-day${i}" name="caption-day${i}" rows="3" placeholder="Enter a caption for your photos"></textarea>
                         </div>
                     </div>
                 `;
@@ -256,11 +259,24 @@
                 daysContainer.appendChild(daySection);
 
                 const fileInput = daySection.querySelector(`#photos-day${i}`);
-                const fileName = daySection.querySelector(`#file-name-day${i}`);
+                const fileList = daySection.querySelector(`#file-list-day${i}`);
+
+                selectedPhotosByDay[i] = selectedPhotosByDay[i] || [];
 
                 fileInput.addEventListener("change", function () {
-                    fileName.textContent = this.files.length > 0 ? this.files[0].name : "No file chosen";
+                    if (this.files.length > 0) {
+                        Array.from(this.files).forEach(file => {
+                            const alreadyExists = selectedPhotosByDay[i].some(existing => existing.name === file.name);
+                            if (!alreadyExists) {
+                                selectedPhotosByDay[i].push(file);
+                            }
+                        });
+                    }
+
+                    renderPhotoList(i);
                     saveDraft();
+
+                    this.value = "";
                 });
 
                 setupActivityInput(i);
@@ -465,10 +481,13 @@
         const val = document.getElementById(`rented-items-day${dayNum}`)?.value.trim();
         if (val) preview.innerHTML = `<p>${val}</p>`;
     } else if (field === "photo") {
-        const val = document.getElementById(`file-name-day${dayNum}`)?.textContent;
-        if (val && val !== "No file chosen") preview.innerHTML = `<p>${val}</p>`;
+        const files = selectedPhotosByDay[dayNum] || [];
+        files.forEach(file => {
+            const p = document.createElement("p");
+            p.textContent = file.name;
+            preview.appendChild(p);
+        });
     }
-
     if (hint) {
         hint.style.display = preview.innerHTML.trim() !== "" ? "none" : "block";
     }
@@ -572,7 +591,7 @@
                     rentedItems: document.getElementById(`rented-items-day${dayNum}`)?.value || "",
                     accommodation: document.getElementById(`accommodation-day${dayNum}`)?.value || "",
                     caption: document.getElementById(`caption-day${dayNum}`)?.value || "",
-                    fileName: document.getElementById(`file-name-day${dayNum}`)?.textContent || "No file chosen",
+                    fileNames: (selectedPhotosByDay[dayNum] || []).map(file => file.name),
                     transports,
                     activityDetails,
                     diningDetails
@@ -658,13 +677,20 @@
                     const rentedField = document.getElementById(`rented-items-day${dayNum}`);
                     const accommodationField = document.getElementById(`accommodation-day${dayNum}`);
                     const captionField = document.getElementById(`caption-day${dayNum}`);
-                    const fileNameField = document.getElementById(`file-name-day${dayNum}`);
 
                     if (costField) costField.value = day.cost || "";
                     if (rentedField) rentedField.value = day.rentedItems || "";
                     if (accommodationField) accommodationField.value = day.accommodation || "";
                     if (captionField) captionField.value = day.caption || "";
-                    if (fileNameField) fileNameField.textContent = day.fileName || "No file chosen";
+                    selectedPhotosByDay[dayNum] = [];
+
+                    if (day.fileNames && day.fileNames.length > 0) {
+                        day.fileNames.forEach(name => {
+                            selectedPhotosByDay[dayNum].push({ name: name });
+                        });
+                    }
+
+                    renderPhotoList(dayNum);
 
                     (day.transports || []).forEach(value => {
                         const checkbox = Array.from(document.querySelectorAll(`input[name="transport-day${dayNum}"]`))
@@ -779,6 +805,40 @@
                 btn.classList.toggle("active", index + 1 === currentDay);
             });
         }
+
+        function renderPhotoList(dayNum) {
+            const fileList = document.getElementById(`file-list-day${dayNum}`);
+            if (!fileList) return;
+
+            fileList.innerHTML = "";
+
+            const files = selectedPhotosByDay[dayNum] || [];
+
+            if (files.length === 0) {
+                fileList.innerHTML = `<p class="file-placeholder">No files chosen</p>`;
+                return;
+            }
+
+            files.forEach((file, index) => {
+                const row = document.createElement("div");
+                row.className = "file-row";
+                row.innerHTML = `
+                    <span>${file.name}</span>
+                    <button type="button" class="remove-photo-btn" onclick="removePhoto(${dayNum}, ${index})">✕</button>
+                `;
+                fileList.appendChild(row);
+            });
+        }
+
+        function removePhoto(dayNum, fileIndex) {
+            if (!selectedPhotosByDay[dayNum]) return;
+
+            selectedPhotosByDay[dayNum].splice(fileIndex, 1);
+            renderPhotoList(dayNum);
+            updateTilePreview("photo", dayNum);
+            saveDraft();
+        }
+
     </script>
     <div id="save-confirmation" class="save-confirmation hidden">
         Draft saved

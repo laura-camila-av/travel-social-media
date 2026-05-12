@@ -1791,4 +1791,36 @@ a:hover, a:active {
     display: none;
 }
 
-/* itienrary start end */
+/* css for file photo list */
+.file-list {
+    margin-top: 10px;
+    text-align: left;
+}
+
+.file-list p {
+    margin: 4px 0;
+    font-size: 14px;
+    color: #333;
+}
+
+.file-placeholder {
+    color: #777;
+}
+
+.file-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    margin: 6px 0;
+}
+
+.remove-photo-btn {
+    border: none;
+    background: transparent;
+    color: #f03d0c;
+    font-size: 16px;
+    cursor: pointer;
+    font-weight: bold;
+}
+/* itinerary start end */
