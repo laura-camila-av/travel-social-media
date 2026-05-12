@@ -336,6 +336,8 @@ def itinerary_create():
             accommodation = request.form.get(f'accommodation-day{day_num}', '').strip()
             transport = request.form.get(f'transport-day{day_num}', '').strip()
             caption = request.form.get(f'caption-day{day_num}', '').strip()
+            activity_details = request.form.get(f'activity-json-day{day_num}', '[]')
+            dining_details = request.form.get(f'dining-json-day{day_num}', '[]')
 
             try:
                 total_cost = float(cost_raw) if cost_raw else None
@@ -352,8 +354,8 @@ def itinerary_create():
                 transport_taken=transport or None,
                 accommodation=accommodation or None,
                 caption=caption or None,
-                activity_details=None,
-                dining_details=None,
+                activity_details=activity_details,
+                dining_details=dining_details,
                 photo_filename=None
             )
 

@@ -241,6 +241,9 @@
                             </div><br>
                             <textarea id="caption-day${i}" name="caption-day${i}" rows="3" placeholder="Enter a caption for your photos"></textarea>
                         </div>
+
+                        <input type="hidden" id="activity-json-day${i}" name="activity-json-day${i}">
+                        <input type="hidden" id="dining-json-day${i}" name="dining-json-day${i}">
                     </div>
                 `;
 
@@ -814,6 +817,31 @@
             updateTilePreview("photo", dayNum);
             saveDraft();
         }
+
+        document.getElementById("itinerary-form").addEventListener("submit", function () {
+            document.querySelectorAll(".day-section").forEach((section, index) => {
+                const dayNum = index + 1;
+
+                const activityDetails = [];
+                document.querySelectorAll(`#activity-details-day${dayNum} .activity-detail-box`).forEach(box => {
+                    activityDetails.push({
+                        title: box.querySelector(".activity-detail-title")?.textContent.trim() || "",
+                        text: box.querySelector("textarea")?.value || ""
+                    });
+                });
+
+                const diningDetails = [];
+                document.querySelectorAll(`#dining-details-day${dayNum} .activity-detail-box`).forEach(box => {
+                    diningDetails.push({
+                        title: box.querySelector(".activity-detail-title")?.textContent.trim() || "",
+                        text: box.querySelector("textarea")?.value || ""
+                    });
+                });
+
+                document.getElementById(`activity-json-day${dayNum}`).value = JSON.stringify(activityDetails);
+                document.getElementById(`dining-json-day${dayNum}`).value = JSON.stringify(diningDetails);
+            });
+        });
 
     </script>
     <div id="save-confirmation" class="save-confirmation hidden">
