@@ -1856,3 +1856,14 @@ a:hover, a:active {
     width: auto;
 }
 /*Search Page Styling END*/
+
+/* Email verification page styling START */
+
+.verification-text {
+    font-size: 14px;
+    color: #444;
+    margin-bottom: 18px;
+    line-height: 1.5;
+}
+
+/* Email verification page styling END */
