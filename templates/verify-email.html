@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <meta charset="UTF-8">
+    <title>Verify Email</title>
+</head>
+
+<body class="login-page-body">
+<div class="login-page-container">
+    <div class="login-page-form-box">
+        <h2 class="login-page-h2">Verify Email</h2>
+
+        <p class="verification-text">
+            We sent a 6-digit verification code to {{ email }}.
+        </p>
+
+        <form method="POST" action="{{ url_for('verify_email') }}">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+            <div class="login-page-input-group">
+                <label for="verificationCode">Verification Code</label>
+                <input
+                        type="text"
+                        id="verificationCode"
+                        name="verification_code"
+                        placeholder="Enter 6-digit code"
+                        maxlength="6"
+                        required
+                >
+            </div>
+
+            <button type="submit" class="btn">Verify</button>
+        </form>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+        {% for category, message in messages %}
+        {% if category == "verify_error" or category == "success" %}
+        <p class="login-page-message {% if category == 'verify_error' %}login-page-error{% endif %}">
+            {{ message }}
+        </p>
+        {% endif %}
+        {% endfor %}
+        {% endif %}
+        {% endwith %}
+    </div>
+</div>
+</body>
+</html>
