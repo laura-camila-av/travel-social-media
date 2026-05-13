@@ -3,7 +3,7 @@ from sqlalchemy import or_, and_
 from flask_sqlalchemy import SQLAlchemy
 from werkzeug.security import generate_password_hash, check_password_hash
 import os
-from datetime import timedelta
+from datetime import timedelta, datetime
 from flask_migrate import Migrate
 from flask_wtf.csrf import CSRFProtect
 from dotenv import load_dotenv
@@ -105,11 +105,22 @@ class ItineraryDay(db.Model):
     transport_taken = db.Column(db.Text, nullable=True)
     accommodation = db.Column(db.String(255), nullable=True)
 
-    photo_filename = db.Column(db.String(255), nullable=True)
     caption = db.Column(db.Text, nullable=True)
 
     activity_details = db.Column(db.Text, nullable=True)
     dining_details = db.Column(db.Text, nullable=True)
+
+    photos = db.relationship(
+        'ItineraryPhoto',
+        backref='day',
+        cascade='all, delete-orphan',
+        lazy=True
+    )
+
+class ItineraryPhoto(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    itinerary_day_id = db.Column(db.Integer, db.ForeignKey('itinerary_day.id'), nullable=False)
+    filename = db.Column(db.String(255), nullable=False)
 
 class Follow(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -289,10 +300,29 @@ def itinerary_create():
         creator_name = request.form.get('creator-name', '').strip()
         destination = request.form.get('destination', '').strip()
         travel_style = request.form.get('travel-style', '').strip()
-        budget = request.form.get('trip-budget', '').strip()
+        budget_raw = request.form.get('trip-budget', '').strip()
+        start_date_raw = request.form.get('start-date', '').strip()
+        end_date_raw = request.form.get('end-date', '').strip()
 
-        if not title:
-            flash("Please enter a title.", "error")
+        if not title or not creator_name or not destination or not start_date_raw or not end_date_raw:
+            flash("Please fill in all required trip details.", "error")
+            return redirect(url_for('itinerary_create'))
+
+        try:
+            start_date = datetime.strptime(start_date_raw, "%Y-%m-%d").date()
+            end_date = datetime.strptime(end_date_raw, "%Y-%m-%d").date()
+        except ValueError:
+            flash("Invalid date format.", "error")
+            return redirect(url_for('itinerary_create'))
+
+        if end_date < start_date:
+            flash("End date cannot be earlier than start date.", "error")
+            return redirect(url_for('itinerary_create'))
+
+        try:
+            budget = float(budget_raw) if budget_raw else None
+        except ValueError:
+            flash("Budget must be a valid number.", "error")
             return redirect(url_for('itinerary_create'))
 
         new_itinerary = Itinerary(
@@ -300,13 +330,64 @@ def itinerary_create():
             user_id=user_id,
             creator_name=creator_name,
             destination=destination,
-            travel_style=travel_style,
-            budget=float(budget) if budget else None
+            travel_style=travel_style if travel_style else None,
+            budget=budget,
+            start_date=start_date,
+            end_date=end_date
         )
 
         db.session.add(new_itinerary)
-        db.session.commit()
+        db.session.flush()
 
+        total_days = (end_date - start_date).days + 1
+
+        for day_num in range(1, total_days + 1):
+            cost_raw = request.form.get(f'cost-day{day_num}', '').strip()
+            rented_items = request.form.get(f'rented-items-day{day_num}', '').strip()
+            accommodation = request.form.get(f'accommodation-day{day_num}', '').strip()
+            transport = request.form.get(f'transport-day{day_num}', '').strip()
+            caption = request.form.get(f'caption-day{day_num}', '').strip()
+            activity_details = request.form.get(f'activity-json-day{day_num}', '[]')
+            dining_details = request.form.get(f'dining-json-day{day_num}', '[]')
+
+            try:
+                total_cost = float(cost_raw) if cost_raw else None
+            except ValueError:
+                total_cost = None
+
+            new_day = ItineraryDay(
+                itinerary_id=new_itinerary.id,
+                day_number=day_num,
+                total_cost=total_cost,
+                rented_items=rented_items or None,
+                transport_taken=transport or None,
+                accommodation=accommodation or None,
+                caption=caption or None,
+                activity_details=activity_details,
+                dining_details=dining_details,
+            )
+
+            db.session.add(new_day)
+            db.session.flush()
+
+            photos = request.files.getlist(f'photos-day{day_num}')
+
+            for index, photo in enumerate(photos, start=1):
+                if photo and photo.filename and allowed_file(photo.filename):
+                    ext = photo.filename.rsplit('.', 1)[1].lower()
+                    filename = f"itinerary_{new_itinerary.id}_day{day_num}_{index}.{ext}"
+                    filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+                    photo.save(filepath)
+
+                    new_photo = ItineraryPhoto(
+                        itinerary_day_id=new_day.id,
+                        filename=filename
+                    )
+                    db.session.add(new_photo)
+
+
+        db.session.commit()
+        flash("Itinerary created successfully.", "success")
         return redirect(url_for('user_profile'))
 
     return render_template('newitens.html')
