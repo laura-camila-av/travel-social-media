@@ -1824,3 +1824,35 @@ a:hover, a:active {
     font-weight: bold;
 }
 /* itinerary start end */
+
+/*Search Page Styling START*/
+.search-controls {
+    max-width: 900px;
+    margin: 30px auto;
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.search-input {
+    padding: 12px;
+    width: 320px;
+    border: 2px solid #e43d12;
+    border-radius: 5px;
+    background-color: white;
+    font-family: Helvetica, Arial, sans-serif;
+}
+
+.search-select {
+    padding: 12px;
+    border: 2px solid #e43d12;
+    border-radius: 5px;
+    background-color: white;
+    font-family: Helvetica, Arial, sans-serif;
+}
+
+.search-btn {
+    width: auto;
+}
+/*Search Page Styling END*/
