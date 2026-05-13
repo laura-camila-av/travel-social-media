@@ -3,6 +3,10 @@ from sqlalchemy import or_, and_
 from flask_sqlalchemy import SQLAlchemy
 from werkzeug.security import generate_password_hash, check_password_hash
 import os
+import random
+import smtplib
+import ssl
+from email.mime.text import MIMEText
 from datetime import timedelta, datetime
 from flask_migrate import Migrate
 from flask_wtf.csrf import CSRFProtect
@@ -260,6 +264,27 @@ def view_user_profile(user_id):
         following_count=following_count
     )
 
+def send_verification_email(to_email, code):
+    email_address = os.environ.get("EMAIL_ADDRESS", "").strip()
+    email_password = os.environ.get("EMAIL_APP_PASSWORD", "").replace(" ", "").strip()
+
+    if not email_address or not email_password:
+        raise RuntimeError("Email configuration is missing.")
+
+    subject = "Your email verification code"
+    body = f"Your verification code is: {code}\n\nThis code will expire in 10 minutes."
+
+    message = MIMEText(body, "plain", "utf-8")
+    message["Subject"] = subject
+    message["From"] = email_address
+    message["To"] = to_email
+
+    context = ssl.create_default_context()
+
+    with smtplib.SMTP_SSL("smtp.gmail.com", 465, context=context) as server:
+        server.login(email_address, email_password)
+        server.send_message(message)
+
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in app.config['ALLOWED_EXTENSIONS']
 
@@ -494,6 +519,7 @@ def register():
     phone = request.form.get('phone', '').strip()
     password = request.form.get('password', '').strip()
     confirm_password = request.form.get('confirm_password', '').strip()
+
     session["register_email"] = email
     session["register_phone"] = phone
 
@@ -522,17 +548,73 @@ def register():
         flash("Another account already exists with this email.", "register_error")
         return redirect(url_for('login_page', form='register'))
 
-    new_user = User(email=email, phone=phone)
-    new_user.set_password(password)
-    db.session.add(new_user)
-    db.session.commit()
+    verification_code = str(random.randint(100000, 999999))
+    expires_at = (datetime.utcnow() + timedelta(minutes=10)).isoformat()
 
-    session["user_id"] = new_user.id
-    session.pop("register_email", None)
-    session.pop("register_phone", None)
-    # First time signup -> choose username
-    return redirect(url_for('choose_username'))
+    session["pending_registration"] = {
+        "email": email,
+        "phone": phone,
+        "password_hash": generate_password_hash(password),
+        "verification_code": verification_code,
+        "expires_at": expires_at
+    }
 
+    try:
+        send_verification_email(email, verification_code)
+    except Exception:
+        flash("Failed to send verification email. Please check the email settings.", "register_error")
+        return redirect(url_for('login_page', form='register'))
+
+    flash("Verification code sent to your email.", "success")
+    return redirect(url_for('verify_email'))
+
+@app.route('/verify-email', methods=['GET', 'POST'])
+def verify_email():
+    pending_registration = session.get("pending_registration")
+
+    if not pending_registration:
+        flash("Please register first.", "register_error")
+        return redirect(url_for('login_page', form='register'))
+
+    email = pending_registration.get("email")
+
+    if request.method == 'POST':
+        user_code = request.form.get("verification_code", "").strip()
+        real_code = pending_registration.get("verification_code")
+        expires_at = datetime.fromisoformat(pending_registration.get("expires_at"))
+
+        if datetime.utcnow() > expires_at:
+            session.pop("pending_registration", None)
+            flash("Verification code expired. Please register again.", "register_error")
+            return redirect(url_for('login_page', form='register'))
+
+        if user_code != real_code:
+            flash("Invalid verification code.", "verify_error")
+            return redirect(url_for('verify_email'))
+
+        existing_email = User.query.filter_by(email=email).first()
+        if existing_email:
+            session.pop("pending_registration", None)
+            flash("Another account already exists with this email.", "register_error")
+            return redirect(url_for('login_page', form='register'))
+
+        new_user = User(
+            email=pending_registration.get("email"),
+            phone=pending_registration.get("phone"),
+            password_hash=pending_registration.get("password_hash")
+        )
+
+        db.session.add(new_user)
+        db.session.commit()
+
+        session["user_id"] = new_user.id
+        session.pop("pending_registration", None)
+        session.pop("register_email", None)
+        session.pop("register_phone", None)
+
+        return redirect(url_for('choose_username'))
+
+    return render_template('verify-email.html', email=email)
 
 @app.route('/login', methods=['POST'])
 def login():
