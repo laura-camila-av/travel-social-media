@@ -46,7 +46,20 @@
                 >
                     <i id="saveIcon" class="{% if user_saved %}fa-solid{% else %}fa-regular{% endif %} fa-bookmark"></i>
                 </button>
-            </div>
+                
+                    <!-- SHARE BUTTON -->
+                <button 
+                    id="shareButton"
+                    class="share-button"
+                    type="button"
+                    data-itinerary-id="{{ itinerary_id }}"
+                    data-itinerary-title="Itinerary Title"
+                >
+                    <i id="shareIcon" class="fa-regular fa-share-from-square"></i>
+                </button>
+
+
+            </div> <!--end of action-button-div-->
             <div class="day-thumbnails">
     
             <div class="day-card">
@@ -153,6 +166,24 @@
         
     
 </div>
+
+<div id="shareModal" class="share-modal hidden">
+    <div class="share-modal-box">
+        <h3>Share Itinerary</h3>
+        <p id="shareItineraryTitle" style="font-weight: bold; margin-bottom: 12px;"></p>
+        <label for="shareUserSelect">Send to:</label>
+        <select id="shareUserSelect" class="share-select">
+            <option value="">Select a user...</option>
+        </select>
+        <label for="shareMessage" style="margin-top: 12px; display: block;">Add a message (optional):</label>
+        <textarea id="shareMessage" class="share-textarea" rows="3" placeholder="Type a message..."></textarea>
+        <div class="share-modal-buttons">
+            <button type="button" class="btn" id="shareSendBtn">Send</button>
+            <button type="button" class="btn" id="shareCancelBtn">Cancel</button>
+        </div>
+    </div>
+</div>
+
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
 <script src="{{ url_for('static', filename='itinerary-display.js') }}"></script>
 <script>
@@ -230,4 +261,3 @@
 </body>
 </html>
 
-<!-- 223 lines of code  -->
