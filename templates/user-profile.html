@@ -34,7 +34,7 @@
 
                 {% if is_own_profile %}
                 <label for="avatar-upload" class="avatar-upload-label">Change Photo</label>
-                <input type="file" id="avatar-upload" accept="image/*" style="display:none;">
+                <input type="file" id="avatar-upload" name="avatar" accept="image/*" style="display:none;">
                 {% endif %}
             </div>
 
@@ -111,8 +111,19 @@
             <div class="itinerary-container">
                 {% if user_itineraries %}
                     {% for itinerary in user_itineraries %}
+                        {% set ns = namespace(cover=none) %}
+                        {% for day in itinerary.days %}
+                            {% if day.photos and not ns.cover %}
+                                {% set ns.cover = day.photos[0].filename %}
+                            {% endif %}
+                        {% endfor %}
                         <a class="card-link" href="{{ url_for('itinerary_display', itinerary_id=itinerary.id) }}">
                             <div class="itinerary-card">
+                                {% if ns.cover %}
+                                    <img src="{{ url_for('static', filename='uploads/' + ns.cover) }}"
+                                        alt="{{ itinerary.title }}"
+                                        style="width: 100%; height: 100%; object-fit: cover;">
+                                {% endif %}
                                 <div class="overlay-text">{{ itinerary.title }}</div>
                             </div>
                         </a>
@@ -136,18 +147,29 @@
 
             <div class="itinerary-container">
                 {% if saved_items %}
-                {% for saved in saved_items %}
-                <a class="card-link" href="{{ url_for('itinerary_display', itinerary_id=saved.itinerary_id) }}">
-                    <div class="itinerary-card">
-                        <div class="overlay-text">Saved Itinerary {{ saved.itinerary_id }}</div>
-                    </div>
-                </a>
-                {% endfor %}
+                    {% for itinerary in saved_items %}
+                        {% set ns = namespace(cover=none) %}
+                        {% for day in itinerary.days %}
+                            {% if day.photos and not ns.cover %}
+                                {% set ns.cover = day.photos[0].filename %}
+                            {% endif %}
+                        {% endfor %}
+                        <a class="card-link" href="{{ url_for('itinerary_display', itinerary_id=itinerary.id) }}">
+                            <div class="itinerary-card">
+                                {% if ns.cover %}
+                                    <img src="{{ url_for('static', filename='uploads/' + ns.cover) }}"
+                                        alt="{{ itinerary.title }}"
+                                        style="width: 100%; height: 100%; object-fit: cover;">
+                                {% endif %}
+                                <div class="overlay-text">{{ itinerary.title }}</div>
+                            </div>
+                        </a>
+                    {% endfor %}
                 {% else %}
-                <div class="empty-state">
-                    <i class="fa-solid fa-map"></i>
-                    <p>You haven’t saved any itineraries yet</p>
-                </div>
+                    <div class="empty-state">
+                        <i class="fa-solid fa-map"></i>
+                        <p>You haven't saved any itineraries yet</p>
+                    </div>
                 {% endif %}
             </div>
         </div>
@@ -220,5 +242,3 @@
     {% endif %}
 </body>
 </html>
-
-<!-- 219 lines of code  -->
