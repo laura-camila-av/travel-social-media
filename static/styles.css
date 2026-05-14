@@ -980,7 +980,7 @@ a:hover, a:active {
 }
 /*Itinerary display styling START*/
 .page-wrapper {
-    margin-left: 200px; /* same as nav width */
+    margin-left: 56px; /* same as nav width */
     display: flex;
     height: 100vh;
     overflow: hidden;
