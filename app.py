@@ -16,7 +16,7 @@ app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get("DATABASE_URL", "sqlite:/
 csrf = CSRFProtect(app)
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 app.config['UPLOAD_FOLDER'] = os.path.join(os.path.dirname(__file__), 'static', 'uploads')
-app.config['ALLOWED_EXTENSIONS'] = {'png', 'jpg', 'jpeg', 'gif'}
+app.config['ALLOWED_EXTENSIONS'] = {'png', 'jpg', 'jpeg', 'gif','heic'}
 app.permanent_session_lifetime = timedelta(days=10)
 
 db = SQLAlchemy(app)
@@ -651,7 +651,29 @@ def api_users():
     if not user_id:
         return jsonify([]), 401
 
-    users = User.query.filter(User.id != user_id).all()
+    #only users that the user follows or has received a message from
+    users = User.query.filter(
+    User.id != user_id,
+    or_(
+        User.id.in_(
+            db.session.query(Follow.following_id).filter_by(
+                follower_id=user_id
+            )
+        ),
+
+        User.id.in_(
+            db.session.query(Message.sender_id).filter(
+                Message.receiver_id == user_id
+            )
+        ),
+
+        User.id.in_(
+            db.session.query(Message.receiver_id).filter(
+                Message.sender_id == user_id
+            )
+        )
+    )
+    ).all()
 
     result = []
 
