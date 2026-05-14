@@ -186,78 +186,7 @@
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
 <script src="{{ url_for('static', filename='itinerary-display.js') }}"></script>
-<script>
-    const likeButton = document.getElementById("likeButton");
-    const likeIcon = document.getElementById("likeIcon");
-    const likeCount = document.getElementById("likeCount");
-    const csrfToken = document.querySelector('meta[name="csrf-token"]').content;
 
-    likeButton.addEventListener("click", async function () {
-        const itineraryId = likeButton.dataset.itineraryId;
-
-        const response = await fetch(`/api/like/${itineraryId}`, {
-            method: "POST",
-            headers: {
-                "X-CSRFToken": csrfToken
-            }
-        });
-
-        if (response.status === 401) {
-            window.location.href = "/login";
-            return;
-        }
-
-        const data = await response.json();
-
-        if (data.liked) {
-            likeButton.classList.add("liked");
-            likeIcon.classList.remove("fa-regular");
-            likeIcon.classList.add("fa-solid");
-        } else {
-            likeButton.classList.remove("liked");
-            likeIcon.classList.remove("fa-solid");
-            likeIcon.classList.add("fa-regular");
-        }
-
-        likeCount.textContent = data.like_count === 1
-            ? "1 like"
-            : data.like_count + " likes";
-    });
-</script>
-<script>
-    const saveButton = document.getElementById("saveButton");
-    const saveIcon = document.getElementById("saveIcon");
-
-    if (saveButton) {
-        saveButton.addEventListener("click", async function () {
-            const itineraryId = saveButton.dataset.itineraryId;
-
-            const response = await fetch(`/api/save/${itineraryId}`, {
-                method: "POST",
-                headers: {
-                    "X-CSRFToken": csrfToken
-                }
-            });
-
-            if (response.status === 401) {
-                window.location.href = "/login";
-                return;
-            }
-
-            const data = await response.json();
-
-            if (data.saved) {
-                saveButton.classList.add("saved");
-                saveIcon.classList.remove("fa-regular");
-                saveIcon.classList.add("fa-solid");
-            } else {
-                saveButton.classList.remove("saved");
-                saveIcon.classList.remove("fa-solid");
-                saveIcon.classList.add("fa-regular");
-            }
-        });
-    }
-</script>
 </body>
 </html>
 
