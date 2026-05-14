@@ -80,7 +80,6 @@ class Itinerary(db.Model):
     
     user = db.relationship('User')   
 
-    creator_name = db.Column(db.String(100), nullable=False)
     destination = db.Column(db.String(120), nullable=False)
     travel_style = db.Column(db.String(50), nullable=True)
     budget = db.Column(db.Float, nullable=True)
@@ -302,14 +301,13 @@ def itinerary_create():
 
     if request.method == 'POST':
         title = request.form.get('trip-title', '').strip()
-        creator_name = request.form.get('creator-name', '').strip()
         destination = request.form.get('destination', '').strip()
         travel_style = request.form.get('travel-style', '').strip()
         budget_raw = request.form.get('trip-budget', '').strip()
         start_date_raw = request.form.get('start-date', '').strip()
         end_date_raw = request.form.get('end-date', '').strip()
 
-        if not title or not creator_name or not destination or not start_date_raw or not end_date_raw:
+        if not title or not destination or not start_date_raw or not end_date_raw:
             flash("Please fill in all required trip details.", "error")
             return redirect(url_for('itinerary_create'))
 
@@ -333,7 +331,6 @@ def itinerary_create():
         new_itinerary = Itinerary(
             title=title,
             user_id=user_id,
-            creator_name=creator_name,
             destination=destination,
             travel_style=travel_style if travel_style else None,
             budget=budget,
