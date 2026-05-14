@@ -1569,6 +1569,16 @@ a:hover, a:active {
     margin-top: 20px;
 }
 
+.trip-input[type="number"]::-webkit-inner-spin-button,
+.trip-input[type="number"]::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+.trip-input[type="number"] {
+    -moz-appearance: textfield;
+}
+
 .budget-summary {
     max-width: 350px;
     margin: 0 auto 10px;
