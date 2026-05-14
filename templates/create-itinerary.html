@@ -14,10 +14,6 @@
     <div class="page-wrapper">
         <div class="middle-column">
 
-            <h1>Create Your Itinerary</h1>
-            <h2>Plan your trip day by day</h2>
-            <p>Enter your trip details, then generate the required number of day sections.</p>
-
             <div id="guide-modal" class="modal-overlay hidden">
                 <div class="modal-box">
                     <h2>How to use this form</h2>
@@ -34,43 +30,88 @@
 
             <form id="itinerary-form" action="{{ url_for('itinerary_create') }}" method="post" enctype="multipart/form-data">
                 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                <div id="trip-details-section">
-                    <h2>Trip Details</h2>
 
-                    <label for="trip-title">Itinerary Title</label><br>
-                    <input type="text" id="trip-title" name="trip-title" required><br><br>
+                <!-- Two-column hero layout for trip details -->
+                <div id="trip-details-section" class="trip-details-hero">
 
-                    <label for="destination">Destination</label><br>
-                    <input type="text" id="destination" name="destination" required><br><br>
+                    <!-- Left panel: branding + instructions -->
+                    <div class="trip-hero-left">
+                        <div class="hero-accent-bar"></div>
+                        <h1 class="hero-title">Create your<br>itinerary</h1>
+                        <p class="hero-subtitle">Plan your trip day by day. Fill in the details to get started.</p>
+                        <ol class="hero-steps">
+                            <li>
+                                <span class="hero-step-num">1</span>
+                                <span>Enter your trip details and travel style</span>
+                            </li>
+                            <li>
+                                <span class="hero-step-num">2</span>
+                                <span>Generate your day-by-day sections</span>
+                            </li>
+                            <li>
+                                <span class="hero-step-num">3</span>
+                                <span>Fill in activities, dining, costs and photos</span>
+                            </li>
+                            <li>
+                                <span class="hero-step-num">4</span>
+                                <span>Save progress and submit when ready</span>
+                            </li>
+                        </ol>
+                    </div>
 
-                    <label for="travel-style">Travel Style</label><br>
-                    <select id="travel-style" name="travel-style" required>
-                        <option value="">Select a travel style</option>
-                        <option value="Backpacker">Backpacker</option>
-                        <option value="Solo">Solo</option>
-                        <option value="Beach">Beach</option>
-                        <option value="Cultural">Cultural</option>
-                        <option value="Luxury">Luxury</option>
-                    </select><br><br>
+                    <!-- Right panel: form fields -->
+                    <div class="trip-hero-right">
+                        <div class="trip-field-group">
+                            <label for="trip-title">Itinerary title</label>
+                            <input type="text" id="trip-title" name="trip-title" class="trip-input" placeholder="e.g. 10 Days in Japan" required>
+                        </div>
 
-                    <label for="start-date">Start Date</label><br>
-                    <input type="date" id="start-date" name="start-date" required><br><br>
+                        <div class="trip-field-group">
+                            <label for="destination">Destination</label>
+                            <input type="text" id="destination" name="destination" class="trip-input" placeholder="e.g. Tokyo, Japan" required>
+                        </div>
 
-                    <label for="end-date">End Date</label><br>
-                    <input type="date" id="end-date" name="end-date" required><br><br>
+                        <div class="trip-field-group">
+                            <label for="travel-style">Travel style</label>
+                            <select id="travel-style" name="travel-style" class="trip-select" required>
+                                <option value="">Select a style</option>
+                                <option value="Backpacker">Backpacker</option>
+                                <option value="Solo">Solo</option>
+                                <option value="Beach">Beach</option>
+                                <option value="Cultural">Cultural</option>
+                                <option value="Luxury">Luxury</option>
+                            </select>
+                        </div>
 
-                    <button type="button" onclick="generateDays()" class="btn btn-itinerary-form">Generate Itinerary Days</button>
+                        <div class="trip-date-row">
+                            <div class="trip-field-group">
+                                <label for="start-date">Start date</label>
+                                <input type="date" id="start-date" name="start-date" class="trip-input" required>
+                            </div>
+                            <div class="trip-field-group">
+                                <label for="end-date">End date</label>
+                                <input type="date" id="end-date" name="end-date" class="trip-input" required>
+                            </div>
+                        </div>
+
+                        <div class="trip-field-group">
+                            <label for="trip-budget">Total budget <span class="label-optional">(optional)</span></label>
+                            <input type="number" id="trip-budget" name="trip-budget" class="trip-input" min="0" step="0.01" placeholder="e.g. 2000">
+                        </div>
+
+                        <button type="button" onclick="generateDays()" class="btn-generate">
+                            Generate itinerary days &rarr;
+                        </button>
+                    </div>
                 </div>
 
+                <!-- Budget summary shown after days are generated -->
                 <div id="budget-section">
-                    <label for="trip-budget">Trip Budget</label><br>
-                    <input type="number" id="trip-budget" name="trip-budget" min="0" step="0.01" placeholder="Enter your total budget"><br><br>
-
                     <div id="budget-summary" class="budget-summary hidden">
                         <p><strong>Budget:</strong> $<span id="budget-total">0.00</span></p>
                         <p><strong>Spent so far:</strong> $<span id="budget-spent">0.00</span></p>
                         <p><strong>Remaining:</strong> $<span id="budget-remaining">0.00</span></p>
-                    </div><br>
+                    </div>
                 </div>
 
                 <div class="top-form-actions">
