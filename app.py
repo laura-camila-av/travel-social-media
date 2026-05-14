@@ -954,6 +954,26 @@ def remove_follower(follower_id):
 
     return jsonify({"success": True})
 
+# Returns a list of users that the current user follows (used to populate the share itinerary dropdown)
+@app.route('/api/followed-users')
+def followed_users():
+    current_user_id = session.get("user_id")
+    if not current_user_id:
+        return jsonify([]), 401
+
+    follows = Follow.query.filter_by(follower_id=current_user_id).all()
+    
+    users = []
+    for follow in follows:
+        user = User.query.get(follow.following_id)
+        if user:
+            users.append({
+                "id": user.id,
+                "username": user.username
+            })
+    
+    return jsonify(users)
+
 @app.route('/logout')
 def logout():
     session.clear()
