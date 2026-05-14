@@ -3,6 +3,7 @@ from sqlalchemy import or_, and_
 from flask_sqlalchemy import SQLAlchemy
 from werkzeug.security import generate_password_hash, check_password_hash
 import os
+import json
 from datetime import timedelta, datetime
 from flask_migrate import Migrate
 from flask_wtf.csrf import CSRFProtect
@@ -15,7 +16,7 @@ app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get("DATABASE_URL", "sqlite:/
 csrf = CSRFProtect(app)
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 app.config['UPLOAD_FOLDER'] = os.path.join(os.path.dirname(__file__), 'static', 'uploads')
-app.config['ALLOWED_EXTENSIONS'] = {'png', 'jpg', 'jpeg', 'gif'}
+app.config['ALLOWED_EXTENSIONS'] = {'png', 'jpg', 'jpeg', 'gif','heic'}
 app.permanent_session_lifetime = timedelta(days=10)
 
 db = SQLAlchemy(app)
@@ -76,8 +77,9 @@ class Itinerary(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(120), nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    
+    user = db.relationship('User')   
 
-    creator_name = db.Column(db.String(100), nullable=False)
     destination = db.Column(db.String(120), nullable=False)
     travel_style = db.Column(db.String(50), nullable=True)
     budget = db.Column(db.Float, nullable=True)
@@ -196,7 +198,9 @@ def user_profile():
     interests = [interest for interest in interests if interest]
 
     user_itineraries = Itinerary.query.filter_by(user_id=user_id).all()
-    saved_items = SavedItinerary.query.filter_by(user_id=user_id).all()
+    saved_items = db.session.query(Itinerary).join(
+        SavedItinerary, SavedItinerary.itinerary_id == Itinerary.id
+    ).filter(SavedItinerary.user_id == user_id).all()
 
     follower_count = Follow.query.filter_by(following_id=user_id).count()
     following_count = Follow.query.filter_by(follower_id=user_id).count()
@@ -297,14 +301,13 @@ def itinerary_create():
 
     if request.method == 'POST':
         title = request.form.get('trip-title', '').strip()
-        creator_name = request.form.get('creator-name', '').strip()
         destination = request.form.get('destination', '').strip()
         travel_style = request.form.get('travel-style', '').strip()
         budget_raw = request.form.get('trip-budget', '').strip()
         start_date_raw = request.form.get('start-date', '').strip()
         end_date_raw = request.form.get('end-date', '').strip()
 
-        if not title or not creator_name or not destination or not start_date_raw or not end_date_raw:
+        if not title or not destination or not start_date_raw or not end_date_raw:
             flash("Please fill in all required trip details.", "error")
             return redirect(url_for('itinerary_create'))
 
@@ -328,7 +331,6 @@ def itinerary_create():
         new_itinerary = Itinerary(
             title=title,
             user_id=user_id,
-            creator_name=creator_name,
             destination=destination,
             travel_style=travel_style if travel_style else None,
             budget=budget,
@@ -415,10 +417,11 @@ def search():
         users=users
     )
 
-
 @app.route('/itinerary/<int:itinerary_id>')
 def itinerary_display(itinerary_id):
     user_id = session.get("user_id")
+
+    itinerary = Itinerary.query.get_or_404(itinerary_id)
 
     like_count = Like.query.filter_by(itinerary_id=itinerary_id).count()
     user_liked = False
@@ -437,13 +440,20 @@ def itinerary_display(itinerary_id):
 
     return render_template(
         'itinerary-display.html',
-        itinerary_id=itinerary_id,
+        itinerary=itinerary,
         like_count=like_count,
         user_liked=user_liked,
         user_saved=user_saved
     )
 
-
+@app.template_filter('from_json')
+def from_json_filter(value):
+    if not value:
+        return []
+    try:
+        return json.loads(value)
+    except Exception:
+        return []
 
 @app.route('/api/save/<int:itinerary_id>', methods=['POST'])
 def toggle_save(itinerary_id):
@@ -642,7 +652,29 @@ def api_users():
     if not user_id:
         return jsonify([]), 401
 
-    users = User.query.filter(User.id != user_id).all()
+    #only users that the user follows or has received a message from
+    users = User.query.filter(
+    User.id != user_id,
+    or_(
+        User.id.in_(
+            db.session.query(Follow.following_id).filter_by(
+                follower_id=user_id
+            )
+        ),
+
+        User.id.in_(
+            db.session.query(Message.sender_id).filter(
+                Message.receiver_id == user_id
+            )
+        ),
+
+        User.id.in_(
+            db.session.query(Message.receiver_id).filter(
+                Message.sender_id == user_id
+            )
+        )
+    )
+    ).all()
 
     result = []
 
