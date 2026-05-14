@@ -535,6 +535,25 @@ a:hover, a:active {
     justify-content: flex-end;
 }
 
+.share-modal-buttons button {
+    height: 48px;
+    color: #e43d12;
+    border: 2px solid #e43d12;
+    border-radius: 10px;
+    padding: 0 20px;
+    background-color: transparent;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: bold;
+    transition: 0.3s;
+}
+
+.share-modal-buttons button:hover {
+    background-color: #e43d12;
+    color: #faf6c3;
+}
+
+
 .hidden {
     display: none !important;
 }
