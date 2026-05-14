@@ -292,7 +292,6 @@
 
             setupAutoSaveForGeneratedFields();
             showDay(1);
-            document.getElementById("submit-btn").style.display = "none";
         }
 
         function setupActivityInput(dayNum) {
@@ -514,7 +513,6 @@
         function setupAutoSaveForTripDetails() {
             const tripFieldIds = [
                 "trip-title",
-                "creator-name",
                 "destination",
                 "travel-style",
                 "trip-budget",
@@ -540,7 +538,6 @@
         function collectDraftData() {
             const draft = {
                 tripTitle: document.getElementById("trip-title").value,
-                creatorName: document.getElementById("creator-name").value,
                 destination: document.getElementById("destination").value,
                 travelStyle: document.getElementById("travel-style").value,
                 tripBudget: document.getElementById("trip-budget").value,
@@ -638,7 +635,6 @@
             const draft = JSON.parse(saved);
 
             document.getElementById("trip-title").value = draft.tripTitle || "";
-            document.getElementById("creator-name").value = draft.creatorName || "";
             document.getElementById("destination").value = draft.destination || "";
             document.getElementById("travel-style").value = draft.travelStyle || "";
             document.getElementById("trip-budget").value = draft.tripBudget || "";
