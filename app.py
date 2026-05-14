@@ -281,7 +281,12 @@ def send_verification_email(to_email, code):
 
     context = ssl.create_default_context()
 
-    with smtplib.SMTP_SSL("smtp.gmail.com", 465, context=context) as server:
+    with smtplib.SMTP_SSL(
+        "smtp.gmail.com",
+        465,
+        context=context,
+        local_hostname="localhost"
+    ) as server:
         server.login(email_address, email_password)
         server.send_message(message)
 
@@ -561,7 +566,8 @@ def register():
 
     try:
         send_verification_email(email, verification_code)
-    except Exception:
+    except Exception as e:
+        print("EMAIL SEND ERROR:", repr(e))
         flash("Failed to send verification email. Please check the email settings.", "register_error")
         return redirect(url_for('login_page', form='register'))
 
