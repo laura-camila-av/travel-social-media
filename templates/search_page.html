@@ -85,6 +85,16 @@
                 {% for itinerary in itineraries %}
                     <a class="card-link" href="{{ url_for('itinerary_display', itinerary_id=itinerary.id) }}">
                         <div class="itinerary-card">
+                            {% set first_photo = itinerary.days[0].photos[0] if itinerary.days and itinerary.days[0].photos else None %}
+
+                            {% if first_photo %}
+                                <img 
+                                    src="{{ url_for('static', filename='uploads/' + first_photo.filename) }}" 
+                                    class="itinerary-thumbnail"
+                                    alt="{{ itinerary.title }}"
+                                >
+                            {% endif %}
+
                             <div class="overlay-text">
                                 {{ itinerary.title }}<br>
                                 {{ itinerary.destination }}<br>
