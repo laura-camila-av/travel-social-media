@@ -794,10 +794,10 @@ a:hover, a:active {
 }
 
 /*User Profile Styling END*/
-.main-content {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
+/* wherever your main content offset is */
+.main-content {           /* or body, or whatever wraps your page */
+    margin-left: 56px;
+    transition: margin-left 0.25s ease;
 }
 
 
@@ -867,17 +867,29 @@ a:hover, a:active {
 }
 
 /*Navigation Bar to go on every page*/
+/* Navigation Bar */
 .navigation-bar {
     position: fixed;
     top: 0;
     left: 0;
-    width: 200px;
+    width: 56px;                        /* collapsed by default */
     height: 100vh;
     background-color: #e43d12;
     display: flex;
     flex-direction: column;
     z-index: 1000;
+    overflow: hidden;
+    white-space: nowrap;
+    transition: width 0.25s ease;
 }
+
+/* Expand on hover or when pinned open */
+.navigation-bar.hovered,
+.navigation-bar.pinned {
+    width: 200px;
+}
+
+/* Nav list */
 .navigation-bar ul {
     list-style-type: none;
     margin: 0;
@@ -887,10 +899,13 @@ a:hover, a:active {
     flex: 1;
 }
 
+/* Links: icon + label side by side */
 .navigation-bar li a {
-    display: block;
+    display: flex;
+    align-items: center;
+    gap: 12px;
     color: white;
-    padding: 20px 14px;
+    padding: 20px 18px;
     text-decoration: none;
 }
 
@@ -899,21 +914,69 @@ a:hover, a:active {
     color: white;
 }
 
+/* Icons: fixed width so they don't shift */
+.navigation-bar li a i {
+    flex-shrink: 0;
+    width: 20px;
+    text-align: center;
+    font-size: 1.1rem;
+}
+
+/* Labels: hidden when collapsed */
+.navigation-bar:not(.hovered):not(.pinned) .nav-label {
+    display: none;
+}
+
+/* Logo */
 .navbar-logo {
     margin-top: auto;
     display: flex;
     justify-content: center;
     align-items: center;
-    padding-bottom: 0px;
 }
+
 .navbar-logo img {
     width: 200px;
     height: auto;
     opacity: 0.95;
-    transition: 0.2s;
+    transition: width 0.25s ease, opacity 0.2s;
 }
+
+/* Shrink logo when collapsed */
+.navigation-bar:not(.hovered):not(.pinned) .navbar-logo img {
+    width: 40px;
+}
+
 .navbar-logo img:hover {
     transform: scale(1.05);
+}
+
+.navbar-toggle {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 1.2rem;
+    padding: 18px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    transition: background-color 0.2s;
+}
+
+.navbar-toggle:hover {
+    background-color: #e66240;
+}
+
+/* Rotate icon when pinned open */
+.navigation-bar.pinned .navbar-toggle i {
+    transform: rotate(90deg);
+    transition: transform 0.25s ease;
+}
+
+.navbar-toggle i {
+    transition: transform 0.25s ease;
 }
 /*Itinerary display styling START*/
 .page-wrapper {
