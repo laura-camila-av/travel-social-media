@@ -426,24 +426,26 @@ def itinerary_display(itinerary_id):
     like_count = Like.query.filter_by(itinerary_id=itinerary_id).count()
     user_liked = False
     user_saved = False
+    is_owner = False
 
     if user_id:
         user_liked = Like.query.filter_by(
-            user_id=user_id,
-            itinerary_id=itinerary_id
+            user_id=user_id, itinerary_id=itinerary_id
         ).first() is not None
 
         user_saved = SavedItinerary.query.filter_by(
-            user_id=user_id,
-            itinerary_id=itinerary_id
+            user_id=user_id, itinerary_id=itinerary_id
         ).first() is not None
+
+        is_owner = (user_id == itinerary.user_id)
 
     return render_template(
         'itinerary-display.html',
         itinerary=itinerary,
         like_count=like_count,
         user_liked=user_liked,
-        user_saved=user_saved
+        user_saved=user_saved,
+        is_owner=is_owner,
     )
 
 @app.template_filter('from_json')
@@ -483,6 +485,36 @@ def toggle_save(itinerary_id):
     return jsonify({
         "saved": saved
     })
+
+@app.route('/api/delete-itinerary/<int:itinerary_id>', methods=['POST'])
+def delete_itinerary(itinerary_id):
+    user_id = session.get("user_id")
+
+    if not user_id:
+        return jsonify({"error": "Not logged in"}), 401
+
+    itinerary = Itinerary.query.get_or_404(itinerary_id)
+
+    if itinerary.user_id != user_id:
+        return jsonify({"error": "Not allowed"}), 403
+
+    # Remove uploaded photo files from disk
+    for day in itinerary.days:
+        for photo in day.photos:
+            filepath = os.path.join(app.config['UPLOAD_FOLDER'], photo.filename)
+            try:
+                os.remove(filepath)
+            except OSError:
+                pass
+
+    # Likes and saves don't cascade, clear them manually
+    Like.query.filter_by(itinerary_id=itinerary_id).delete()
+    SavedItinerary.query.filter_by(itinerary_id=itinerary_id).delete()
+
+    db.session.delete(itinerary)
+    db.session.commit()
+
+    return jsonify({"success": True})
 
 @app.route('/feed')
 def feed():

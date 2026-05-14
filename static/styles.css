@@ -2180,4 +2180,19 @@ a:hover, a:active {
     }
 }
 
+.delete-button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 24px;
+    color: #222;
+    padding: 0;
+    transition: 0.2s;
+}
+
+.delete-button:hover {
+    color: #e43d12;
+    transform: scale(1.12);
+}
+
 /* itinerary display page end */
