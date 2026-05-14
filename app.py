@@ -402,8 +402,13 @@ def search():
         return redirect(url_for('login_page'))
 
     q = request.args.get('q', '').strip()
+    duration = request.args.get('duration', '').strip()
+    travel_style = request.args.get('travel_style', '').strip()
+    budget_level = request.args.get('budget', '').strip()
 
     users = []
+    itineraries_query = Itinerary.query
+
     if q:
         users = User.query.filter(
             User.id != user_id,
@@ -411,10 +416,54 @@ def search():
             User.username.ilike(f'%{q}%')
         ).all()
 
+        itineraries_query = itineraries_query.filter(
+            or_(
+                Itinerary.title.ilike(f'%{q}%'),
+                Itinerary.destination.ilike(f'%{q}%'),
+                User.username.ilike(f'%{q}%')
+            )
+        ).join(User, Itinerary.user_id == User.id)
+
+    if travel_style:
+        itineraries_query = itineraries_query.filter(
+            Itinerary.travel_style == travel_style
+        )
+
+    if budget_level == "Low":
+        itineraries_query = itineraries_query.filter(Itinerary.budget <= 500)
+    elif budget_level == "Medium":
+        itineraries_query = itineraries_query.filter(
+            Itinerary.budget > 500,
+            Itinerary.budget <= 2000
+        )
+    elif budget_level == "High":
+        itineraries_query = itineraries_query.filter(Itinerary.budget > 2000)
+
+    itineraries = itineraries_query.order_by(Itinerary.created_at.desc()).all()
+
+    if duration:
+        filtered = []
+
+        for itinerary in itineraries:
+            trip_days = (itinerary.end_date - itinerary.start_date).days + 1
+
+            if duration == "1-3" and 1 <= trip_days <= 3:
+                filtered.append(itinerary)
+            elif duration == "4-7" and 4 <= trip_days <= 7:
+                filtered.append(itinerary)
+            elif duration == "8+" and trip_days >= 8:
+                filtered.append(itinerary)
+
+        itineraries = filtered
+
     return render_template(
         'search_page.html',
         q=q,
-        users=users
+        users=users,
+        itineraries=itineraries,
+        duration=duration,
+        travel_style=travel_style,
+        budget_level=budget_level
     )
 
 @app.route('/itinerary/<int:itinerary_id>')
