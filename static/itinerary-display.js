@@ -287,3 +287,32 @@ function updateDots(containerId, total, activeIndex) {
         }
     });
  
+    const deleteButton = document.getElementById("deleteButton");
+
+    if (deleteButton) {
+        deleteButton.addEventListener("click", async function () {
+            const confirmed = confirm("Delete this itinerary? This cannot be undone.");
+            if (!confirmed) return;
+
+            const itineraryId = deleteButton.dataset.itineraryId;
+
+            const response = await fetch(`/api/delete-itinerary/${itineraryId}`, {
+                method: "POST",
+                headers: {
+                    "X-CSRFToken": csrfToken
+                }
+            });
+
+            if (response.status === 401) {
+                window.location.href = "/login";
+                return;
+            }
+
+            if (!response.ok) {
+                alert("Failed to delete itinerary.");
+                return;
+            }
+
+            window.location.href = "/profile";
+        });
+    }
