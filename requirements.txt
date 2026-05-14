@@ -5,3 +5,5 @@ Flask-Login
 Flask-Migrate
 Flask-WTF
 python-dotenv
+pytest
+selenium
