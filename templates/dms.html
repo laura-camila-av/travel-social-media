@@ -36,6 +36,7 @@
 </div>
 
 <script>
+  const drafts = {};
   const userList = document.getElementById("userList");
   const chatHeader = document.getElementById("chatHeader");
   const messagesDiv = document.getElementById("messages");
@@ -71,6 +72,10 @@
       }
 
       userEl.addEventListener("click", async () => {
+        // save current draft
+        if (selectedUserId){
+          drafts[selectedUserId] = messageInput.value;
+        }
         selectedUserId = user.id;
 
         document.querySelectorAll(".user").forEach(el => {
@@ -78,11 +83,12 @@
         });
         userEl.classList.add("active-user");
 
-        chatHeader.textContent = "Chat with " + (user.username || user.email);
-
+        chatHeader.innerHTML = `Chat with <a href="/user/${user.id}" class="chat-profile-link">${user.username || user.email}</a>`;
+        messageInput.value = ""; // clears unsent message when switching chat
         messageInput.disabled = false;
         sendButton.disabled = false;
         messageInput.placeholder = "Type a message...";
+        messageInput.value = drafts[user.id] || ""; // restore draft for this user
         messageInput.focus();
 
         await loadMessages();
