@@ -1,5 +1,9 @@
 <!-- NAVBAR -->
 <div class="navigation-bar collapsed" id="navbar">
+
+    <button class="navbar-toggle" id="navbarToggle" title="Toggle menu">
+        <i class="fa-solid fa-bars"></i>
+    </button>
     <ul>
         <li>
             <a href="{{ url_for('user_profile') }}">
@@ -70,6 +74,7 @@ document.addEventListener("DOMContentLoaded", function () {
     const logoutLink = document.getElementById("logoutLink");
     const modal = document.getElementById("logoutModal");
     const navbar = document.getElementById("navbar");
+    const toggleBtn = document.getElementById("navbarToggle");
 
     // --- Logout ---
     if (logoutLink && modal) {
@@ -79,10 +84,8 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     }
 
-    // --- Navbar: click to pin open/closed ---
-    navbar.addEventListener("click", function (e) {
-        // Don't toggle if clicking a link (let the link work normally)
-        if (e.target.closest("a")) return;
+    // --- Navbar: click toggle to pin open/closed ---
+    toggleBtn.addEventListener("click", function () {
         navbar.classList.toggle("pinned");
     });
 
