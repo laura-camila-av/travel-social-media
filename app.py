@@ -392,7 +392,7 @@ def itinerary_create():
         flash("Itinerary created successfully.", "success")
         return redirect(url_for('user_profile'))
 
-    return render_template('newitens.html')
+    return render_template('create-itinerary.html')
 
 @app.route('/search')
 def search():
