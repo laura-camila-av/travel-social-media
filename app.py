@@ -3,6 +3,7 @@ from sqlalchemy import or_, and_
 from flask_sqlalchemy import SQLAlchemy
 from werkzeug.security import generate_password_hash, check_password_hash
 import os
+import json
 from datetime import timedelta, datetime
 from flask_migrate import Migrate
 from flask_wtf.csrf import CSRFProtect
@@ -415,10 +416,11 @@ def search():
         users=users
     )
 
-
 @app.route('/itinerary/<int:itinerary_id>')
 def itinerary_display(itinerary_id):
     user_id = session.get("user_id")
+
+    itinerary = Itinerary.query.get_or_404(itinerary_id)
 
     like_count = Like.query.filter_by(itinerary_id=itinerary_id).count()
     user_liked = False
@@ -437,13 +439,20 @@ def itinerary_display(itinerary_id):
 
     return render_template(
         'itinerary-display.html',
-        itinerary_id=itinerary_id,
+        itinerary=itinerary,
         like_count=like_count,
         user_liked=user_liked,
         user_saved=user_saved
     )
 
-
+@app.template_filter('from_json')
+def from_json_filter(value):
+    if not value:
+        return []
+    try:
+        return json.loads(value)
+    except Exception:
+        return []
 
 @app.route('/api/save/<int:itinerary_id>', methods=['POST'])
 def toggle_save(itinerary_id):
