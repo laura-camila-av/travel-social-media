@@ -15,12 +15,35 @@
     <div class="page-wrapper">
         <div class="middle-column">
     
-            <h2>Itinerary Title</h2>
+            <h2>{{ itinerary.title }}</h2>
+
             <div class="creator-section">
                 <div class="creator-pic"></div>
-                <p>@Creator_username</p>
+                <p>@{{ itinerary.user.username }}</p>
             </div>
-            <div class="main-image"></div>
+
+            <div class="main-image">
+                {% if itinerary.days and itinerary.days[0].photos %}
+                    <img 
+                        src="{{ url_for('static', filename='uploads/' + itinerary.days[0].photos[0].filename) }}" 
+                        alt="Main itinerary image"
+                        style="width: 100%; height: 100%; object-fit: cover;"
+                    >
+                {% endif %}
+            </div>
+
+            <div class="trip-summary">
+                <p><strong>Destination:</strong> {{ itinerary.destination }}</p>
+                <p><strong>Travel Style:</strong> {{ itinerary.travel_style or 'Not specified' }}</p>
+                <p><strong>Budget:</strong> 
+                    {% if itinerary.budget is not none %}
+                        ${{ "%.2f"|format(itinerary.budget) }}
+                    {% else %}
+                        Not specified
+                    {% endif %}
+                </p>
+                <p><strong>Dates:</strong> {{ itinerary.start_date }} to {{ itinerary.end_date }}</p>
+            </div>
             <div class="action-buttons">
                 <!-- LIKE COLUMN -->
                 <div class="like-group">
@@ -28,7 +51,7 @@
                         id="likeButton" 
                         class="like-button {% if user_liked %}liked{% endif %}" 
                         type="button"
-                        data-itinerary-id="{{ itinerary_id }}"
+                        data-itinerary-id="{{ itinerary.id }}"
                     >
                         <i id="likeIcon" class="{% if user_liked %}fa-solid{% else %}fa-regular{% endif %} fa-heart"></i>
                     </button>
@@ -38,118 +61,136 @@
                     </span>
                 </div>
                 <!-- SAVE BUTTON -->
+                
                 <button 
                     id="saveButton"
                     class="save-button {% if user_saved %}saved{% endif %}"
                     type="button"
-                    data-itinerary-id="{{ itinerary_id }}"
+                    data-itinerary-id="{{ itinerary.id }}"
                 >
                     <i id="saveIcon" class="{% if user_saved %}fa-solid{% else %}fa-regular{% endif %} fa-bookmark"></i>
                 </button>
             </div>
             <div class="day-thumbnails">
-    
-            <div class="day-card">
-            <div class="overlay-text">Day 2</div>
+                {% for day in itinerary.days %}
+                    <div class="day-card">
+                        {% if day.photos %}
+                            <img 
+                                src="{{ url_for('static', filename='uploads/' + day.photos[0].filename) }}" 
+                                alt="Day {{ day.day_number }} photo"
+                                style="width: 100%; height: 100%; object-fit: cover;"
+                            >
+                        {% endif %}
+                        <div class="overlay-text">Day {{ day.day_number }}</div>
+                    </div>
+                {% endfor %}
             </div>
-
-            <div class="day-card">
-            <div class="overlay-text">Day 3</div>
-            </div>
-
-            <div class="day-card">
-            <div class="overlay-text">Day 4</div>
-        </div>
-
-        <div class="day-card">
-            <div class="overlay-text">Day 5</div>
-        </div>
-
-        </div>
         
     </div>
    <div class="right-column">
-    <div class="itinerary-detail-box">
-        <div class="detail-icon-panel">
-            <i class="fa-solid fa-bed"></i>
-        </div>
-        <div class="detail-content">
-            <p>Hotel name, 123 Hotel address, hotel location.</p>
-        </div>
+        {% for day in itinerary.days %}
+            <h3>Day {{ day.day_number }}</h3>
 
-    </div>
-
-    <div class="itinerary-detail-box" id="activities-box">
-        <div class="detail-icon-panel">
-            <i class="fa-solid fa-camera"></i>
-        </div>
-        <div class="detail-content">
-            <div class="activities-content">
-                <div class="activities-collapsed">
-                    <p style="font-size: 20px; margin: 2px 0;">Hiking at Mount Fuji</p>
-                    <p style="font-size: 20px; margin: 2px 0;">Visit Senso-ji Temple</p>
-                    <p style="font-size: 20px; margin: 2px 0;">Shibuya Crossing</p>
-                    <p style="font-size: 20px; margin: 2px 0;">TeamLab Planets</p>
+            <div class="itinerary-detail-box">
+                <div class="detail-icon-panel">
+                    <i class="fa-solid fa-bed"></i>
                 </div>
-                <div class="activities-expanded" style="display: none;">
-                    <p class="activity-name" style="font-size: 20px; margin: 0;"></p>
-                    <p class="activity-desc" style="font-size: 15px; margin: 5px 0;"></p>
-                    <div class="activities-arrows">
-                        <i class="fa-solid fa-arrow-left" id="prev-activity"></i>
-                        <div class="dot-indicator" id="activity-dots"></div>
-                        <i class="fa-solid fa-arrow-right" id="next-activity"></i>
-                    </div>
+                <div class="detail-content">
+                    <p>{{ day.accommodation or 'No accommodation added.' }}</p>
                 </div>
             </div>
-        </div>
-    </div>
 
-    <div class="itinerary-detail-box" id="dining-box">
-        <div class="detail-icon-panel">
-            <i class="fa-solid fa-utensils"></i>
-        </div>
-        <div class="detail-content">
-            <div class="dining-collapsed">
-                <p style="font-size: 20px; margin: 2px 0;">Ichiran Ramen</p>
-                <p style="font-size: 20px; margin: 2px 0;">Tsukiji Outer Market</p>
-                <p style="font-size: 20px; margin: 2px 0;">Shibuya Stream Bar</p>
-                <p style="font-size: 20px; margin: 2px 0;">Conveyor Belt Sushi</p>
-            </div>
-            <div class="dining-expanded" style="display: none;">
-                <p class="dining-name" style="font-size: 20px; margin: 0;"></p>
-                <p class="dining-desc" style="font-size: 15px; margin: 5px 0;"></p>
-                <div class="activities-arrows">
-                    <i class="fa-solid fa-arrow-left" id="prev-dining"></i>
-                    <div class="dot-indicator" id="dining-dots"></div>
-                    <i class="fa-solid fa-arrow-right" id="next-dining"></i>
+            <div class="itinerary-detail-box">
+                <div class="detail-icon-panel">
+                    <i class="fa-solid fa-camera"></i>
+                </div>
+                <div class="detail-content">
+                    <p><strong>Activities</strong></p>
+                    {% set activities = day.activity_details | from_json %}
+                    {% if activities %}
+                        {% for activity in activities %}
+                            <p><strong>{{ activity.title }}</strong></p>
+                            <p>{{ activity.text }}</p>
+                        {% endfor %}
+                    {% else %}
+                        <p>No activities added.</p>
+                    {% endif %}
                 </div>
             </div>
-        </div>
-    </div>
-    <div class="itinerary-detail-box" id="transport-box">
-        <div class="detail-icon-panel">
-            <i class="fa-solid fa-car"></i>
-        </div>
-        <div class="detail-content"> 
-            <div class="activities-content">
-            <div class="transport-collapsed">
-                <p style="font-size: 20px; margin: 2px 0;">Train</p>
-                <p style="font-size: 20px; margin: 2px 0;">Uber</p>
-            </div>
-            <div class="transport-expanded" style="display: none;">
-                <p class="transport-name" style="font-size: 20px; margin: 0;"></p>
-                <p class="transport-desc" style="font-size: 15px; margin: 5px 0;"></p>
-                <div class="activities-arrows">
-                    <i class="fa-solid fa-arrow-left" id="prev-transport"></i>
-                    <div class="dot-indicator" id="transport-dots"></div>
-                    <i class="fa-solid fa-arrow-right" id="next-transport"></i>
+
+            <div class="itinerary-detail-box">
+                <div class="detail-icon-panel">
+                    <i class="fa-solid fa-utensils"></i>
+                </div>
+                <div class="detail-content">
+                    <p><strong>Dining</strong></p>
+                    {% set dining = day.dining_details | from_json %}
+                    {% if dining %}
+                        {% for meal in dining %}
+                            <p><strong>{{ meal.title }}</strong></p>
+                            <p>{{ meal.text }}</p>
+                        {% endfor %}
+                    {% else %}
+                        <p>No dining added.</p>
+                    {% endif %}
                 </div>
             </div>
-        </div>
-    </div>
 
-</div>
-</div>
+            <div class="itinerary-detail-box">
+                <div class="detail-icon-panel">
+                    <i class="fa-solid fa-car"></i>
+                </div>
+                <div class="detail-content">
+                    <p>{{ day.transport_taken or 'No transport added.' }}</p>
+                </div>
+            </div>
+
+            <div class="itinerary-detail-box">
+                <div class="detail-icon-panel">
+                    <i class="fa-solid fa-dollar-sign"></i>
+                </div>
+                <div class="detail-content">
+                    <p>
+                        {% if day.total_cost is not none %}
+                            ${{ "%.2f"|format(day.total_cost) }}
+                        {% else %}
+                            No cost added.
+                        {% endif %}
+                    </p>
+                </div>
+            </div>
+
+            <div class="itinerary-detail-box">
+                <div class="detail-icon-panel">
+                    <i class="fa-solid fa-person-skiing"></i>
+                </div>
+                <div class="detail-content">
+                    <p>{{ day.rented_items or 'No rented items added.' }}</p>
+                </div>
+            </div>
+
+            <div class="itinerary-detail-box">
+                <div class="detail-icon-panel">
+                    <i class="fa-solid fa-image"></i>
+                </div>
+                <div class="detail-content">
+                    {% if day.photos %}
+                        {% for photo in day.photos %}
+                            <img 
+                                src="{{ url_for('static', filename='uploads/' + photo.filename) }}" 
+                                alt="Day {{ day.day_number }} photo"
+                                style="width: 100%; max-width: 250px; margin-bottom: 10px; display: block;"
+                            >
+                        {% endfor %}
+                    {% else %}
+                        <p>No photos uploaded.</p>
+                    {% endif %}
+
+                    <p>{{ day.caption or '' }}</p>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
         
     
 </div>

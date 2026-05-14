@@ -1872,3 +1872,222 @@ a:hover, a:active {
     width: auto;
 }
 /*Search Page Styling END*/
+
+/* itinerary display page start */
+
+.itinerary-display-page .display-header {
+    text-align: center;
+    margin-bottom: 25px;
+}
+
+.itinerary-display-page .display-header h1 {
+    margin-bottom: 10px;
+}
+
+.itinerary-display-page .display-meta {
+    margin-top: 15px;
+    font-size: 18px;
+}
+
+.itinerary-display-page .creator-section {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 15px;
+    margin-bottom: 20px;
+}
+
+.itinerary-display-page .creator-pic {
+    width: 65px;
+    height: 65px;
+    border-radius: 50%;
+    overflow: hidden;
+    background: #ddd;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.itinerary-display-page .creator-pic img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.itinerary-display-page .main-image {
+    width: 100%;
+    max-width: 700px;
+    height: 340px;
+    margin: 0 auto 20px auto;
+    border-radius: 16px;
+    overflow: hidden;
+    background: #ddd;
+}
+
+.itinerary-display-page .main-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.itinerary-display-page .trip-summary {
+    max-width: 700px;
+    margin: 0 auto 25px auto;
+    padding: 20px;
+    border: 2px solid #f03d0c;
+    border-radius: 18px;
+    background: rgba(255,255,255,0.25);
+}
+
+.itinerary-display-page .trip-summary p {
+    margin: 8px 0;
+    font-size: 18px;
+}
+
+.itinerary-display-page .action-buttons {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+    margin: 20px 0 30px 0;
+}
+
+.itinerary-display-page .like-group {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.itinerary-display-page .day-thumbnails {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 18px;
+    justify-content: center;
+    margin-bottom: 35px;
+}
+
+.itinerary-display-page .day-card {
+    width: 170px;
+    height: 130px;
+    border-radius: 16px;
+    overflow: hidden;
+    position: relative;
+    background: #ddd;
+    border: 2px solid #f03d0c;
+}
+
+.itinerary-display-page .day-card img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.itinerary-display-page .overlay-text {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    padding: 10px;
+    background: rgba(0, 0, 0, 0.45);
+    color: white;
+    text-align: center;
+    font-weight: bold;
+}
+
+.itinerary-display-page .display-days-wrapper {
+    margin-top: 20px;
+}
+
+.itinerary-display-page .day-display-section {
+    margin-bottom: 35px;
+    padding-bottom: 15px;
+    border-bottom: 2px solid rgba(0,0,0,0.08);
+}
+
+.itinerary-display-page .day-display-title {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.itinerary-display-page .detail-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(270px, 1fr));
+    gap: 18px;
+}
+
+.itinerary-display-page .itinerary-detail-box {
+    display: flex;
+    min-height: 120px;
+    border-radius: 18px;
+    overflow: hidden;
+    border: 2px solid #f03d0c;
+    background: #f03d0c;
+    color: white;
+}
+
+.itinerary-display-page .detail-icon-panel {
+    width: 80px;
+    min-width: 80px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #c92f05;
+    font-size: 34px;
+}
+
+.itinerary-display-page .detail-content {
+    flex: 1;
+    padding: 18px;
+}
+
+.itinerary-display-page .detail-content h4 {
+    margin-bottom: 10px;
+    font-size: 28px;
+    font-weight: 700;
+}
+
+.itinerary-display-page .detail-content p {
+    margin: 0 0 8px 0;
+    font-size: 18px;
+    line-height: 1.35;
+}
+
+.itinerary-display-page .detail-content .small-label {
+    opacity: 0.9;
+    font-size: 15px;
+    margin-bottom: 10px;
+}
+
+.itinerary-display-page .photo-gallery {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.itinerary-display-page .photo-gallery img {
+    width: 100%;
+    max-width: 320px;
+    border-radius: 12px;
+    display: block;
+    object-fit: cover;
+}
+
+.itinerary-display-page .empty-text {
+    opacity: 0.9;
+}
+
+@media (max-width: 768px) {
+    .itinerary-display-page .main-image {
+        height: 240px;
+    }
+
+    .itinerary-display-page .detail-content h4 {
+        font-size: 24px;
+    }
+
+    .itinerary-display-page .detail-content p {
+        font-size: 16px;
+    }
+}
+
+/* itinerary display page end */
