@@ -197,7 +197,9 @@ def user_profile():
     interests = [interest for interest in interests if interest]
 
     user_itineraries = Itinerary.query.filter_by(user_id=user_id).all()
-    saved_items = SavedItinerary.query.filter_by(user_id=user_id).all()
+    saved_items = db.session.query(Itinerary).join(
+        SavedItinerary, SavedItinerary.itinerary_id == Itinerary.id
+    ).filter(SavedItinerary.user_id == user_id).all()
 
     follower_count = Follow.query.filter_by(following_id=user_id).count()
     following_count = Follow.query.filter_by(follower_id=user_id).count()
