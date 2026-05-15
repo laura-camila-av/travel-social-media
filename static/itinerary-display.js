@@ -332,5 +332,12 @@ document.querySelectorAll('.day-card').forEach(card => {
         // update active thumbnail
         document.querySelectorAll('.day-card').forEach(c => c.classList.remove('active-day'));
         this.classList.add('active-day');
+
+        // update main image
+        const img = this.querySelector('img');
+        const mainImage = document.querySelector('.main-image img');
+        if (mainImage && img) {
+            mainImage.src = img.src;
+        }
     });
 });
