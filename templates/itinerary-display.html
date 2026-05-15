@@ -83,6 +83,13 @@
                 </button>
 
                 {% if is_owner %}
+                <a 
+                    href="{{ url_for('itinerary_edit', itinerary_id=itinerary.id) }}"
+                    class="edit-button"
+                    title="Edit this itinerary"
+                >
+                    <i class="fa-solid fa-pen"></i>
+                </a>
                 <button 
                     id="deleteButton" 
                     class="delete-button"

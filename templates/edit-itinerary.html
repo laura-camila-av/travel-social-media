@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Itinerary</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+<body>
+
+    {% include 'navbar.html' %}
+
+    <div class="page-wrapper">
+        <div class="middle-column">
+
+            <form id="itinerary-form" action="{{ url_for('itinerary_edit_submit', itinerary_id=itinerary.id) }}" method="post" enctype="multipart/form-data">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+                <div id="trip-details-section" class="trip-details-hero">
+                    <div class="trip-hero-left">
+                        <div class="hero-accent-bar"></div>
+                        <h1 class="hero-title">Edit your<br>itinerary</h1>
+                        <p class="hero-subtitle">Update your trip details and day-by-day plan below.</p>
+                        <p class="hero-subtitle" style="margin-top:1rem; font-size:0.9rem;">
+                            If you change the dates, click <strong>Regenerate Days</strong> to rebuild the day sections.
+                            Note: regenerating will clear any unsaved day edits.
+                        </p>
+                    </div>
+
+                    <div class="trip-hero-right">
+                        <div class="trip-field-group">
+                            <label for="trip-title">Itinerary title</label>
+                            <input type="text" id="trip-title" name="trip-title" class="trip-input" required>
+                        </div>
+                        <div class="trip-field-group">
+                            <label for="destination">Destination</label>
+                            <input type="text" id="destination" name="destination" class="trip-input" required>
+                        </div>
+                        <div class="trip-field-group">
+                            <label for="travel-style">Travel style</label>
+                            <select id="travel-style" name="travel-style" class="trip-select" required>
+                                <option value="">Select a style</option>
+                                <option value="Backpacker">Backpacker</option>
+                                <option value="Solo">Solo</option>
+                                <option value="Beach">Beach</option>
+                                <option value="Cultural">Cultural</option>
+                                <option value="Luxury">Luxury</option>
+                            </select>
+                        </div>
+                        <div class="trip-date-row">
+                            <div class="trip-field-group">
+                                <label for="start-date">Start date</label>
+                                <input type="date" id="start-date" name="start-date" class="trip-input" required>
+                            </div>
+                            <div class="trip-field-group">
+                                <label for="end-date">End date</label>
+                                <input type="date" id="end-date" name="end-date" class="trip-input" required>
+                            </div>
+                        </div>
+                        <div class="trip-field-group">
+                            <label for="trip-budget">Total budget <span class="label-optional">(optional)</span></label>
+                            <input type="number" id="trip-budget" name="trip-budget" class="trip-input" min="0" step="0.01">
+                        </div>
+                        <button type="button" onclick="generateDays()" class="btn-generate">
+                            Regenerate days &rarr;
+                        </button>
+                    </div>
+                </div>
+
+                <div id="budget-section">
+                    <div id="budget-summary" class="budget-summary hidden">
+                        <p><strong>Budget:</strong> $<span id="budget-total">0.00</span></p>
+                        <p><strong>Spent so far:</strong> $<span id="budget-spent">0.00</span></p>
+                        <p><strong>Remaining:</strong> $<span id="budget-remaining">0.00</span></p>
+                    </div>
+                </div>
+
+                <div id="days-container"></div>
+
+                <button type="submit" class="btn btn-itinerary-form" id="submit-btn">Save Changes</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        const ITINERARY_DATA = {{ itinerary_data | safe }};
+    </script>
+    <script src="{{ url_for('static', filename='edit-itinerary.js') }}"></script>
+</body>
+</html>
