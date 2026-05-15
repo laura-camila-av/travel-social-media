@@ -50,6 +50,7 @@ class Message(db.Model):
     receiver_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     text = db.Column(db.Text, nullable=False)
     reaction = db.Column(db.String(10), nullable=True)
+    reply_to_id = db.Column(db.Integer, db.ForeignKey('message.id'), nullable=True)
     is_read = db.Column(db.Boolean, default=False)
     created_at = db.Column(db.DateTime, server_default=db.func.now())
 
@@ -802,9 +803,11 @@ def api_get_messages(other_user_id):
             "text": msg.text,
             "sender_id": msg.sender_id,
             "receiver_id": msg.receiver_id,
-            "created_at": msg.created_at.strftime("%Y-%m-%d %H:%M:%S"),
+            "created_at": msg.created_at.isoformat() + "Z",
             "is_mine": msg.sender_id == user_id,
-            "reaction": msg.reaction
+            "reaction": msg.reaction,
+            "reply_to_id": msg.reply_to_id,
+            "reply_to_text": Message.query.get(msg.reply_to_id).text if msg.reply_to_id else None
         }
         for msg in messages
     ])
@@ -819,14 +822,15 @@ def api_send_message():
     data = request.get_json()
     receiver_id = data.get("receiver_id")
     text = data.get("text", "").strip()
-
+    reply_to_id = data.get("reply_to_id")
     if not receiver_id or not text:
         return jsonify({"error": "Missing data"}), 400
 
     new_message = Message(
         sender_id=user_id,
         receiver_id=receiver_id,
-        text=text
+        text=text,
+        reply_to_id=reply_to_id
     )
 
     db.session.add(new_message)

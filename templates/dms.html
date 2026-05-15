@@ -28,7 +28,10 @@
     <div class="dms-messages" id="messages">
       <div class="dms-empty">Choose someone to start chatting.</div>
     </div>
-
+    <div id="replyPreview" class="reply-preview hidden">
+      <span id="replyPreviewText"></span>
+      <button type="button" onclick="cancelReply()">✕</button>
+    </div>
     <form class="dms-composer" id="messageForm">
       <input type="text" id="messageInput" placeholder="Select a user first..." required disabled />
       <button type="submit" id="sendButton" disabled>Send</button>

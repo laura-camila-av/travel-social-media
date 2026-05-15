@@ -7,6 +7,8 @@ const drafts = {};
   const sendButton = document.getElementById("sendButton");
   const csrfToken = document.querySelector('meta[name="csrf-token"]').content;
   let selectedUserId = null;
+  let replyToMessageId = null;
+  let replyToMessageText = null;
 
   async function loadUsers() {
     const response = await fetch("/api/users");
@@ -98,6 +100,14 @@ const drafts = {};
       const msgEl = document.createElement("div");
       msgEl.className = "dms-message " + (msg.is_mine ? "dms-mine" : "dms-theirs");
 
+      // REPLY PREVIEW
+      if (msg.reply_to_text) {
+        const replyBox = document.createElement("div");
+        replyBox.className = "reply-box";
+        replyBox.textContent = msg.reply_to_text;
+
+        msgEl.appendChild(replyBox);
+      }
       const textEl = document.createElement("div");
       textEl.textContent = msg.text;
       msgEl.appendChild(textEl);
@@ -136,6 +146,23 @@ const drafts = {};
 
         reactionBar.appendChild(reactionBtn);
       });
+      // REPLIES
+      const replyBtn = document.createElement("button");
+      replyBtn.type = "button";
+      replyBtn.className = "reply-btn";
+      replyBtn.textContent = "Reply";
+
+      replyBtn.addEventListener("click", () => {
+        replyToMessageId = msg.id;
+        replyToMessageText = msg.text;
+
+        document.getElementById("replyPreviewText").textContent = "Replying to: " + msg.text;
+        document.getElementById("replyPreview").classList.remove("hidden");
+
+        messageInput.focus();
+      });
+
+      wrapper.appendChild(replyBtn);
 
       wrapper.appendChild(msgEl);
       wrapper.appendChild(reactionBar);
@@ -167,12 +194,17 @@ const drafts = {};
       },
       body: JSON.stringify({
         receiver_id: selectedUserId,
-        text: text
+        text: text,
+        reply_to_id: replyToMessageId
       })
     });
 
     if (response.ok) {
       messageInput.value = "";
+      replyToMessageId = null;
+      replyToMessageText = null;
+      document.getElementById("replyPreview").classList.add("hidden");
+      document.getElementById("replyPreviewText").textContent = "";
       await loadMessages();
     } else {
       alert("Message failed to send.");
@@ -202,4 +234,11 @@ const drafts = {};
     if (response.ok) {
       await loadMessages();
     }
+  }
+
+  function cancelReply() {
+    replyToMessageId = null;
+    replyToMessageText = null;
+    document.getElementById("replyPreview").classList.add("hidden");
+    document.getElementById("replyPreviewText").textContent = "";
   }
