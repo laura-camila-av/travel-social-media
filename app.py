@@ -802,6 +802,7 @@ def api_get_messages(other_user_id):
             "text": msg.text,
             "sender_id": msg.sender_id,
             "receiver_id": msg.receiver_id,
+            "created_at": msg.created_at.strftime("%Y-%m-%d %H:%M:%S"),
             "is_mine": msg.sender_id == user_id,
             "reaction": msg.reaction
         }

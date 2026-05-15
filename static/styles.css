@@ -1522,6 +1522,29 @@ a:hover, a:active {
   background: var(--primary);
   color: var(--surface);
 }
+/* TIME */
+.message-time {
+    font-size: 11px;
+    color: rgba(255,255,255,0.75);
+    margin-top: 4px;
+    text-align: right;
+}
+
+.dms-theirs .message-time {
+    color: #777;
+}
+
+/* DATE SEPARATOR */
+.date-separator {
+    align-self: center;
+    background: #fffdf4;
+    border: 1px solid #ddd;
+    border-radius: 20px;
+    padding: 5px 12px;
+    font-size: 12px;
+    color: #666;
+    margin: 14px 0;
+}
 /*unread message*/
 .unread-dot {
   width: 10px;
