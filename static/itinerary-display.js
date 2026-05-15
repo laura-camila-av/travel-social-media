@@ -214,8 +214,6 @@ function updateDots(containerId, total, activeIndex) {
     const shareSendBtn = document.getElementById("shareSendBtn");
     const shareCancelBtn = document.getElementById("shareCancelBtn");
     const shareItineraryTitle = document.getElementById("shareItineraryTitle");
-    console.log("shareButton:", shareButton);
-    console.log("shareSendBtn:", shareSendBtn);
 
     // open modal and load users
     shareButton.addEventListener("click", async function() {
@@ -247,14 +245,10 @@ function updateDots(containerId, total, activeIndex) {
 
     // send the itinerary
     shareSendBtn.addEventListener("click", async function() {
-        console.log("send clicked");
         const receiverId = shareUserSelect.value;
         const message = shareMessage.value.trim();
         const itineraryId = shareButton.dataset.itineraryId;
         const itineraryTitle = shareButton.dataset.itineraryTitle;
-
-        console.log("receiverId:", receiverId);
-        console.log("itineraryId:", itineraryId);
 
         if (!receiverId) {
             alert("Please select a user to send to.");
@@ -262,8 +256,6 @@ function updateDots(containerId, total, activeIndex) {
         }
 
         const formattedText = `[ITINERARY:${itineraryId}:${itineraryTitle}]${message ? '\n' + message : ''}`;
-        console.log("formattedText:", formattedText);
-        console.log("about to fetch");
 
         const response = await fetch("/api/messages", {
             method: "POST",
