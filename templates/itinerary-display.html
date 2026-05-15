@@ -76,12 +76,11 @@
                     id="shareButton"
                     class="share-button"
                     type="button"
-                    data-itinerary-id="{{ itinerary_id }}"
-                    data-itinerary-title="Itinerary Title"
+                    data-itinerary-id="{{ itinerary.id }}"
+                    data-itinerary-title="{{ itinerary.title }}"
                 >
-                    <i id="shareIcon" class="fa-regular fa-share-from-square"></i>
+                <i id="shareIcon" class="fa-regular fa-share-from-square"></i>
                 </button>
-
                 {% if is_owner %}
                 <button 
                     id="deleteButton" 
