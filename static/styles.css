@@ -2260,6 +2260,26 @@ a:hover, a:active {
 /*Search Page Styling END*/
 
 /* itinerary display page start */
+.day-card.active-day {
+    outline: 3px solid #A50034;
+    outline-offset: 2px;
+}
+
+.trip-summary {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    justify-content: center;
+    margin: 12px 0;
+}
+
+.trip-pill {
+    background-color: #A50034;
+    color: white;
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 14px;
+}
 
 .itinerary-display-page .display-header {
     text-align: center;

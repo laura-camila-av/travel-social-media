@@ -316,3 +316,29 @@ function updateDots(containerId, total, activeIndex) {
             window.location.href = "/profile";
         });
     }
+
+    // show day 1 by default
+document.addEventListener("DOMContentLoaded", function() {
+    const firstDay = document.querySelector('.day-details');
+    if (firstDay) firstDay.style.display = 'block';
+    
+    const firstThumb = document.querySelector('.day-card');
+    if (firstThumb) firstThumb.classList.add('active-day');
+});
+
+// thumbnail click handler
+document.querySelectorAll('.day-card').forEach(card => {
+    card.addEventListener('click', function() {
+        const dayNum = this.dataset.day;
+
+        // hide all day details
+        document.querySelectorAll('.day-details').forEach(d => d.style.display = 'none');
+        
+        // show selected day
+        document.querySelector(`.day-details[data-day="${dayNum}"]`).style.display = 'block';
+
+        // update active thumbnail
+        document.querySelectorAll('.day-card').forEach(c => c.classList.remove('active-day'));
+        this.classList.add('active-day');
+    });
+});

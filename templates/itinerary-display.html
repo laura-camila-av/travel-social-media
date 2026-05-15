@@ -92,7 +92,7 @@
             </div> <!--end of action-button-div-->
             <div class="day-thumbnails">
                 {% for day in itinerary.days %}
-                    <div class="day-card">
+                    <div class="day-card" data-day="{{ day.day_number }}">
                         {% if day.photos %}
                             <img 
                                 src="{{ url_for('static', filename='uploads/' + day.photos[0].filename) }}" 
@@ -108,6 +108,7 @@
     </div>
    <div class="right-column">
         {% for day in itinerary.days %}
+        <div class="day-details" data-day="{{ day.day_number }}" style="display: none;">
             <h3>Day {{ day.day_number }}</h3>
 
             <div class="itinerary-detail-box">
@@ -208,6 +209,7 @@
                     <p>{{ day.caption or '' }}</p>
                 </div>
             </div>
+        </div>
         {% endfor %}
     </div>
         
