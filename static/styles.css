@@ -831,13 +831,6 @@ a:hover, a:active {
     position: relative;
 }
 
-.main-image {
-    width: 100%;
-    aspect-ratio: 1 / 1;
-    background-color: var(--text-main);
-    position: center;
-}
-
 .time-block {
     border: 1px solid black;
     height: 120px;
@@ -2322,8 +2315,8 @@ a:hover, a:active {
 
 .itinerary-display-page .main-image {
     width: 100%;
-    max-width: 700px;
-    height: 340px;
+    max-width: 900px;
+    max-height: 700px;
     margin: 0 auto 20px auto;
     border-radius: 16px;
     overflow: hidden;
@@ -2507,7 +2500,6 @@ a:hover, a:active {
 }
 
 .delete-button:hover {
-    color: var(--primary);
     transform: scale(1.12);
 }
 
