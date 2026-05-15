@@ -32,18 +32,14 @@
                 {% endif %}
             </div>
 
-            <div class="trip-summary">
-                <p><strong>Destination:</strong> {{ itinerary.destination }}</p>
-                <p><strong>Travel Style:</strong> {{ itinerary.travel_style or 'Not specified' }}</p>
-                <p><strong>Budget:</strong> 
-                    {% if itinerary.budget is not none %}
-                        ${{ "%.2f"|format(itinerary.budget) }}
-                    {% else %}
-                        Not specified
-                    {% endif %}
-                </p>
-                <p><strong>Dates:</strong> {{ itinerary.start_date }} to {{ itinerary.end_date }}</p>
-            </div>
+    <div class="trip-summary">
+        <span class="trip-pill"><strong>Location: </strong> {{ itinerary.destination }}</span>
+        <span class="trip-pill"><strong>Style: </strong> {{ itinerary.travel_style or 'Not specified' }}</span>
+        <span class="trip-pill">
+            <strong>Budget: </strong> {% if itinerary.budget is not none %}${{ "%.2f"|format(itinerary.budget) }}{% else %}Not specified{% endif %}
+        </span>
+        <span class="trip-pill"><strong>Dates: </strong>{{ itinerary.start_date }} – {{ itinerary.end_date }}</span>
+    </div>
             <div class="action-buttons">
                 <!-- LIKE COLUMN -->
                 <div class="like-group">
