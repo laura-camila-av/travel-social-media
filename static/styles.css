@@ -4883,3 +4883,19 @@ textarea:focus {
     color: #ffffff !important;
     font-weight: 800;
 }
+/* Fix homepage how-it-works card text contrast */
+.step,
+.step p,
+.step .step-number,
+.step .step-title,
+.step .step-desc {
+    color: #ffffff !important;
+}
+
+.step .step-number {
+    opacity: 0.85;
+}
+
+.step .step-desc {
+    color: #f5f5f5 !important;
+}
