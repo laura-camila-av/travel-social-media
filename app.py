@@ -776,6 +776,8 @@ def api_users():
             "unread_count": unread_count
         })
 
+    session["messages_seen_at"] = datetime.utcnow().isoformat()
+
     return jsonify(result)
 
 @app.route('/api/messages/<int:other_user_id>')
@@ -992,6 +994,17 @@ def following_page(user_id):
         list_type='following'
     )
 
+def get_session_datetime(key):
+    value = session.get(key)
+
+    if not value:
+        return datetime.min
+
+    try:
+        return datetime.fromisoformat(value)
+    except ValueError:
+        return datetime.min
+
 @app.context_processor
 def inject_notification_counts():
     current_user_id = session.get("user_id")
@@ -1002,26 +1015,42 @@ def inject_notification_counts():
             "notification_badge_count": 0
         }
 
-    unread_message_count = Message.query.filter_by(
-        receiver_id=current_user_id,
-        is_read=False
+    notifications_seen_at = get_session_datetime("notifications_seen_at")
+    messages_seen_at = get_session_datetime("messages_seen_at")
+
+    # Messages badge only counts unread messages received after opening messages page
+    message_badge_count = Message.query.filter(
+        Message.receiver_id == current_user_id,
+        Message.is_read.is_(False),
+        Message.created_at > messages_seen_at
     ).count()
 
-    follower_count = Follow.query.filter_by(
-        following_id=current_user_id
+    # Follow notifications only count follows after opening notifications page
+    new_follow_count = Follow.query.filter(
+        Follow.following_id == current_user_id,
+        Follow.created_at > notifications_seen_at
     ).count()
 
-    like_count = db.session.query(Like).join(
+    # Like notifications only count likes after opening notifications page
+    new_like_count = db.session.query(Like).join(
         Itinerary,
         Like.itinerary_id == Itinerary.id
     ).filter(
         Itinerary.user_id == current_user_id,
-        Like.user_id != current_user_id
+        Like.user_id != current_user_id,
+        Like.created_at > notifications_seen_at
+    ).count()
+
+    # DM notifications only count unread messages after opening notifications page
+    new_message_notification_count = Message.query.filter(
+        Message.receiver_id == current_user_id,
+        Message.is_read.is_(False),
+        Message.created_at > notifications_seen_at
     ).count()
 
     return {
-        "message_badge_count": unread_message_count,
-        "notification_badge_count": follower_count + like_count + unread_message_count
+        "message_badge_count": message_badge_count,
+        "notification_badge_count": new_follow_count + new_like_count + new_message_notification_count
     }
 
 @app.route('/notifications')
@@ -1110,6 +1139,8 @@ def notifications():
         key=lambda notification: notification["created_at"],
         reverse=True
     )
+
+    session["notifications_seen_at"] = datetime.utcnow().isoformat()
 
     return render_template(
         'notifications.html',
