@@ -855,9 +855,9 @@ def react_to_message(message_id):
 
     message = Message.query.get_or_404(message_id)
 
-    # Only sender or receiver can react to the message
-    if message.sender_id != user_id and message.receiver_id != user_id:
-        return jsonify({"error": "Not allowed"}), 403
+    # Only receiver can react to the message
+    if message.receiver_id != user_id:
+        return jsonify({"error": "You can only react to messages you received"}), 403
 
     # If same reaction clicked again, remove it
     if message.reaction == reaction:
