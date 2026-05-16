@@ -1,9 +1,5 @@
 <!-- NAVBAR -->
 <div class="navigation-bar collapsed" id="navbar">
-
-    <button class="navbar-toggle" id="navbarToggle" title="Toggle menu">
-        <i class="fa-solid fa-bars"></i>
-    </button>
     <ul>
         <li>
             <a href="{{ url_for('user_profile') }}">
@@ -11,36 +7,50 @@
                 <span class="nav-label">Your Profile</span>
             </a>
         </li>
+
         <li>
             <a href="{{ url_for('itinerary_create') }}">
                 <i class="fa-solid fa-square-plus"></i>
                 <span class="nav-label">Create Itinerary</span>
             </a>
         </li>
+
         <li>
-            <a href="{{ url_for('dms') }}">
+            <a href="{{ url_for('dms') }}" class="nav-link-with-badge">
                 <i class="fa-solid fa-message"></i>
                 <span class="nav-label">Messages</span>
+
+                {% if message_badge_count and message_badge_count > 0 %}
+                <span class="nav-badge">{{ message_badge_count }}</span>
+                {% endif %}
             </a>
         </li>
+
         <li>
             <a href="{{ url_for('feed') }}">
                 <i class="fa-solid fa-compass"></i>
                 <span class="nav-label">Feed</span>
             </a>
         </li>
+
         <li>
             <a href="{{ url_for('search') }}">
                 <i class="fa-solid fa-magnifying-glass"></i>
                 <span class="nav-label">Search</span>
             </a>
         </li>
+
         <li>
-            <a href="{{ url_for('notifications') }}">
+            <a href="{{ url_for('notifications') }}" class="nav-link-with-badge">
                 <i class="fa-solid fa-bell"></i>
                 <span class="nav-label">Notifications</span>
+
+                {% if notification_badge_count and notification_badge_count > 0 %}
+                <span class="nav-badge">{{ notification_badge_count }}</span>
+                {% endif %}
             </a>
         </li>
+
         <li>
             <a href="#" id="logoutLink">
                 <i class="fa-solid fa-right-from-bracket"></i>
@@ -48,11 +58,11 @@
             </a>
         </li>
     </ul>
-    <!--LOGO-->
+
     <div class="navbar-logo">
-        <img 
-            src="{{ url_for('static', filename='logo.png') }}" 
-            alt="Website Logo"
+        <img
+                src="{{ url_for('static', filename='logo.png') }}"
+                alt="Website Logo"
         >
     </div>
 </div>
@@ -70,39 +80,34 @@
 
 <!-- LOGOUT + NAVBAR SCRIPT -->
 <script>
-document.addEventListener("DOMContentLoaded", function () {
-    const logoutLink = document.getElementById("logoutLink");
-    const modal = document.getElementById("logoutModal");
-    const navbar = document.getElementById("navbar");
-    const toggleBtn = document.getElementById("navbarToggle");
+    document.addEventListener("DOMContentLoaded", function () {
+        const logoutLink = document.getElementById("logoutLink");
+        const modal = document.getElementById("logoutModal");
+        const navbar = document.getElementById("navbar");
 
-    // --- Logout ---
-    if (logoutLink && modal) {
-        logoutLink.addEventListener("click", function (e) {
-            e.preventDefault();
-            modal.classList.remove("hidden");
-        });
+        if (logoutLink && modal) {
+            logoutLink.addEventListener("click", function (e) {
+                e.preventDefault();
+                modal.classList.remove("hidden");
+            });
+        }
+
+        if (navbar) {
+            navbar.addEventListener("mouseenter", function () {
+                navbar.classList.add("hovered");
+            });
+
+            navbar.addEventListener("mouseleave", function () {
+                navbar.classList.remove("hovered");
+            });
+        }
+    });
+
+    function closeModal() {
+        document.getElementById("logoutModal").classList.add("hidden");
     }
 
-    // --- Navbar: click toggle to pin open/closed ---
-    toggleBtn.addEventListener("click", function () {
-        navbar.classList.toggle("pinned");
-    });
-
-    // --- Navbar: hover to temporarily expand ---
-    navbar.addEventListener("mouseenter", function () {
-        navbar.classList.add("hovered");
-    });
-    navbar.addEventListener("mouseleave", function () {
-        navbar.classList.remove("hovered");
-    });
-});
-
-function closeModal() {
-    document.getElementById("logoutModal").classList.add("hidden");
-}
-
-function confirmLogout() {
-    window.location.href = "{{ url_for('logout') }}";
-}
+    function confirmLogout() {
+        window.location.href = "{{ url_for('logout') }}";
+    }
 </script>
