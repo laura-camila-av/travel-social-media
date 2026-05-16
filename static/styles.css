@@ -3477,3 +3477,272 @@ textarea:focus {
 /* ============================================================
    Global UI polish END
    ============================================================ */
+/* ============================================================
+   Homepage / Feed / Search UI polish START
+   ============================================================ */
+
+.page-hero {
+    max-width: 900px;
+    margin: 10px auto 28px;
+    padding: 34px 28px;
+    border-radius: var(--radius-lg);
+    background:
+            radial-gradient(circle at top left, rgba(165, 0, 52, 0.12), transparent 34%),
+            linear-gradient(135deg, #ffffff, var(--surface-soft));
+    border: 1px solid var(--border-soft);
+    box-shadow: var(--shadow-soft);
+}
+
+.page-hero h1 {
+    font-size: 42px;
+    line-height: 1.05;
+    margin: 6px 0 12px;
+}
+
+.hero-description {
+    max-width: 680px;
+    margin: 0 auto;
+    color: var(--text-secondary);
+    font-size: 16px;
+    line-height: 1.7;
+}
+
+.eyebrow {
+    color: var(--primary);
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    font-size: 12px;
+    font-weight: 800;
+    margin: 0;
+}
+
+.section-heading-row {
+    max-width: 940px;
+    margin: 28px auto 14px;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    text-align: left;
+}
+
+.section-heading-row h2 {
+    margin: 4px 0 0;
+}
+
+/* Feed */
+
+.feed-grid {
+    max-width: 1050px;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.feed-card,
+.search-itinerary-card {
+    min-height: 230px;
+}
+
+.card-gradient {
+    position: absolute;
+    inset: 0;
+    background:
+            linear-gradient(135deg, rgba(165, 0, 52, 0.85), rgba(34, 34, 34, 0.9)),
+            radial-gradient(circle at top right, rgba(255,255,255,0.25), transparent 28%);
+}
+
+.feed-card .overlay-text,
+.search-itinerary-card .overlay-text {
+    position: absolute;
+    left: 18px;
+    right: 18px;
+    bottom: 18px;
+    z-index: 2;
+    color: #ffffff;
+    text-align: left;
+    font-size: 22px;
+    line-height: 1.15;
+}
+
+/* Search */
+
+.search-panel {
+    max-width: 1100px;
+}
+
+.results-section {
+    max-width: 1120px;
+    margin: 0 auto 30px;
+}
+
+.search-results-grid {
+    max-width: 1050px;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.itinerary-thumbnail {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.search-itinerary-card::after,
+.feed-card::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to top, rgba(0,0,0,0.65), transparent 60%);
+    z-index: 1;
+}
+
+.user-result-avatar,
+.user-result-placeholder {
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    object-fit: cover;
+    flex-shrink: 0;
+}
+
+.user-result-placeholder {
+    background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+}
+
+.user-result-info {
+    display: flex;
+    flex-direction: column;
+    text-align: left;
+}
+
+.user-result-info strong {
+    color: var(--text-main);
+    font-size: 16px;
+}
+
+.user-result-info span {
+    color: var(--text-secondary);
+    font-size: 13px;
+    margin-top: 4px;
+}
+
+.compact-empty {
+    max-width: 760px;
+    margin: 14px auto;
+    padding: 24px;
+}
+
+/* Homepage */
+
+.homepage-header {
+    position: sticky;
+    top: 0;
+    z-index: 20;
+    background: rgba(255, 255, 255, 0.88);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border-soft);
+    box-shadow: 0 4px 18px rgba(0,0,0,0.04);
+}
+
+.homepage-header h1 {
+    margin: 0;
+}
+
+.account-buttons a,
+.account-buttons a:link,
+.account-buttons a:visited {
+    border-radius: 999px;
+    border: 2px solid var(--primary);
+    padding: 9px 16px;
+    margin-left: 8px;
+    font-size: 15px;
+    font-weight: 800;
+}
+
+.about-section {
+    background: var(--surface);
+    border: 1px solid var(--border-soft);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-soft);
+    padding: 34px;
+}
+
+.steps-container {
+    flex-wrap: wrap;
+}
+
+.step {
+    box-shadow: var(--shadow-soft);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.step:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-hover);
+}
+
+/* Better feature boxes */
+
+.feature-detail-box {
+    background: var(--surface);
+    box-shadow: var(--shadow-soft);
+    border: 1px solid var(--border-soft);
+}
+
+.feature-detail-box:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-hover);
+    filter: none;
+}
+
+/* Responsive */
+
+@media (max-width: 950px) {
+    .feed-grid,
+    .search-results-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .page-hero h1 {
+        font-size: 34px;
+    }
+}
+
+@media (max-width: 620px) {
+    .feed-grid,
+    .search-results-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .page-hero {
+        padding: 26px 18px;
+    }
+
+    .section-heading-row {
+        padding: 0 4px;
+    }
+
+    .homepage-header {
+        flex-direction: column;
+        gap: 12px;
+    }
+
+    .account-buttons {
+        position: static;
+        font-size: 15px;
+    }
+}
+
+/* ============================================================
+   Homepage / Feed / Search UI polish END
+   ============================================================ */
+/* Fix homepage feature box text contrast */
+.feature-detail-box p,
+.feature-detail-box .detail-content,
+.feature-detail-box .activities-content,
+.feature-detail-box .activities-collapsed p,
+.feature-detail-box .activities-expanded p {
+    color: #ffffff !important;
+}
+
+.feature-detail-box h3,
+.feature-detail-box strong {
+    color: #ffffff !important;
+}

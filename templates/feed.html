@@ -4,90 +4,100 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tripster - Search</title>
-    <link rel="stylesheet" href="../static/styles.css">
+    <title>Tripster - Feed</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
 </head>
 
 <body>
+{% include 'navbar.html' %}
 
-    <!--Navigation bar-->
-    {% include 'navbar.html' %}
+<div class="page-wrapper">
+    <div class="middle-column">
 
-    <div class="page-wrapper">
-        <!-- Middle content -->
-        <div class="middle-column">
-            
-            <!-- Account buttons -->
-            <h1>Tripster</h1>
-           
-            <h2>Your Curated Feed</h2>
+        <section class="page-hero">
+            <p class="eyebrow">Explore student travel ideas</p>
+            <h1>Your Curated Feed</h1>
+            <p class="hero-description">
+                Browse real itineraries shared by students and find inspiration for your next trip.
+            </p>
+        </section>
 
-<div class="itinerary-container">
-    <a class="card-link" href="{{ url_for('itinerary_display', itinerary_id=1) }}">
-        <div class="itinerary-card">
-            <div class="overlay-text">Tokyo Budget Trip</div>
+        <div class="itinerary-container feed-grid">
+
+            <a class="card-link" href="{{ url_for('itinerary_display', itinerary_id=1) }}">
+                <div class="itinerary-card feed-card">
+                    <div class="card-gradient"></div>
+                    <div class="overlay-text">Tokyo Budget Trip</div>
+                </div>
+                <div class="card-info">
+                    <p class="card-title">Tokyo Budget Trip</p>
+                    <p class="card-meta"><i class="fa-regular fa-calendar"></i> 7 Days</p>
+                    <p class="card-meta"><i class="fa-solid fa-location-dot"></i> Tokyo, Japan</p>
+                </div>
+            </a>
+
+            <a class="card-link" href="{{ url_for('itinerary_display', itinerary_id=2) }}">
+                <div class="itinerary-card feed-card">
+                    <div class="card-gradient"></div>
+                    <div class="overlay-text">Kyoto Cultural Journey</div>
+                </div>
+                <div class="card-info">
+                    <p class="card-title">Kyoto Cultural Journey</p>
+                    <p class="card-meta"><i class="fa-regular fa-calendar"></i> 5 Days</p>
+                    <p class="card-meta"><i class="fa-solid fa-location-dot"></i> Kyoto, Japan</p>
+                </div>
+            </a>
+
+            <a class="card-link" href="{{ url_for('itinerary_display', itinerary_id=3) }}">
+                <div class="itinerary-card feed-card">
+                    <div class="card-gradient"></div>
+                    <div class="overlay-text">Seoul Food Adventure</div>
+                </div>
+                <div class="card-info">
+                    <p class="card-title">Seoul Food Adventure</p>
+                    <p class="card-meta"><i class="fa-regular fa-calendar"></i> 5 Days</p>
+                    <p class="card-meta"><i class="fa-solid fa-location-dot"></i> Seoul, South Korea</p>
+                </div>
+            </a>
+
+            <a class="card-link" href="{{ url_for('itinerary_display', itinerary_id=4) }}">
+                <div class="itinerary-card feed-card">
+                    <div class="card-gradient"></div>
+                    <div class="overlay-text">Bali Beach Escape</div>
+                </div>
+                <div class="card-info">
+                    <p class="card-title">Bali Beach Escape</p>
+                    <p class="card-meta"><i class="fa-regular fa-calendar"></i> 10 Days</p>
+                    <p class="card-meta"><i class="fa-solid fa-location-dot"></i> Bali, Indonesia</p>
+                </div>
+            </a>
+
+            <a class="card-link" href="{{ url_for('itinerary_display', itinerary_id=5) }}">
+                <div class="itinerary-card feed-card">
+                    <div class="card-gradient"></div>
+                    <div class="overlay-text">Paris 5-Day Plan</div>
+                </div>
+                <div class="card-info">
+                    <p class="card-title">Paris 5-Day Plan</p>
+                    <p class="card-meta"><i class="fa-regular fa-calendar"></i> 5 Days</p>
+                    <p class="card-meta"><i class="fa-solid fa-location-dot"></i> Paris, France</p>
+                </div>
+            </a>
+
+            <a class="card-link" href="{{ url_for('itinerary_display', itinerary_id=6) }}">
+                <div class="itinerary-card feed-card">
+                    <div class="card-gradient"></div>
+                    <div class="overlay-text">Sydney Weekend Guide</div>
+                </div>
+                <div class="card-info">
+                    <p class="card-title">Sydney Weekend Guide</p>
+                    <p class="card-meta"><i class="fa-regular fa-calendar"></i> 4 Days</p>
+                    <p class="card-meta"><i class="fa-solid fa-location-dot"></i> Sydney, Australia</p>
+                </div>
+            </a>
+
         </div>
-        <div class="card-info">
-            <p class="card-title">Tokyo Budget Trip</p>
-            <p class="card-meta">7 Days</p>
-            <p class="card-meta">Tokyo, Japan</p>
-        </div>
-    </a>
-    <a class="card-link" href="{{ url_for('itinerary_display', itinerary_id=2) }}">
-        <div class="itinerary-card">
-            <div class="overlay-text">Kyoto Cultural Journey</div>
-        </div>
-        <div class="card-info">
-            <p class="card-title">Kyoto Cultural Journey</p>
-            <p class="card-meta">5 Days</p>
-            <p class="card-meta">Kyoto, Japan</p>
-        </div>
-    </a>
-    <a class="card-link" href="{{ url_for('itinerary_display', itinerary_id=3) }}">
-        <div class="itinerary-card">
-            <div class="overlay-text">Seoul Food Adventure</div>
-        </div>
-        <div class="card-info">
-            <p class="card-title">Seoul Food Adventure</p>
-            <p class="card-meta">5 Days</p>
-            <p class="card-meta">Seoul, South Korea</p>
-        </div>
-    </a>
-    <a class="card-link" href="{{ url_for('itinerary_display', itinerary_id=4) }}">
-        <div class="itinerary-card">
-            <div class="overlay-text">Bali Beach Escape</div>
-        </div>
-        <div class="card-info">
-            <p class="card-title">Bali Beach Escape</p>
-            <p class="card-meta">10 Days</p>
-            <p class="card-meta">Bali, Indonesia</p>
-        </div>
-    </a>
-    <a class="card-link" href="{{ url_for('itinerary_display', itinerary_id=5) }}">
-        <div class="itinerary-card">
-            <div class="overlay-text">Paris 5-Day Plan</div>
-        </div>
-            <div class="card-info">
-            <p class="card-title">Paris 5-Day Plan</p>
-            <p class="card-meta">5 Days</p>
-            <p class="card-meta">Paris, France</p>
-        </div>
-    </a>
-    <a class="card-link" href="{{ url_for('itinerary_display', itinerary_id=6) }}">
-        <div class="itinerary-card">
-            <div class="overlay-text">Sydney Weekend Guide</div>
-        </div>
-            <div class="card-info">
-            <p class="card-title">Sydney Weekend Guide</p>
-            <p class="card-meta">4 Days</p>
-            <p class="card-meta">Sydney, Australia</p>
-        </div>
-    </a>
+    </div>
 </div>
-        </div>
-
-    </div>    
 </body>
 </html>
-
-<!-- 90 lines of code  -->
