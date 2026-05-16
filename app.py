@@ -143,7 +143,16 @@ class SearchHistory(db.Model):
     search_text = db.Column(db.String(120), nullable=False)
     created_at = db.Column(db.DateTime, server_default=db.func.now())
 
-    
+def add_thumbnails(itineraries):
+    for itinerary in itineraries:
+        first_photo = ItineraryPhoto.query.join(ItineraryDay).filter(
+            ItineraryDay.itinerary_id == itinerary.id
+        ).order_by(ItineraryDay.day_number.asc(), ItineraryPhoto.id.asc()).first()
+
+        itinerary.thumbnail = first_photo.filename if first_photo else None
+
+    return itineraries
+
 @app.route('/save-bio', methods=['POST'])
 def save_bio():
     user_id = session.get("user_id")
@@ -205,10 +214,10 @@ def user_profile():
     ]
     interests = [interest for interest in interests if interest]
 
-    user_itineraries = Itinerary.query.filter_by(user_id=user_id).all()
-    saved_items = db.session.query(Itinerary).join(
+    user_itineraries = add_thumbnails(Itinerary.query.filter_by(user_id=user_id).all())
+    saved_items = add_thumbnails(db.session.query(Itinerary).join(
         SavedItinerary, SavedItinerary.itinerary_id == Itinerary.id
-    ).filter(SavedItinerary.user_id == user_id).all()
+    ).filter(SavedItinerary.user_id == user_id).all())
 
     follower_count = Follow.query.filter_by(following_id=user_id).count()
     following_count = Follow.query.filter_by(follower_id=user_id).count()
@@ -217,7 +226,7 @@ def user_profile():
         'user-profile.html',
         user=user,
         interests=interests,
-        user_itineraries=user_itineraries,
+        user_itineraries=add_thumbnails(user_itineraries),
         saved_items=saved_items,
         is_own_profile=True,
         is_following=False,
@@ -247,7 +256,7 @@ def view_user_profile(user_id):
     ]
     interests = [interest for interest in interests if interest]
 
-    user_itineraries = Itinerary.query.filter_by(user_id=user_id).all()
+    user_itineraries = add_thumbnails(Itinerary.query.filter_by(user_id=user_id).all())
     saved_items = []
 
     existing_follow = Follow.query.filter_by(
@@ -472,7 +481,7 @@ def search():
         'search_page.html',
         q=q,
         users=users,
-        itineraries=itineraries,
+        itineraries = add_thumbnails(itineraries),
         duration=duration,
         travel_style=travel_style,
         budget_level=budget_level
@@ -625,9 +634,9 @@ def feed():
 
     return render_template(
         'feed.html',
-        following_itineraries=following_itineraries,
-        recommended_itineraries=recommended_itineraries,
-        other_itineraries=other_itineraries
+        following_itineraries = add_thumbnails(following_itineraries),
+        recommended_itineraries = add_thumbnails(recommended_itineraries),
+        other_itineraries = add_thumbnails(other_itineraries)
     )
 
 

@@ -20,6 +20,12 @@
                     {% for itinerary in following_itineraries %}
                         <a class="card-link" href="{{ url_for('itinerary_display', itinerary_id=itinerary.id) }}">
                             <div class="itinerary-card">
+                                {% if itinerary.thumbnail %}
+                                    <img
+                                        src="{{ url_for('static', filename='uploads/' + itinerary.thumbnail) }}"
+                                        class="itinerary-thumbnail"
+                                    >
+                                {% endif %}
                                 <div class="overlay-text">
                                     {{ itinerary.title }}
                                 </div>
@@ -41,6 +47,12 @@
                     {% for itinerary in recommended_itineraries %}
                         <a class="card-link" href="{{ url_for('itinerary_display', itinerary_id=itinerary.id) }}">
                             <div class="itinerary-card">
+                                {% if itinerary.thumbnail %}
+                                    <img
+                                        src="{{ url_for('static', filename='uploads/' + itinerary.thumbnail) }}"
+                                        class="itinerary-thumbnail"
+                                    >
+                                {% endif %}
                                 <div class="overlay-text">
                                     {{ itinerary.title }}
                                 </div>
@@ -62,6 +74,12 @@
                     {% for itinerary in other_itineraries %}
                         <a class="card-link" href="{{ url_for('itinerary_display', itinerary_id=itinerary.id) }}">
                             <div class="itinerary-card">
+                                {% if itinerary.thumbnail %}
+                                    <img
+                                        src="{{ url_for('static', filename='uploads/' + itinerary.thumbnail) }}"
+                                        class="itinerary-thumbnail"
+                                    >
+                                {% endif %}
                                 <div class="overlay-text">
                                     {{ itinerary.title }}
                                 </div>
