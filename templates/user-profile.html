@@ -131,13 +131,21 @@
                 {% else %}
                     <div class="empty-state">
                         <i class="fa-solid fa-map"></i>
-                        <p>You haven’t created any itineraries yet</p>
+                        <p>
+                            {% if is_own_profile %}
+                                You haven’t created any itineraries yet
+                            {% else %}
+                                {{ user.username }} hasn't created any itineraries yet
+                            {% endif %}
+                        </p>
                     </div>
                 {% endif %}
             </div>
+            {% if is_own_profile %}
             <a href="{{ url_for('itinerary_create') }}">
                 Create an itinerary
             </a>
+            {% endif %}
         </div>
 
         {% if is_own_profile %}
