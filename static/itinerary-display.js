@@ -341,3 +341,55 @@ document.querySelectorAll('.day-card').forEach(card => {
         }
     });
 });
+
+let lightboxImages = [];
+let lightboxIndex = 0;
+
+function openLightbox(images, index) {
+    lightboxImages = images;
+    lightboxIndex = index;
+    document.getElementById('lightbox-img').src = lightboxImages[lightboxIndex];
+    document.getElementById('lightbox').classList.remove('hidden');
+}
+
+function closeLightbox() {
+    document.getElementById('lightbox').classList.add('hidden');
+}
+
+document.querySelector('.lightbox-close').addEventListener('click', closeLightbox);
+document.querySelector('.lightbox-overlay').addEventListener('click', closeLightbox);
+
+document.querySelector('.lightbox-prev').addEventListener('click', function() {
+    lightboxIndex = (lightboxIndex - 1 + lightboxImages.length) % lightboxImages.length;
+    document.getElementById('lightbox-img').src = lightboxImages[lightboxIndex];
+});
+
+document.querySelector('.lightbox-next').addEventListener('click', function() {
+    lightboxIndex = (lightboxIndex + 1) % lightboxImages.length;
+    document.getElementById('lightbox-img').src = lightboxImages[lightboxIndex];
+});
+
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') closeLightbox();
+    if (e.key === 'ArrowLeft') {
+        lightboxIndex = (lightboxIndex - 1 + lightboxImages.length) % lightboxImages.length;
+        document.getElementById('lightbox-img').src = lightboxImages[lightboxIndex];
+    }
+    if (e.key === 'ArrowRight') {
+        lightboxIndex = (lightboxIndex + 1) % lightboxImages.length;
+        document.getElementById('lightbox-img').src = lightboxImages[lightboxIndex];
+    }
+});
+
+// make detail tab photos clickable
+document.querySelectorAll('.day-details').forEach(dayDiv => {
+    const imgs = Array.from(dayDiv.querySelectorAll('img'));
+    const srcs = imgs.map(img => img.src);
+    
+    imgs.forEach((img, index) => {
+        img.style.cursor = 'pointer';
+        img.addEventListener('click', function() {
+            openLightbox(srcs, index);
+        });
+    });
+});
