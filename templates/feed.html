@@ -1,93 +1,81 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tripster - Search</title>
-    <link rel="stylesheet" href="../static/styles.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <title>Feed</title>
 </head>
 
 <body>
-
-    <!--Navigation bar-->
     {% include 'navbar.html' %}
 
     <div class="page-wrapper">
-        <!-- Middle content -->
         <div class="middle-column">
-            
-            <!-- Account buttons -->
-            <h1>Tripster</h1>
-           
-            <h2>Your Curated Feed</h2>
+            <h1>Feed</h1>
 
-<div class="itinerary-container">
-    <a class="card-link" href="{{ url_for('itinerary_display', itinerary_id=1) }}">
-        <div class="itinerary-card">
-            <div class="overlay-text">Tokyo Budget Trip</div>
-        </div>
-        <div class="card-info">
-            <p class="card-title">Tokyo Budget Trip</p>
-            <p class="card-meta">7 Days</p>
-            <p class="card-meta">Tokyo, Japan</p>
-        </div>
-    </a>
-    <a class="card-link" href="{{ url_for('itinerary_display', itinerary_id=2) }}">
-        <div class="itinerary-card">
-            <div class="overlay-text">Kyoto Cultural Journey</div>
-        </div>
-        <div class="card-info">
-            <p class="card-title">Kyoto Cultural Journey</p>
-            <p class="card-meta">5 Days</p>
-            <p class="card-meta">Kyoto, Japan</p>
-        </div>
-    </a>
-    <a class="card-link" href="{{ url_for('itinerary_display', itinerary_id=3) }}">
-        <div class="itinerary-card">
-            <div class="overlay-text">Seoul Food Adventure</div>
-        </div>
-        <div class="card-info">
-            <p class="card-title">Seoul Food Adventure</p>
-            <p class="card-meta">5 Days</p>
-            <p class="card-meta">Seoul, South Korea</p>
-        </div>
-    </a>
-    <a class="card-link" href="{{ url_for('itinerary_display', itinerary_id=4) }}">
-        <div class="itinerary-card">
-            <div class="overlay-text">Bali Beach Escape</div>
-        </div>
-        <div class="card-info">
-            <p class="card-title">Bali Beach Escape</p>
-            <p class="card-meta">10 Days</p>
-            <p class="card-meta">Bali, Indonesia</p>
-        </div>
-    </a>
-    <a class="card-link" href="{{ url_for('itinerary_display', itinerary_id=5) }}">
-        <div class="itinerary-card">
-            <div class="overlay-text">Paris 5-Day Plan</div>
-        </div>
-            <div class="card-info">
-            <p class="card-title">Paris 5-Day Plan</p>
-            <p class="card-meta">5 Days</p>
-            <p class="card-meta">Paris, France</p>
-        </div>
-    </a>
-    <a class="card-link" href="{{ url_for('itinerary_display', itinerary_id=6) }}">
-        <div class="itinerary-card">
-            <div class="overlay-text">Sydney Weekend Guide</div>
-        </div>
-            <div class="card-info">
-            <p class="card-title">Sydney Weekend Guide</p>
-            <p class="card-meta">4 Days</p>
-            <p class="card-meta">Sydney, Australia</p>
-        </div>
-    </a>
-</div>
-        </div>
+            <h2>From People You Follow</h2>
 
-    </div>    
+            <div class="itinerary-container">
+                {% if following_itineraries %}
+                    {% for itinerary in following_itineraries %}
+                        <a class="card-link" href="{{ url_for('itinerary_display', itinerary_id=itinerary.id) }}">
+                            <div class="itinerary-card">
+                                <div class="overlay-text">
+                                    {{ itinerary.title }}
+                                </div>
+                            </div>
+                        </a>
+                    {% endfor %}
+                {% else %}
+                    <div class="empty-state">
+                        <i class="fa-solid fa-user-plus"></i>
+                        <p>Follow users to see their itineraries here</p>
+                    </div>
+                {% endif %}
+            </div>
+
+            <h2>Based on Your Searches</h2>
+
+            <div class="itinerary-container">
+                {% if recommended_itineraries %}
+                    {% for itinerary in recommended_itineraries %}
+                        <a class="card-link" href="{{ url_for('itinerary_display', itinerary_id=itinerary.id) }}">
+                            <div class="itinerary-card">
+                                <div class="overlay-text">
+                                    {{ itinerary.title }}
+                                </div>
+                            </div>
+                        </a>
+                    {% endfor %}
+                {% else %}
+                    <div class="empty-state">
+                        <i class="fa-solid fa-magnifying-glass"></i>
+                        <p>Search for destinations or users to improve your recommendations</p>
+                    </div>
+                {% endif %}
+            </div>
+
+            <h2>Explore More</h2>
+
+            <div class="itinerary-container">
+                {% if other_itineraries %}
+                    {% for itinerary in other_itineraries %}
+                        <a class="card-link" href="{{ url_for('itinerary_display', itinerary_id=itinerary.id) }}">
+                            <div class="itinerary-card">
+                                <div class="overlay-text">
+                                    {{ itinerary.title }}
+                                </div>
+                            </div>
+                        </a>
+                    {% endfor %}
+                {% else %}
+                    <div class="empty-state">
+                        <i class="fa-solid fa-map"></i>
+                        <p>No itineraries available yet</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
 </body>
 </html>
-
-<!-- 90 lines of code  -->
