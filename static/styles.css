@@ -4866,3 +4866,20 @@ textarea:focus {
     box-shadow: var(--shadow-hover);
     box-sizing: border-box;
 }
+/* Fix itinerary display right-side card text contrast */
+.right-column .itinerary-detail-box,
+.right-column .itinerary-detail-box .detail-content,
+.right-column .itinerary-detail-box .detail-content p,
+.right-column .itinerary-detail-box .detail-content strong,
+.right-column .itinerary-detail-box .detail-content h3 {
+    color: #ffffff !important;
+}
+
+.right-column .itinerary-detail-box .detail-content p {
+    opacity: 0.95;
+}
+
+.right-column .itinerary-detail-box .detail-content strong {
+    color: #ffffff !important;
+    font-weight: 800;
+}
