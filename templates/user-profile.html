@@ -54,17 +54,23 @@
                 </div>
 
                 {% if not is_own_profile %}
-                <button
-                        type="button"
-                        id="follow-button"
-                        class="follow-button {% if is_following %}following{% endif %}"
-                        data-user-id="{{ user.id }}">
-                    {% if is_following %}
-                    Unfollow
-                    {% else %}
-                    Follow
-                    {% endif %}
-                </button>
+                <div class="profile-action-buttons">
+                    <button
+                            type="button"
+                            id="follow-button"
+                            class="follow-button {% if is_following %}following{% endif %}"
+                            data-user-id="{{ user.id }}">
+                        {% if is_following %}
+                        Unfollow
+                        {% else %}
+                        Follow
+                        {% endif %}
+                    </button>
+
+                    <a href="{{ url_for('dms', user_id=user.id, username=user.username) }}" class="message-button">
+                        Message
+                    </a>
+                </div>
                 {% endif %}
             </div>
         </div>
@@ -127,13 +133,21 @@
                 {% else %}
                     <div class="empty-state">
                         <i class="fa-solid fa-map"></i>
-                        <p>You haven’t created any itineraries yet</p>
+                        <p>
+                            {% if is_own_profile %}
+                                You haven’t created any itineraries yet
+                            {% else %}
+                                {{ user.username }} hasn't created any itineraries yet
+                            {% endif %}
+                        </p>
                     </div>
                 {% endif %}
             </div>
+            {% if is_own_profile %}
             <a href="{{ url_for('itinerary_create') }}">
                 Create an itinerary
             </a>
+            {% endif %}
         </div>
 
         {% if is_own_profile %}

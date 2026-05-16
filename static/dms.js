@@ -14,6 +14,18 @@ const drafts = {};
     const response = await fetch("/api/users");
     const users = await response.json();
 
+    const params = new URLSearchParams(window.location.search);
+    const targetUserId = params.get('user_id');
+    const targetUsername = params.get('username');
+    if (targetUserId && !users.some(u => u.id === parseInt(targetUserId))) {
+        users.unshift({
+            id: parseInt(targetUserId),
+            username: targetUsername || 'User',
+            email: null,
+            unread_count: 0
+        });
+    }
+
     userList.innerHTML = "";
 
     if (users.length === 0) {
@@ -24,6 +36,7 @@ const drafts = {};
     users.forEach((user) => {
       const userEl = document.createElement("div");
       userEl.className = "user";
+      userEl.dataset.userId = user.id;
       const nameSpan = document.createElement("span");
       nameSpan.textContent = user.username || user.email || "Unnamed user";
 
@@ -233,7 +246,38 @@ if (match) {
     }
   });
 
-  loadUsers();
+async function autoSelectUserFromURL() {
+    const params = new URLSearchParams(window.location.search);
+    const targetUserId = params.get('user_id');
+    const targetUsername = params.get('username');
+
+    if (!targetUserId) return;
+
+    // If the user is already in the sidebar, click them
+    const userEl = document.querySelector(`.user[data-user-id="${targetUserId}"]`);
+    if (userEl) {
+      userEl.click();
+      return;
+    }
+
+    // Otherwise, set up the chat manually
+    selectedUserId = parseInt(targetUserId);
+    chatHeader.innerHTML = `Chat with <a href="/user/${targetUserId}" class="chat-profile-link">${targetUsername || 'User'}</a>`;
+    messageInput.disabled = false;
+    sendButton.disabled = false;
+    messageInput.placeholder = "Type a message...";
+    messageInput.value = "";
+    messageInput.focus();
+    await loadMessages();
+  }
+
+  loadUsers().then(() => autoSelectUserFromURL());
+
+  setInterval(() => {
+    if (selectedUserId) {
+      loadMessages();
+    }
+  }, 3000);
 
   setInterval(() => {
     if (selectedUserId) {

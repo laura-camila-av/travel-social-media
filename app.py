@@ -558,6 +558,90 @@ def toggle_save(itinerary_id):
         "saved": saved
     })
 
+@app.route('/itinerary/<int:itinerary_id>/edit', methods=['GET'])
+def itinerary_edit(itinerary_id):
+    user_id = session.get("user_id")
+    if not user_id:
+        return redirect(url_for('login_page'))
+
+    itinerary = Itinerary.query.get_or_404(itinerary_id)
+    if itinerary.user_id != user_id:
+        return redirect(url_for('itinerary_display', itinerary_id=itinerary_id))
+
+    itinerary_data = {
+        'id': itinerary.id,
+        'title': itinerary.title,
+        'destination': itinerary.destination,
+        'travel_style': itinerary.travel_style or '',
+        'budget': itinerary.budget,
+        'start_date': itinerary.start_date.strftime('%Y-%m-%d'),
+        'end_date': itinerary.end_date.strftime('%Y-%m-%d'),
+        'days': [{
+            'day_number': day.day_number,
+            'accommodation': day.accommodation or '',
+            'transport': day.transport_taken or '',
+            'rented_items': day.rented_items or '',
+            'caption': day.caption or '',
+            'total_cost': day.total_cost,
+            'activity_details': json.loads(day.activity_details) if day.activity_details else [],
+            'dining_details': json.loads(day.dining_details) if day.dining_details else [],
+            'photos': [{'id': p.id, 'filename': p.filename} for p in day.photos]
+        } for day in itinerary.days]
+    }
+
+    return render_template('edit-itinerary.html', itinerary=itinerary, itinerary_data=json.dumps(itinerary_data))
+
+
+@app.route('/itinerary/<int:itinerary_id>/edit', methods=['POST'])
+def itinerary_edit_submit(itinerary_id):
+    user_id = session.get("user_id")
+    if not user_id:
+        return redirect(url_for('login_page'))
+
+    itinerary = Itinerary.query.get_or_404(itinerary_id)
+    if itinerary.user_id != user_id:
+        return redirect(url_for('itinerary_display', itinerary_id=itinerary_id))
+
+    itinerary.title = request.form.get('trip-title', '').strip()
+    itinerary.destination = request.form.get('destination', '').strip()
+    itinerary.travel_style = request.form.get('travel-style', '').strip() or None
+    budget_raw = request.form.get('trip-budget', '').strip()
+    itinerary.budget = float(budget_raw) if budget_raw else None
+
+    # Delete photos the user marked for removal
+    for photo_id in request.form.getlist('delete_photo_ids'):
+        photo = ItineraryPhoto.query.get(int(photo_id))
+        if photo:
+            try:
+                os.remove(os.path.join(app.config['UPLOAD_FOLDER'], photo.filename))
+            except OSError:
+                pass
+            db.session.delete(photo)
+    db.session.flush()  # so day.photos reflects deletions before we count
+
+    for day in itinerary.days:
+        n = day.day_number
+        day.accommodation = request.form.get(f'accommodation-day{n}', '').strip() or None
+        day.transport_taken = request.form.get(f'transport-day{n}', '').strip() or None
+        day.rented_items = request.form.get(f'rented-items-day{n}', '').strip() or None
+        day.caption = request.form.get(f'caption-day{n}', '').strip() or None
+        day.activity_details = request.form.get(f'activity-json-day{n}', '[]')
+        day.dining_details = request.form.get(f'dining-json-day{n}', '[]')
+        cost_raw = request.form.get(f'cost-day{n}', '').strip()
+        day.total_cost = float(cost_raw) if cost_raw else None
+
+        existing_count = len(day.photos)
+        for idx, photo in enumerate(request.files.getlist(f'photos-day{n}'), start=existing_count + 1):
+            if photo and photo.filename and allowed_file(photo.filename):
+                ext = photo.filename.rsplit('.', 1)[1].lower()
+                filename = f"itinerary_{itinerary.id}_day{n}_{idx}.{ext}"
+                photo.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+                db.session.add(ItineraryPhoto(itinerary_day_id=day.id, filename=filename))
+
+    db.session.commit()
+    flash("Itinerary updated successfully.", "success")
+    return redirect(url_for('itinerary_display', itinerary_id=itinerary_id))
+
 @app.route('/api/delete-itinerary/<int:itinerary_id>', methods=['POST'])
 def delete_itinerary(itinerary_id):
     user_id = session.get("user_id")
