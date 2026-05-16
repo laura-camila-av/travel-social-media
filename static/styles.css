@@ -4899,3 +4899,27 @@ textarea:focus {
 .step .step-desc {
     color: #f5f5f5 !important;
 }
+/* Fix itinerary display main image cropping */
+.main-image {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #f8f8f8;
+}
+
+.main-image img {
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: contain !important;
+    object-position: center center !important;
+    display: block;
+    background-color: #f8f8f8;
+}
+
+/* Keep day thumbnails cropped nicely */
+.day-card img {
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: cover !important;
+    object-position: center center !important;
+}
