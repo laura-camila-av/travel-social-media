@@ -108,6 +108,32 @@ const drafts = {};
       const textEl = document.createElement("div");
       textEl.textContent = msg.text;
       msgEl.appendChild(textEl);
+      const itineraryPattern = /^\[ITINERARY:(\d+):(.+?)\]([\s\S]*)?$/;
+const match = msg.text.match(itineraryPattern);
+
+if (match) {
+    const itineraryId = match[1];
+    const itineraryTitle = match[2];
+    const extraMessage = match[3] ? match[3].trim() : "";
+
+    const itineraryLink = document.createElement("a");
+    itineraryLink.href = `/itinerary/${itineraryId}`;
+    itineraryLink.style.fontWeight = "bold";
+    itineraryLink.style.display = "block";
+    itineraryLink.style.marginBottom = extraMessage ? "6px" : "0";
+    itineraryLink.textContent = `✈️ ${itineraryTitle}`;
+    msgEl.appendChild(itineraryLink);
+
+    if (extraMessage) {
+        const extraEl = document.createElement("span");
+        extraEl.textContent = extraMessage;
+        msgEl.appendChild(extraEl);
+    }
+} else {
+    const textEl = document.createElement("span");
+    textEl.textContent = msg.text;
+    msgEl.appendChild(textEl);
+}
 
       // TIMESTAMP
       const timeEl = document.createElement("div");

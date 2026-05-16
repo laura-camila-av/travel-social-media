@@ -14,12 +14,10 @@
        
     <div class="page-wrapper">
         <div class="middle-column">
-    
-            <h2>{{ itinerary.title }}</h2>
 
             <div class="creator-section">
                 <div class="creator-pic"></div>
-                <p>@{{ itinerary.user.username }}</p>
+                <a href="{{ url_for('view_user_profile', user_id=itinerary.user.id) }}" class="creator-profile-link">@{{ itinerary.user.username }}</a>
             </div>
 
             <div class="main-image">
@@ -32,19 +30,7 @@
                 {% endif %}
             </div>
 
-            <div class="trip-summary">
-                <p><strong>Destination:</strong> {{ itinerary.destination }}</p>
-                <p><strong>Travel Style:</strong> {{ itinerary.travel_style or 'Not specified' }}</p>
-                <p><strong>Budget:</strong> 
-                    {% if itinerary.budget is not none %}
-                        ${{ "%.2f"|format(itinerary.budget) }}
-                    {% else %}
-                        Not specified
-                    {% endif %}
-                </p>
-                <p><strong>Dates:</strong> {{ itinerary.start_date }} to {{ itinerary.end_date }}</p>
-            </div>
-            <div class="action-buttons">
+                        <div class="action-buttons">
                 <!-- LIKE COLUMN -->
                 <div class="like-group">
                     <button 
@@ -76,12 +62,11 @@
                     id="shareButton"
                     class="share-button"
                     type="button"
-                    data-itinerary-id="{{ itinerary_id }}"
-                    data-itinerary-title="Itinerary Title"
+                    data-itinerary-id="{{ itinerary.id }}"
+                    data-itinerary-title="{{ itinerary.title }}"
                 >
-                    <i id="shareIcon" class="fa-regular fa-share-from-square"></i>
+                <i id="shareIcon" class="fa-regular fa-share-from-square"></i>
                 </button>
-
                 {% if is_owner %}
                 <button 
                     id="deleteButton" 
@@ -95,9 +80,34 @@
                 {% endif %}
 
             </div> <!--end of action-button-div-->
+
+            
+            <h2>{{ itinerary.title }}</h2>
+
+            <div class="itinerary-display-page">
+                <div class="main-image">
+                    {% if itinerary.days and itinerary.days[0].photos %}
+                <img 
+                    src="{{ url_for('static', filename='uploads/' + itinerary.days[0].photos[0].filename) }}" 
+                    alt="Main itinerary image"
+                    style="width: 100%; height: 100%; object-fit: cover;"
+                >
+                {% endif %}
+            </div>
+</div>
+
+    <div class="trip-summary">
+        <span class="trip-pill"><strong>Location: </strong> {{ itinerary.destination }}</span>
+        <span class="trip-pill"><strong>Style: </strong> {{ itinerary.travel_style or 'Not specified' }}</span>
+        <span class="trip-pill">
+            <strong>Budget: </strong> {% if itinerary.budget is not none %}${{ "%.2f"|format(itinerary.budget) }}{% else %}Not specified{% endif %}
+        </span>
+        <span class="trip-pill"><strong>Dates: </strong>{{ itinerary.start_date }} – {{ itinerary.end_date }}</span>
+    </div>
+
             <div class="day-thumbnails">
                 {% for day in itinerary.days %}
-                    <div class="day-card">
+                    <div class="day-card" data-day="{{ day.day_number }}">
                         {% if day.photos %}
                             <img 
                                 src="{{ url_for('static', filename='uploads/' + day.photos[0].filename) }}" 
@@ -113,6 +123,7 @@
     </div>
    <div class="right-column">
         {% for day in itinerary.days %}
+        <div class="day-details" data-day="{{ day.day_number }}" style="display: none;">
             <h3>Day {{ day.day_number }}</h3>
 
             <div class="itinerary-detail-box">
@@ -213,6 +224,7 @@
                     <p>{{ day.caption or '' }}</p>
                 </div>
             </div>
+        </div>
         {% endfor %}
     </div>
         
@@ -234,6 +246,14 @@
             <button type="button" class="btn" id="shareCancelBtn">Cancel</button>
         </div>
     </div>
+</div>
+
+<div id="lightbox" class="lightbox hidden">
+    <div class="lightbox-overlay"></div>
+    <button class="lightbox-close">✕</button>
+    <button class="lightbox-prev">&#8249;</button>
+    <img id="lightbox-img" src="" alt="">
+    <button class="lightbox-next">&#8250;</button>
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
