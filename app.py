@@ -992,6 +992,38 @@ def following_page(user_id):
         list_type='following'
     )
 
+@app.context_processor
+def inject_notification_counts():
+    current_user_id = session.get("user_id")
+
+    if not current_user_id:
+        return {
+            "message_badge_count": 0,
+            "notification_badge_count": 0
+        }
+
+    unread_message_count = Message.query.filter_by(
+        receiver_id=current_user_id,
+        is_read=False
+    ).count()
+
+    follower_count = Follow.query.filter_by(
+        following_id=current_user_id
+    ).count()
+
+    like_count = db.session.query(Like).join(
+        Itinerary,
+        Like.itinerary_id == Itinerary.id
+    ).filter(
+        Itinerary.user_id == current_user_id,
+        Like.user_id != current_user_id
+    ).count()
+
+    return {
+        "message_badge_count": unread_message_count,
+        "notification_badge_count": follower_count + like_count + unread_message_count
+    }
+
 @app.route('/notifications')
 def notifications():
     current_user_id = session.get("user_id")
@@ -999,11 +1031,12 @@ def notifications():
     if not current_user_id:
         return redirect(url_for('login_page'))
 
+    notifications = []
+
+    # Follow notifications
     follower_records = Follow.query.filter_by(
         following_id=current_user_id
     ).order_by(Follow.created_at.desc()).all()
-
-    notifications = []
 
     for record in follower_records:
         follower = User.query.get(record.follower_id)
@@ -1015,9 +1048,68 @@ def notifications():
             ).first() is not None
 
             notifications.append({
-                "follower": follower,
+                "type": "follow",
+                "actor": follower,
+                "created_at": record.created_at,
                 "is_following_back": is_following_back
             })
+
+    # Like notifications
+    like_records = db.session.query(
+        Like,
+        Itinerary,
+        User
+    ).join(
+        Itinerary,
+        Like.itinerary_id == Itinerary.id
+    ).join(
+        User,
+        Like.user_id == User.id
+    ).filter(
+        Itinerary.user_id == current_user_id,
+        Like.user_id != current_user_id
+    ).order_by(
+        Like.created_at.desc()
+    ).all()
+
+    for like, itinerary, liker in like_records:
+        notifications.append({
+            "type": "like",
+            "actor": liker,
+            "itinerary": itinerary,
+            "created_at": like.created_at
+        })
+
+    # DM notifications for unread messages
+    unread_messages = Message.query.filter_by(
+        receiver_id=current_user_id,
+        is_read=False
+    ).order_by(
+        Message.created_at.desc()
+    ).all()
+
+    seen_senders = set()
+
+    for message in unread_messages:
+        if message.sender_id in seen_senders:
+            continue
+
+        sender = User.query.get(message.sender_id)
+
+        if sender:
+            notifications.append({
+                "type": "message",
+                "actor": sender,
+                "message": message,
+                "created_at": message.created_at
+            })
+
+            seen_senders.add(message.sender_id)
+
+    notifications.sort(
+        key=lambda notification: notification["created_at"],
+        reverse=True
+    )
 
     return render_template(
         'notifications.html',
