@@ -129,7 +129,11 @@
                         </div>
 
                         <div id="form-transport-day${i}">
-                            <input type="text" id="transport-day${i}" name="transport-day${i}" placeholder="Enter transport used, e.g. Train, Taxi, Bus">
+                            <div class="activity-input-area" id="transport-input-area-day${i}">
+                                <ul class="activity-list" id="transport-list-day${i}"></ul>
+                                <input type="text" class="activity-input" id="transport-input-day${i}" placeholder="Type a transport and press Enter">
+                            </div>
+                            <div class="activity-details-grid" id="transport-details-day${i}"></div>
                         </div>
 
                         <div id="form-accommodation-day${i}">
@@ -141,7 +145,11 @@
                         </div>
 
                         <div id="form-rented-day${i}">
-                            <input type="text" id="rented-items-day${i}" name="rented-items-day${i}" placeholder="Enter any rented items">
+                            <div class="activity-input-area" id="rented-input-area-day${i}">
+                                <ul class="activity-list" id="rented-list-day${i}"></ul>
+                                <input type="text" class="activity-input" id="rented-input-day${i}" placeholder="Type a rented item and press Enter">
+                            </div>
+                            <div class="activity-details-grid" id="rented-details-day${i}"></div>
                         </div>
 
                         <div id="form-photo-day${i}">
@@ -155,6 +163,8 @@
 
                         <input type="hidden" id="activity-json-day${i}" name="activity-json-day${i}">
                         <input type="hidden" id="dining-json-day${i}" name="dining-json-day${i}">
+                        <input type="hidden" id="transport-json-day${i}" name="transport-json-day${i}">
+                        <input type="hidden" id="rented-json-day${i}" name="rented-json-day${i}">
                     </div>
                 `;
 
@@ -184,6 +194,8 @@
 
                 setupActivityInput(i);
                 setupDiningInput(i);
+                setupListInput(i, "transport", "Type a transport and press Enter");
+                setupListInput(i, "rented", "Type a rented item and press Enter");
             }
 
             totalDays = dayCount;
@@ -283,6 +295,34 @@
             });
         }
 
+        function setupListInput(dayNum, type, placeholder) {
+            const input = document.getElementById(`${type}-input-day${dayNum}`);
+            const list  = document.getElementById(`${type}-list-day${dayNum}`);
+            const grid  = document.getElementById(`${type}-details-day${dayNum}`);
+            if (!input) return;
+            let count = list.children.length;
+
+            input.addEventListener("keydown", function(e) {
+                if (e.key !== "Enter") return;
+                e.preventDefault();
+                const value = this.value.trim();
+                if (!value) return;
+                count++;
+                const id = `${type}-detail-day${dayNum}-item${count}`;
+                const li = document.createElement("li");
+                li.innerHTML = `${value} <span class="remove-activity" onclick="removeActivity('${id}', this); saveDraft();">✕</span>`;
+                list.appendChild(li);
+                const box = document.createElement("div");
+                box.classList.add("activity-detail-box");
+                box.id = id;
+                box.innerHTML = `<p class="activity-detail-title">${value}</p><textarea id="${id}-textarea" placeholder="Enter details for ${value}..." rows="3"></textarea>`;
+                grid.appendChild(box);
+                box.querySelector("textarea").addEventListener("input", saveDraft);
+                this.value = "";
+                saveDraft();
+            });
+        }
+
         function removeActivity(boxId, span) {
             const box = document.getElementById(boxId);
             if (box) box.remove();
@@ -368,8 +408,11 @@
             preview.appendChild(p);
         });
     } else if (field === "transport") {
-        const val = document.getElementById(`transport-day${dayNum}`)?.value.trim();
-        if (val) preview.innerHTML = `<p>${val}</p>`;
+        document.querySelectorAll(`#transport-list-day${dayNum} li`).forEach(item => {
+            const p = document.createElement("p");
+            p.textContent = item.textContent.replace("✕", "").trim();
+            preview.appendChild(p);
+        });
     } else if (field === "accommodation") {
         const val = document.getElementById(`accommodation-day${dayNum}`)?.value.trim();
         if (val) preview.innerHTML = `<p>${val}</p>`;
@@ -377,8 +420,11 @@
         const val = document.getElementById(`cost-day${dayNum}`)?.value.trim();
         if (val) preview.innerHTML = `<p>$${val}</p>`;
     } else if (field === "rented") {
-        const val = document.getElementById(`rented-items-day${dayNum}`)?.value.trim();
-        if (val) preview.innerHTML = `<p>${val}</p>`;
+        document.querySelectorAll(`#rented-list-day${dayNum} li`).forEach(item => {
+            const p = document.createElement("p");
+            p.textContent = item.textContent.replace("✕", "").trim();
+            preview.appendChild(p);
+        });
     } else if (field === "photo") {
         const files = selectedPhotosByDay[dayNum] || [];
         files.forEach(file => {
@@ -478,15 +524,30 @@
                     diningDetails.push({ title, text: textarea ? textarea.value : "" });
                 });
 
+                const transportDetails = [];
+                document.querySelectorAll(`#transport-details-day${dayNum} .activity-detail-box`).forEach(box => {
+                    transportDetails.push({
+                        title: box.querySelector(".activity-detail-title")?.textContent.trim() || "",
+                        text: box.querySelector("textarea")?.value || ""
+                    });
+                });
+                const rentedDetails = [];
+                document.querySelectorAll(`#rented-details-day${dayNum} .activity-detail-box`).forEach(box => {
+                    rentedDetails.push({
+                        title: box.querySelector(".activity-detail-title")?.textContent.trim() || "",
+                        text: box.querySelector("textarea")?.value || ""
+                    });
+                });
+
                 draft.days.push({
                     cost: document.getElementById(`cost-day${dayNum}`)?.value || "",
-                    rentedItems: document.getElementById(`rented-items-day${dayNum}`)?.value || "",
                     accommodation: document.getElementById(`accommodation-day${dayNum}`)?.value || "",
                     caption: document.getElementById(`caption-day${dayNum}`)?.value || "",
                     fileNames: (selectedPhotosByDay[dayNum] || []).map(file => file.name),
-                    transport: document.getElementById(`transport-day${dayNum}`)?.value || "",
                     activityDetails,
-                    diningDetails
+                    diningDetails,
+                    transportDetails,
+                    rentedDetails
                 });
             });
 
@@ -571,10 +632,8 @@
                     const transportField = document.getElementById(`transport-day${dayNum}`);
 
                     if (costField) costField.value = day.cost || "";
-                    if (rentedField) rentedField.value = day.rentedItems || "";
                     if (accommodationField) accommodationField.value = day.accommodation || "";
                     if (captionField) captionField.value = day.caption || "";
-                    if (transportField) transportField.value = day.transport || "";
                     selectedPhotosByDay[dayNum] = [];
 
                     if (day.fileNames && day.fileNames.length > 0) {
@@ -587,6 +646,8 @@
 
                     restoreDynamicList(dayNum, "activity", day.activityDetails || []);
                     restoreDynamicList(dayNum, "dining", day.diningDetails || []);
+                    restoreDynamicList(dayNum, "transport", day.transportDetails || []);
+                    restoreDynamicList(dayNum, "rented",    day.rentedDetails    || []);
 
                     updateTilePreview("activities", dayNum);
                     updateTilePreview("dining", dayNum);
@@ -745,24 +806,16 @@
             document.querySelectorAll(".day-section").forEach((section, index) => {
                 const dayNum = index + 1;
 
-                const activityDetails = [];
-                document.querySelectorAll(`#activity-details-day${dayNum} .activity-detail-box`).forEach(box => {
-                    activityDetails.push({
-                        title: box.querySelector(".activity-detail-title")?.textContent.trim() || "",
-                        text: box.querySelector("textarea")?.value || ""
+                ["activity", "dining", "transport", "rented"].forEach(type => {
+                    const items = [];
+                    document.querySelectorAll(`#${type}-details-day${dayNum} .activity-detail-box`).forEach(box => {
+                        items.push({
+                            title: box.querySelector(".activity-detail-title")?.textContent.trim() || "",
+                            text: box.querySelector("textarea")?.value || ""
+                        });
                     });
+                    document.getElementById(`${type}-json-day${dayNum}`).value = JSON.stringify(items);
                 });
-
-                const diningDetails = [];
-                document.querySelectorAll(`#dining-details-day${dayNum} .activity-detail-box`).forEach(box => {
-                    diningDetails.push({
-                        title: box.querySelector(".activity-detail-title")?.textContent.trim() || "",
-                        text: box.querySelector("textarea")?.value || ""
-                    });
-                });
-
-                document.getElementById(`activity-json-day${dayNum}`).value = JSON.stringify(activityDetails);
-                document.getElementById(`dining-json-day${dayNum}`).value = JSON.stringify(diningDetails);
             });
             localStorage.removeItem(STORAGE_KEY);
         });

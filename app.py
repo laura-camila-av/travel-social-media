@@ -153,6 +153,18 @@ def add_thumbnails(itineraries):
 
     return itineraries
 
+def to_list_field(value):
+    """Parse stored value as a JSON list, falling back to wrapping legacy plain text."""
+    if not value:
+        return []
+    try:
+        result = json.loads(value)
+        if isinstance(result, list):
+            return result
+    except Exception:
+        pass
+    return [{"title": value, "text": ""}]
+
 @app.route('/save-bio', methods=['POST'])
 def save_bio():
     user_id = session.get("user_id")
@@ -362,12 +374,12 @@ def itinerary_create():
 
         for day_num in range(1, total_days + 1):
             cost_raw = request.form.get(f'cost-day{day_num}', '').strip()
-            rented_items = request.form.get(f'rented-items-day{day_num}', '').strip()
             accommodation = request.form.get(f'accommodation-day{day_num}', '').strip()
-            transport = request.form.get(f'transport-day{day_num}', '').strip()
             caption = request.form.get(f'caption-day{day_num}', '').strip()
-            activity_details = request.form.get(f'activity-json-day{day_num}', '[]')
-            dining_details = request.form.get(f'dining-json-day{day_num}', '[]')
+            activity_details  = request.form.get(f'activity-json-day{day_num}',  '[]')
+            dining_details    = request.form.get(f'dining-json-day{day_num}',    '[]')
+            transport_details = request.form.get(f'transport-json-day{day_num}', '[]')
+            rented_details    = request.form.get(f'rented-json-day{day_num}',    '[]')
 
             try:
                 total_cost = float(cost_raw) if cost_raw else None
@@ -378,8 +390,8 @@ def itinerary_create():
                 itinerary_id=new_itinerary.id,
                 day_number=day_num,
                 total_cost=total_cost,
-                rented_items=rented_items or None,
-                transport_taken=transport or None,
+                rented_items=rented_details,
+                transport_taken=transport_details,
                 accommodation=accommodation or None,
                 caption=caption or None,
                 activity_details=activity_details,
@@ -529,6 +541,10 @@ def from_json_filter(value):
     except Exception:
         return []
 
+@app.template_filter('legacy_to_list')
+def legacy_to_list_filter(value):
+    return to_list_field(value)
+
 @app.route('/api/save/<int:itinerary_id>', methods=['POST'])
 def toggle_save(itinerary_id):
     user_id = session.get("user_id")
@@ -579,8 +595,8 @@ def itinerary_edit(itinerary_id):
         'days': [{
             'day_number': day.day_number,
             'accommodation': day.accommodation or '',
-            'transport': day.transport_taken or '',
-            'rented_items': day.rented_items or '',
+            'transport': to_list_field(day.transport_taken),
+            'rented_items': to_list_field(day.rented_items),
             'caption': day.caption or '',
             'total_cost': day.total_cost,
             'activity_details': json.loads(day.activity_details) if day.activity_details else [],
@@ -622,8 +638,8 @@ def itinerary_edit_submit(itinerary_id):
     for day in itinerary.days:
         n = day.day_number
         day.accommodation = request.form.get(f'accommodation-day{n}', '').strip() or None
-        day.transport_taken = request.form.get(f'transport-day{n}', '').strip() or None
-        day.rented_items = request.form.get(f'rented-items-day{n}', '').strip() or None
+        day.transport_taken = request.form.get(f'transport-json-day{n}', '[]')
+        day.rented_items = request.form.get(f'rented-json-day{n}', '[]')
         day.caption = request.form.get(f'caption-day{n}', '').strip() or None
         day.activity_details = request.form.get(f'activity-json-day{n}', '[]')
         day.dining_details = request.form.get(f'dining-json-day{n}', '[]')

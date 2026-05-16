@@ -175,7 +175,16 @@
                     <i class="fa-solid fa-car"></i>
                 </div>
                 <div class="detail-content">
-                    <p>{{ day.transport_taken or 'No transport added.' }}</p>
+                    <p><strong>Transport</strong></p>
+                    {% set transport = day.transport_taken | legacy_to_list %}
+                    {% if transport %}
+                        {% for item in transport %}
+                            <p><strong>{{ item.title }}</strong></p>
+                            {% if item.text %}<p>{{ item.text }}</p>{% endif %}
+                        {% endfor %}
+                    {% else %}
+                        <p>No transport added.</p>
+                    {% endif %}
                 </div>
             </div>
 
@@ -199,7 +208,16 @@
                     <i class="fa-solid fa-person-skiing"></i>
                 </div>
                 <div class="detail-content">
-                    <p>{{ day.rented_items or 'No rented items added.' }}</p>
+                    <p><strong>Rented Items</strong></p>
+                    {% set rented = day.rented_items | legacy_to_list %}
+                    {% if rented %}
+                        {% for item in rented %}
+                            <p><strong>{{ item.title }}</strong></p>
+                            {% if item.text %}<p>{{ item.text }}</p>{% endif %}
+                        {% endfor %}
+                    {% else %}
+                        <p>No rented items added.</p>
+                    {% endif %}
                 </div>
             </div>
 

@@ -118,7 +118,11 @@ function generateDays() {
                     <div class="activity-details-grid" id="dining-details-day${i}"></div>
                 </div>
                 <div id="form-transport-day${i}">
-                    <input type="text" id="transport-day${i}" name="transport-day${i}" placeholder="Enter transport used">
+                    <div class="activity-input-area" id="transport-input-area-day${i}">
+                        <ul class="activity-list" id="transport-list-day${i}"></ul>
+                        <input type="text" class="activity-input" id="transport-input-day${i}" placeholder="Type a transport and press Enter">
+                    </div>
+                    <div class="activity-details-grid" id="transport-details-day${i}"></div>
                 </div>
                 <div id="form-accommodation-day${i}">
                     <input type="text" id="accommodation-day${i}" name="accommodation-day${i}" placeholder="Enter accommodation name and address">
@@ -127,7 +131,11 @@ function generateDays() {
                     <input type="number" id="cost-day${i}" name="cost-day${i}" min="0" step="0.01" placeholder="Enter total cost for the day">
                 </div>
                 <div id="form-rented-day${i}">
-                    <input type="text" id="rented-items-day${i}" name="rented-items-day${i}" placeholder="Enter any rented items">
+                    <div class="activity-input-area" id="rented-input-area-day${i}">
+                        <ul class="activity-list" id="rented-list-day${i}"></ul>
+                        <input type="text" class="activity-input" id="rented-input-day${i}" placeholder="Type a rented item and press Enter">
+                    </div>
+                    <div class="activity-details-grid" id="rented-details-day${i}"></div>
                 </div>
                 <div id="form-photo-day${i}">
                     <div id="existing-photos-day${i}"></div>
@@ -140,6 +148,8 @@ function generateDays() {
                 </div>
                 <input type="hidden" id="activity-json-day${i}" name="activity-json-day${i}">
                 <input type="hidden" id="dining-json-day${i}" name="dining-json-day${i}">
+                <input type="hidden" id="transport-json-day${i}" name="transport-json-day${i}">
+                <input type="hidden" id="rented-json-day${i}" name="rented-json-day${i}">
             </div>
         `;
 
@@ -162,6 +172,8 @@ function generateDays() {
 
         setupActivityInput(i);
         setupDiningInput(i);
+        setupListInput(i, "transport");
+        setupListInput(i, "rented");
     }
 
     totalDays = dayCount;
@@ -199,14 +211,14 @@ function initEditForm() {
         const n = day.day_number;
 
         const get = id => document.getElementById(id);
-        if (get(`transport-day${n}`))       get(`transport-day${n}`).value       = day.transport || "";
         if (get(`accommodation-day${n}`))   get(`accommodation-day${n}`).value   = day.accommodation || "";
-        if (get(`rented-items-day${n}`))    get(`rented-items-day${n}`).value    = day.rented_items || "";
         if (get(`caption-day${n}`))         get(`caption-day${n}`).value         = day.caption || "";
         if (get(`cost-day${n}`))            get(`cost-day${n}`).value            = day.total_cost !== null ? day.total_cost : "";
 
-        restoreDynamicList(n, "activity", day.activity_details || []);
-        restoreDynamicList(n, "dining",   day.dining_details   || []);
+        restoreDynamicList(n, "activity",  day.activity_details || []);
+        restoreDynamicList(n, "dining",    day.dining_details   || []);
+        restoreDynamicList(n, "transport", day.transport        || []);
+        restoreDynamicList(n, "rented",    day.rented_items     || []);
         renderExistingPhotos(n, day.photos || []);
 
         ["activities","dining","transport","accommodation","cost","rented","photo"].forEach(field => {
@@ -304,6 +316,32 @@ function setupDiningInput(dayNum) {
     });
 }
 
+function setupListInput(dayNum, type) {
+    const input = document.getElementById(`${type}-input-day${dayNum}`);
+    const list  = document.getElementById(`${type}-list-day${dayNum}`);
+    const grid  = document.getElementById(`${type}-details-day${dayNum}`);
+    if (!input) return;
+    let count = list.children.length;
+
+    input.addEventListener("keydown", function(e) {
+        if (e.key !== "Enter") return;
+        e.preventDefault();
+        const value = this.value.trim();
+        if (!value) return;
+        count++;
+        const id = `${type}-detail-day${dayNum}-item${count}`;
+        const li = document.createElement("li");
+        li.innerHTML = `${value} <span class="remove-activity" onclick="removeActivity('${id}', this);">✕</span>`;
+        list.appendChild(li);
+        const box = document.createElement("div");
+        box.classList.add("activity-detail-box");
+        box.id = id;
+        box.innerHTML = `<p class="activity-detail-title">${value}</p><textarea id="${id}-textarea" placeholder="Enter details for ${value}..." rows="3"></textarea>`;
+        grid.appendChild(box);
+        this.value = "";
+    });
+}
+
 function removeActivity(boxId, span) {
     const box = document.getElementById(boxId);
     if (box) box.remove();
@@ -377,8 +415,11 @@ function updateTilePreview(field, dayNum) {
             preview.appendChild(p);
         });
     } else if (field === "transport") {
-        const val = document.getElementById(`transport-day${dayNum}`)?.value.trim();
-        if (val) preview.innerHTML = `<p>${val}</p>`;
+        document.querySelectorAll(`#transport-list-day${dayNum} li`).forEach(item => {
+            const p = document.createElement("p");
+            p.textContent = item.textContent.replace("✕", "").trim();
+            preview.appendChild(p);
+        });
     } else if (field === "accommodation") {
         const val = document.getElementById(`accommodation-day${dayNum}`)?.value.trim();
         if (val) preview.innerHTML = `<p>${val}</p>`;
@@ -386,8 +427,11 @@ function updateTilePreview(field, dayNum) {
         const val = document.getElementById(`cost-day${dayNum}`)?.value.trim();
         if (val) preview.innerHTML = `<p>$${val}</p>`;
     } else if (field === "rented") {
-        const val = document.getElementById(`rented-items-day${dayNum}`)?.value.trim();
-        if (val) preview.innerHTML = `<p>${val}</p>`;
+        document.querySelectorAll(`#rented-list-day${dayNum} li`).forEach(item => {
+            const p = document.createElement("p");
+            p.textContent = item.textContent.replace("✕", "").trim();
+            preview.appendChild(p);
+        });
     } else if (field === "photo") {
         const existingRows = document.querySelectorAll(`#existing-photos-day${dayNum} .file-row`).length;
         const newFiles     = (selectedPhotosByDay[dayNum] || []).length;
@@ -474,15 +518,15 @@ document.addEventListener("DOMContentLoaded", function () {
 document.getElementById("itinerary-form").addEventListener("submit", function () {
     document.querySelectorAll(".day-section").forEach((section, index) => {
         const dayNum = index + 1;
-        const activityDetails = [];
-        document.querySelectorAll(`#activity-details-day${dayNum} .activity-detail-box`).forEach(box => {
-            activityDetails.push({ title: box.querySelector(".activity-detail-title")?.textContent.trim() || "", text: box.querySelector("textarea")?.value || "" });
+        ["activity", "dining", "transport", "rented"].forEach(type => {
+            const items = [];
+            document.querySelectorAll(`#${type}-details-day${dayNum} .activity-detail-box`).forEach(box => {
+                items.push({
+                    title: box.querySelector(".activity-detail-title")?.textContent.trim() || "",
+                    text: box.querySelector("textarea")?.value || ""
+                });
+            });
+            document.getElementById(`${type}-json-day${dayNum}`).value = JSON.stringify(items);
         });
-        const diningDetails = [];
-        document.querySelectorAll(`#dining-details-day${dayNum} .activity-detail-box`).forEach(box => {
-            diningDetails.push({ title: box.querySelector(".activity-detail-title")?.textContent.trim() || "", text: box.querySelector("textarea")?.value || "" });
-        });
-        document.getElementById(`activity-json-day${dayNum}`).value = JSON.stringify(activityDetails);
-        document.getElementById(`dining-json-day${dayNum}`).value   = JSON.stringify(diningDetails);
     });
 });
