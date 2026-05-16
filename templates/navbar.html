@@ -18,12 +18,14 @@
             </a>
         </li>
         <li>
-            <a href="{{ url_for('dms') }}">
+            <a href="{{ url_for('dms') }}" class="nav-link-with-badge">
                 <i class="fa-solid fa-message"></i>
                 <span class="nav-label">Messages</span>
+
+                {% if message_badge_count and message_badge_count > 0 %}
+                <span class="nav-badge">{{ message_badge_count }}</span>
+                {% endif %}
             </a>
-        </li>
-        <li>
             <a href="{{ url_for('feed') }}">
                 <i class="fa-solid fa-compass"></i>
                 <span class="nav-label">Feed</span>
@@ -36,9 +38,13 @@
             </a>
         </li>
         <li>
-            <a href="{{ url_for('notifications') }}">
+            <a href="{{ url_for('notifications') }}" class="nav-link-with-badge">
                 <i class="fa-solid fa-bell"></i>
                 <span class="nav-label">Notifications</span>
+
+                {% if notification_badge_count and notification_badge_count > 0 %}
+                <span class="nav-badge">{{ notification_badge_count }}</span>
+                {% endif %}
             </a>
         </li>
         <li>
