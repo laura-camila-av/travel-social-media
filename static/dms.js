@@ -1,3 +1,4 @@
+const drafts = {};
   const userList = document.getElementById("userList");
   const chatHeader = document.getElementById("chatHeader");
   const messagesDiv = document.getElementById("messages");
@@ -33,6 +34,10 @@
       }
 
       userEl.addEventListener("click", async () => {
+        // save current draft
+        if (selectedUserId){
+          drafts[selectedUserId] = messageInput.value;
+        }
         selectedUserId = user.id;
 
         document.querySelectorAll(".user").forEach(el => {
@@ -40,11 +45,12 @@
         });
         userEl.classList.add("active-user");
 
-        chatHeader.textContent = "Chat with " + (user.username || user.email);
-
+        chatHeader.innerHTML = `Chat with <a href="/user/${user.id}" class="chat-profile-link">${user.username || user.email}</a>`;
+        messageInput.value = ""; // clears unsent message when switching chat
         messageInput.disabled = false;
         sendButton.disabled = false;
         messageInput.placeholder = "Type a message...";
+        messageInput.value = drafts[user.id] || ""; // restore draft for this user
         messageInput.focus();
 
         await loadMessages();
@@ -75,31 +81,31 @@
       msgEl.className = "dms-message " + (msg.is_mine ? "dms-mine" : "dms-theirs");
 
       const itineraryPattern = /^\[ITINERARY:(\d+):(.+?)\]([\s\S]*)?$/;
-    const match = msg.text.match(itineraryPattern);
+const match = msg.text.match(itineraryPattern);
 
-    if (match) {
-        const itineraryId = match[1];
-        const itineraryTitle = match[2];
-        const extraMessage = match[3] ? match[3].trim() : "";
+if (match) {
+    const itineraryId = match[1];
+    const itineraryTitle = match[2];
+    const extraMessage = match[3] ? match[3].trim() : "";
 
-        const itineraryLink = document.createElement("a");
-        itineraryLink.href = `/itinerary/${itineraryId}`;
-        itineraryLink.style.fontWeight = "bold";
-        itineraryLink.style.display = "block";
-        itineraryLink.style.marginBottom = extraMessage ? "6px" : "0";
-        itineraryLink.textContent = `✈️ ${itineraryTitle}`;
-        msgEl.appendChild(itineraryLink);
+    const itineraryLink = document.createElement("a");
+    itineraryLink.href = `/itinerary/${itineraryId}`;
+    itineraryLink.style.fontWeight = "bold";
+    itineraryLink.style.display = "block";
+    itineraryLink.style.marginBottom = extraMessage ? "6px" : "0";
+    itineraryLink.textContent = `✈️ ${itineraryTitle}`;
+    msgEl.appendChild(itineraryLink);
 
     if (extraMessage) {
         const extraEl = document.createElement("span");
         extraEl.textContent = extraMessage;
         msgEl.appendChild(extraEl);
     }
-    } else {
-        const textEl = document.createElement("span");
-        textEl.textContent = msg.text;
-        msgEl.appendChild(textEl);
-    }
+} else {
+    const textEl = document.createElement("span");
+    textEl.textContent = msg.text;
+    msgEl.appendChild(textEl);
+}
 
       if (msg.reaction) {
         const reactionEl = document.createElement("span");

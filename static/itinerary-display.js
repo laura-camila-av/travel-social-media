@@ -214,8 +214,6 @@ function updateDots(containerId, total, activeIndex) {
     const shareSendBtn = document.getElementById("shareSendBtn");
     const shareCancelBtn = document.getElementById("shareCancelBtn");
     const shareItineraryTitle = document.getElementById("shareItineraryTitle");
-    console.log("shareButton:", shareButton);
-    console.log("shareSendBtn:", shareSendBtn);
 
     // open modal and load users
     shareButton.addEventListener("click", async function() {
@@ -247,14 +245,10 @@ function updateDots(containerId, total, activeIndex) {
 
     // send the itinerary
     shareSendBtn.addEventListener("click", async function() {
-        console.log("send clicked");
         const receiverId = shareUserSelect.value;
         const message = shareMessage.value.trim();
         const itineraryId = shareButton.dataset.itineraryId;
         const itineraryTitle = shareButton.dataset.itineraryTitle;
-
-        console.log("receiverId:", receiverId);
-        console.log("itineraryId:", itineraryId);
 
         if (!receiverId) {
             alert("Please select a user to send to.");
@@ -262,8 +256,6 @@ function updateDots(containerId, total, activeIndex) {
         }
 
         const formattedText = `[ITINERARY:${itineraryId}:${itineraryTitle}]${message ? '\n' + message : ''}`;
-        console.log("formattedText:", formattedText);
-        console.log("about to fetch");
 
         const response = await fetch("/api/messages", {
             method: "POST",
@@ -316,3 +308,88 @@ function updateDots(containerId, total, activeIndex) {
             window.location.href = "/profile";
         });
     }
+
+    // show day 1 by default
+document.addEventListener("DOMContentLoaded", function() {
+    const firstDay = document.querySelector('.day-details');
+    if (firstDay) firstDay.style.display = 'block';
+    
+    const firstThumb = document.querySelector('.day-card');
+    if (firstThumb) firstThumb.classList.add('active-day');
+});
+
+// thumbnail click handler
+document.querySelectorAll('.day-card').forEach(card => {
+    card.addEventListener('click', function() {
+        const dayNum = this.dataset.day;
+
+        // hide all day details
+        document.querySelectorAll('.day-details').forEach(d => d.style.display = 'none');
+        
+        // show selected day
+        document.querySelector(`.day-details[data-day="${dayNum}"]`).style.display = 'block';
+
+        // update active thumbnail
+        document.querySelectorAll('.day-card').forEach(c => c.classList.remove('active-day'));
+        this.classList.add('active-day');
+
+        // update main image
+        const img = this.querySelector('img');
+        const mainImage = document.querySelector('.main-image img');
+        if (mainImage && img) {
+            mainImage.src = img.src;
+        }
+    });
+});
+
+let lightboxImages = [];
+let lightboxIndex = 0;
+
+function openLightbox(images, index) {
+    lightboxImages = images;
+    lightboxIndex = index;
+    document.getElementById('lightbox-img').src = lightboxImages[lightboxIndex];
+    document.getElementById('lightbox').classList.remove('hidden');
+}
+
+function closeLightbox() {
+    document.getElementById('lightbox').classList.add('hidden');
+}
+
+document.querySelector('.lightbox-close').addEventListener('click', closeLightbox);
+document.querySelector('.lightbox-overlay').addEventListener('click', closeLightbox);
+
+document.querySelector('.lightbox-prev').addEventListener('click', function() {
+    lightboxIndex = (lightboxIndex - 1 + lightboxImages.length) % lightboxImages.length;
+    document.getElementById('lightbox-img').src = lightboxImages[lightboxIndex];
+});
+
+document.querySelector('.lightbox-next').addEventListener('click', function() {
+    lightboxIndex = (lightboxIndex + 1) % lightboxImages.length;
+    document.getElementById('lightbox-img').src = lightboxImages[lightboxIndex];
+});
+
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') closeLightbox();
+    if (e.key === 'ArrowLeft') {
+        lightboxIndex = (lightboxIndex - 1 + lightboxImages.length) % lightboxImages.length;
+        document.getElementById('lightbox-img').src = lightboxImages[lightboxIndex];
+    }
+    if (e.key === 'ArrowRight') {
+        lightboxIndex = (lightboxIndex + 1) % lightboxImages.length;
+        document.getElementById('lightbox-img').src = lightboxImages[lightboxIndex];
+    }
+});
+
+// make detail tab photos clickable
+document.querySelectorAll('.day-details').forEach(dayDiv => {
+    const imgs = Array.from(dayDiv.querySelectorAll('img'));
+    const srcs = imgs.map(img => img.src);
+    
+    imgs.forEach((img, index) => {
+        img.style.cursor = 'pointer';
+        img.addEventListener('click', function() {
+            openLightbox(srcs, index);
+        });
+    });
+});
