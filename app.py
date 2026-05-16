@@ -136,6 +136,13 @@ class Follow(db.Model):
     __table_args__ = (
         db.UniqueConstraint('follower_id', 'following_id', name='unique_user_follow'),
     )
+
+class SearchHistory(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    search_text = db.Column(db.String(120), nullable=False)
+    created_at = db.Column(db.DateTime, server_default=db.func.now())
+
     
 @app.route('/save-bio', methods=['POST'])
 def save_bio():
@@ -403,6 +410,10 @@ def search():
         return redirect(url_for('login_page'))
 
     q = request.args.get('q', '').strip()
+    if q:
+        new_search = SearchHistory(user_id=user_id, search_text=q)
+        db.session.add(new_search)
+        db.session.commit()
     duration = request.args.get('duration', '').strip()
     travel_style = request.args.get('travel_style', '').strip()
     budget_level = request.args.get('budget', '').strip()
@@ -570,7 +581,54 @@ def delete_itinerary(itinerary_id):
 
 @app.route('/feed')
 def feed():
-    return render_template('feed.html')
+    user_id = session.get("user_id")
+
+    if not user_id:
+        return redirect(url_for('login_page'))
+
+    following_ids = [
+        follow.following_id
+        for follow in Follow.query.filter_by(follower_id=user_id).all()
+    ]
+
+    following_itineraries = []
+
+    if following_ids:
+        following_itineraries = Itinerary.query.filter(
+            Itinerary.user_id.in_(following_ids)
+        ).order_by(Itinerary.created_at.desc()).all()
+
+    recent_searches = SearchHistory.query.filter_by(
+        user_id=user_id
+    ).order_by(SearchHistory.created_at.desc()).limit(5).all()
+
+    search_terms = [search.search_text for search in recent_searches]
+
+    recommended_itineraries = []
+
+    for term in search_terms:
+        matches = Itinerary.query.filter(
+            or_(
+                Itinerary.title.ilike(f"%{term}%"),
+                Itinerary.destination.ilike(f"%{term}%"),
+                Itinerary.travel_style.ilike(f"%{term}%")
+            )
+        ).all()
+
+        for itinerary in matches:
+            if itinerary not in recommended_itineraries:
+                recommended_itineraries.append(itinerary)
+
+    other_itineraries = Itinerary.query.filter(
+        Itinerary.user_id != user_id
+    ).order_by(Itinerary.created_at.desc()).limit(12).all()
+
+    return render_template(
+        'feed.html',
+        following_itineraries=following_itineraries,
+        recommended_itineraries=recommended_itineraries,
+        other_itineraries=other_itineraries
+    )
 
 
 @app.route('/login', methods=['GET'])
