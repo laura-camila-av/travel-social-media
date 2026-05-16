@@ -8,100 +8,183 @@
 </head>
 
 <body>
-    {% include 'navbar.html' %}
+{% include 'navbar.html' %}
 
-    <div class="page-wrapper">
-        <div class="middle-column">
-            <h1>Notifications</h1>
+<div class="page-wrapper">
+    <div class="middle-column">
+        <h1>Notifications</h1>
+        <p class="notification-page-subtitle">
+            See new follows, likes, and messages here.
+        </p>
 
-            <div class="notifications-container">
-                {% if notifications %}
-                    {% for notification in notifications %}
-                        <div class="notification-card" onclick="goToProfile('{{ notification.follower.id }}')">
-                            <div class="notification-left">
-                                {% if notification.follower.avatar_url %}
-                                    <img 
-                                        src="{{ url_for('static', filename='uploads/' + notification.follower.avatar_url) }}" 
-                                        class="notification-avatar"
-                                    >
-                                {% else %}
-                                    <div class="notification-avatar-placeholder"></div>
-                                {% endif %}
+        <div class="notifications-container">
+            {% if notifications %}
+            {% for notification in notifications %}
 
-                                <p>
-                                    <strong>{{ notification.follower.username }}</strong>
-                                    followed you
-                                </p>
-                            </div>
+            {% if notification.type == "follow" %}
+            <div class="notification-card" onclick="goToProfile('{{ notification.actor.id }}')">
+                <div class="notification-left">
+                    {% if notification.actor.avatar_url %}
+                    <img
+                            src="{{ url_for('static', filename='uploads/' + notification.actor.avatar_url) }}"
+                            class="notification-avatar"
+                    >
+                    {% else %}
+                    <div class="notification-avatar-placeholder"></div>
+                    {% endif %}
 
-                            <div class="notification-actions" onclick="event.stopPropagation()">
-                                {% if notification.is_following_back %}
-                                    <button class="notification-btn following-btn" disabled>
-                                        Following
-                                    </button>
-                                {% else %}
-                                    <button 
-                                        class="notification-btn follow-back-btn"
-                                        onclick="followBack('{{ notification.follower.id }}', this)"
-                                    >
-                                        Follow back
-                                    </button>
-                                {% endif %}
-
-                                <button 
-                                    class="notification-btn remove-btn"
-                                    onclick="removeFollower('{{ notification.follower.id }}', this)"
-                                >
-                                    Remove
-                                </button>
-                            </div>
-                        </div>
-                    {% endfor %}
-                {% else %}
-                    <div class="empty-state">
-                        <i class="fa-solid fa-bell"></i>
-                        <p>No notifications yet</p>
+                    <div class="notification-text">
+                        <p>
+                            <i class="fa-solid fa-user-plus notification-type-icon"></i>
+                            <strong>{{ notification.actor.username }}</strong>
+                            followed you
+                        </p>
+                        <span class="notification-hint">Click to view profile</span>
                     </div>
-                {% endif %}
+                </div>
+
+                <div class="notification-actions" onclick="event.stopPropagation()">
+                    {% if notification.is_following_back %}
+                    <button class="notification-btn following-btn" disabled>
+                        Following
+                    </button>
+                    {% else %}
+                    <button
+                            class="notification-btn follow-back-btn"
+                            onclick="followBack('{{ notification.actor.id }}', this)"
+                    >
+                        Follow back
+                    </button>
+                    {% endif %}
+
+                    <button
+                            class="notification-btn remove-btn"
+                            onclick="removeFollower('{{ notification.actor.id }}', this)"
+                    >
+                        Remove
+                    </button>
+                </div>
             </div>
+
+            {% elif notification.type == "like" %}
+            <div class="notification-card" onclick="goToItinerary('{{ notification.itinerary.id }}')">
+                <div class="notification-left">
+                    {% if notification.actor.avatar_url %}
+                    <img
+                            src="{{ url_for('static', filename='uploads/' + notification.actor.avatar_url) }}"
+                            class="notification-avatar"
+                    >
+                    {% else %}
+                    <div class="notification-avatar-placeholder"></div>
+                    {% endif %}
+
+                    <div class="notification-text">
+                        <p>
+                            <i class="fa-solid fa-heart notification-type-icon"></i>
+                            <strong>{{ notification.actor.username }}</strong>
+                            liked your itinerary
+                            <strong>{{ notification.itinerary.title }}</strong>
+                        </p>
+                        <span class="notification-hint">Click to view itinerary</span>
+                    </div>
+                </div>
+            </div>
+
+            {% elif notification.type == "message" %}
+            <div class="notification-card" onclick="goToMessages()">
+                <div class="notification-left">
+                    {% if notification.actor.avatar_url %}
+                    <img
+                            src="{{ url_for('static', filename='uploads/' + notification.actor.avatar_url) }}"
+                            class="notification-avatar"
+                    >
+                    {% else %}
+                    <div class="notification-avatar-placeholder"></div>
+                    {% endif %}
+
+                    <div class="notification-text">
+                        <p>
+                            <i class="fa-solid fa-message notification-type-icon"></i>
+                            <strong>{{ notification.actor.username }}</strong>
+                            sent you a new message
+                        </p>
+                        <span class="notification-preview">
+                                            {{ notification.message.text[:80] }}
+                                            {% if notification.message.text|length > 80 %}...{% endif %}
+                                        </span>
+                    </div>
+                </div>
+
+                <span class="notification-new-badge">NEW</span>
+            </div>
+            {% endif %}
+
+            {% endfor %}
+            {% else %}
+            <div class="empty-state">
+                <i class="fa-solid fa-bell"></i>
+                <p>No notifications yet</p>
+            </div>
+            {% endif %}
         </div>
     </div>
+</div>
 
-    <script>
-        const csrfToken = document.querySelector('meta[name="csrf-token"]').content;
-        function goToProfile(userId) {
-            window.location.href = `/user/${userId}`;
+<script>
+    const csrfToken = document.querySelector('meta[name="csrf-token"]').content;
+
+    function goToProfile(userId) {
+        window.location.href = `/user/${userId}`;
+    }
+
+    function goToItinerary(itineraryId) {
+        window.location.href = `/itinerary/${itineraryId}`;
+    }
+
+    function goToMessages() {
+        window.location.href = `/messages`;
+    }
+
+    async function followBack(userId, button) {
+        const response = await fetch(`/api/follow/${userId}`, {
+            method: "POST",
+            headers: {
+                "X-CSRFToken": csrfToken
+            }
+        });
+
+        if (response.ok) {
+            button.textContent = "Following";
+            button.disabled = true;
+            button.classList.remove("follow-back-btn");
+            button.classList.add("following-btn");
         }
+    }
 
-        async function followBack(userId, button) {
-            const response = await fetch(`/api/follow/${userId}`, {
-                method: "POST",
-                headers: {
-                    "X-CSRFToken": csrfToken
-                }
-            });
+    async function removeFollower(userId, button) {
+        const response = await fetch(`/api/remove-follower/${userId}`, {
+            method: "POST",
+            headers: {
+                "X-CSRFToken": csrfToken
+            }
+        });
 
-            if (response.ok) {
-                button.textContent = "Following";
-                button.disabled = true;
-                button.classList.remove("follow-back-btn");
-                button.classList.add("following-btn");
+        if (response.ok) {
+            const card = button.closest(".notification-card");
+            card.remove();
+
+            const remainingCards = document.querySelectorAll(".notification-card");
+
+            if (remainingCards.length === 0) {
+                document.querySelector(".notifications-container").innerHTML = `
+                        <div class="empty-state">
+                            <i class="fa-solid fa-bell"></i>
+                            <p>No notifications yet</p>
+                        </div>
+                    `;
             }
         }
-
-        async function removeFollower(userId, button) {
-            const response = await fetch(`/api/remove-follower/${userId}`, {
-                method: "POST",
-                headers: {
-                    "X-CSRFToken": csrfToken
-                }
-            });
-
-            if (response.ok) {
-                const card = button.closest(".notification-card");
-                card.remove();
-            }
-        }
-    </script>
+    }
+</script>
 </body>
 </html>

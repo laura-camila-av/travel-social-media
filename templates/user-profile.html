@@ -117,18 +117,14 @@
             <div class="itinerary-container">
                 {% if user_itineraries %}
                     {% for itinerary in user_itineraries %}
-                        {% set ns = namespace(cover=none) %}
-                        {% for day in itinerary.days %}
-                            {% if day.photos and not ns.cover %}
-                                {% set ns.cover = day.photos[0].filename %}
-                            {% endif %}
-                        {% endfor %}
                         <a class="card-link" href="{{ url_for('itinerary_display', itinerary_id=itinerary.id) }}">
                             <div class="itinerary-card">
-                                {% if ns.cover %}
-                                    <img src="{{ url_for('static', filename='uploads/' + ns.cover) }}"
+                                {% if itinerary.thumbnail %}
+                                    <img
+                                        src="{{ url_for('static', filename='uploads/' + itinerary.thumbnail) }}"
+                                        class="itinerary-thumbnail"
                                         alt="{{ itinerary.title }}"
-                                        style="width: 100%; height: 100%; object-fit: cover;">
+                                    >
                                 {% endif %}
                                 <div class="overlay-text">{{ itinerary.title }}</div>
                             </div>
@@ -162,18 +158,14 @@
             <div class="itinerary-container">
                 {% if saved_items %}
                     {% for itinerary in saved_items %}
-                        {% set ns = namespace(cover=none) %}
-                        {% for day in itinerary.days %}
-                            {% if day.photos and not ns.cover %}
-                                {% set ns.cover = day.photos[0].filename %}
-                            {% endif %}
-                        {% endfor %}
                         <a class="card-link" href="{{ url_for('itinerary_display', itinerary_id=itinerary.id) }}">
                             <div class="itinerary-card">
-                                {% if ns.cover %}
-                                    <img src="{{ url_for('static', filename='uploads/' + ns.cover) }}"
+                                {% if itinerary.thumbnail %}
+                                    <img
+                                        src="{{ url_for('static', filename='uploads/' + itinerary.thumbnail) }}"
+                                        class="itinerary-thumbnail"
                                         alt="{{ itinerary.title }}"
-                                        style="width: 100%; height: 100%; object-fit: cover;">
+                                    >
                                 {% endif %}
                                 <div class="overlay-text">{{ itinerary.title }}</div>
                             </div>

@@ -527,7 +527,7 @@
             if (daysContainer) daysContainer.innerHTML = "";
 
             const tripDetailsSection = document.getElementById("trip-details-section");
-            if (tripDetailsSection) tripDetailsSection.style.display = "block";
+            if (tripDetailsSection) tripDetailsSection.style.display = "";
 
             const submitBtn = document.getElementById("submit-btn");
             if (submitBtn) submitBtn.style.display = "none";

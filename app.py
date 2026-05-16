@@ -50,6 +50,7 @@ class Message(db.Model):
     receiver_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     text = db.Column(db.Text, nullable=False)
     reaction = db.Column(db.String(10), nullable=True)
+    reply_to_id = db.Column(db.Integer, db.ForeignKey('message.id'), nullable=True)
     is_read = db.Column(db.Boolean, default=False)
     created_at = db.Column(db.DateTime, server_default=db.func.now())
 
@@ -135,7 +136,23 @@ class Follow(db.Model):
     __table_args__ = (
         db.UniqueConstraint('follower_id', 'following_id', name='unique_user_follow'),
     )
-    
+
+class SearchHistory(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    search_text = db.Column(db.String(120), nullable=False)
+    created_at = db.Column(db.DateTime, server_default=db.func.now())
+
+def add_thumbnails(itineraries):
+    for itinerary in itineraries:
+        first_photo = ItineraryPhoto.query.join(ItineraryDay).filter(
+            ItineraryDay.itinerary_id == itinerary.id
+        ).order_by(ItineraryDay.day_number.asc(), ItineraryPhoto.id.asc()).first()
+
+        itinerary.thumbnail = first_photo.filename if first_photo else None
+
+    return itineraries
+
 @app.route('/save-bio', methods=['POST'])
 def save_bio():
     user_id = session.get("user_id")
@@ -197,10 +214,10 @@ def user_profile():
     ]
     interests = [interest for interest in interests if interest]
 
-    user_itineraries = Itinerary.query.filter_by(user_id=user_id).all()
-    saved_items = db.session.query(Itinerary).join(
+    user_itineraries = add_thumbnails(Itinerary.query.filter_by(user_id=user_id).all())
+    saved_items = add_thumbnails(db.session.query(Itinerary).join(
         SavedItinerary, SavedItinerary.itinerary_id == Itinerary.id
-    ).filter(SavedItinerary.user_id == user_id).all()
+    ).filter(SavedItinerary.user_id == user_id).all())
 
     follower_count = Follow.query.filter_by(following_id=user_id).count()
     following_count = Follow.query.filter_by(follower_id=user_id).count()
@@ -209,7 +226,7 @@ def user_profile():
         'user-profile.html',
         user=user,
         interests=interests,
-        user_itineraries=user_itineraries,
+        user_itineraries=add_thumbnails(user_itineraries),
         saved_items=saved_items,
         is_own_profile=True,
         is_following=False,
@@ -239,7 +256,7 @@ def view_user_profile(user_id):
     ]
     interests = [interest for interest in interests if interest]
 
-    user_itineraries = Itinerary.query.filter_by(user_id=user_id).all()
+    user_itineraries = add_thumbnails(Itinerary.query.filter_by(user_id=user_id).all())
     saved_items = []
 
     existing_follow = Follow.query.filter_by(
@@ -402,6 +419,10 @@ def search():
         return redirect(url_for('login_page'))
 
     q = request.args.get('q', '').strip()
+    if q:
+        new_search = SearchHistory(user_id=user_id, search_text=q)
+        db.session.add(new_search)
+        db.session.commit()
     duration = request.args.get('duration', '').strip()
     travel_style = request.args.get('travel_style', '').strip()
     budget_level = request.args.get('budget', '').strip()
@@ -460,7 +481,7 @@ def search():
         'search_page.html',
         q=q,
         users=users,
-        itineraries=itineraries,
+        itineraries = add_thumbnails(itineraries),
         duration=duration,
         travel_style=travel_style,
         budget_level=budget_level
@@ -470,6 +491,8 @@ def search():
 def itinerary_display(itinerary_id):
     user_id = session.get("user_id")
 
+    if not user_id:                       
+        return redirect(url_for('login_page'))
     itinerary = Itinerary.query.get_or_404(itinerary_id)
 
     like_count = Like.query.filter_by(itinerary_id=itinerary_id).count()
@@ -651,7 +674,54 @@ def delete_itinerary(itinerary_id):
 
 @app.route('/feed')
 def feed():
-    return render_template('feed.html')
+    user_id = session.get("user_id")
+
+    if not user_id:
+        return redirect(url_for('login_page'))
+
+    following_ids = [
+        follow.following_id
+        for follow in Follow.query.filter_by(follower_id=user_id).all()
+    ]
+
+    following_itineraries = []
+
+    if following_ids:
+        following_itineraries = Itinerary.query.filter(
+            Itinerary.user_id.in_(following_ids)
+        ).order_by(Itinerary.created_at.desc()).all()
+
+    recent_searches = SearchHistory.query.filter_by(
+        user_id=user_id
+    ).order_by(SearchHistory.created_at.desc()).limit(5).all()
+
+    search_terms = [search.search_text for search in recent_searches]
+
+    recommended_itineraries = []
+
+    for term in search_terms:
+        matches = Itinerary.query.filter(
+            or_(
+                Itinerary.title.ilike(f"%{term}%"),
+                Itinerary.destination.ilike(f"%{term}%"),
+                Itinerary.travel_style.ilike(f"%{term}%")
+            )
+        ).all()
+
+        for itinerary in matches:
+            if itinerary not in recommended_itineraries:
+                recommended_itineraries.append(itinerary)
+
+    other_itineraries = Itinerary.query.filter(
+        Itinerary.user_id != user_id
+    ).order_by(Itinerary.created_at.desc()).limit(12).all()
+
+    return render_template(
+        'feed.html',
+        following_itineraries = add_thumbnails(following_itineraries),
+        recommended_itineraries = add_thumbnails(recommended_itineraries),
+        other_itineraries = add_thumbnails(other_itineraries)
+    )
 
 
 @app.route('/login', methods=['GET'])
@@ -857,6 +927,8 @@ def api_users():
             "unread_count": unread_count
         })
 
+    session["messages_seen_at"] = datetime.utcnow().isoformat()
+
     return jsonify(result)
 
 @app.route('/api/messages/<int:other_user_id>')
@@ -886,8 +958,11 @@ def api_get_messages(other_user_id):
             "text": msg.text,
             "sender_id": msg.sender_id,
             "receiver_id": msg.receiver_id,
+            "created_at": msg.created_at.isoformat() + "Z",
             "is_mine": msg.sender_id == user_id,
-            "reaction": msg.reaction
+            "reaction": msg.reaction,
+            "reply_to_id": msg.reply_to_id,
+            "reply_to_text": Message.query.get(msg.reply_to_id).text if msg.reply_to_id else None
         }
         for msg in messages
     ])
@@ -902,14 +977,15 @@ def api_send_message():
     data = request.get_json()
     receiver_id = data.get("receiver_id")
     text = data.get("text", "").strip()
-
+    reply_to_id = data.get("reply_to_id")
     if not receiver_id or not text:
         return jsonify({"error": "Missing data"}), 400
 
     new_message = Message(
         sender_id=user_id,
         receiver_id=receiver_id,
-        text=text
+        text=text,
+        reply_to_id=reply_to_id
     )
 
     db.session.add(new_message)
@@ -934,9 +1010,9 @@ def react_to_message(message_id):
 
     message = Message.query.get_or_404(message_id)
 
-    # Only sender or receiver can react to the message
-    if message.sender_id != user_id and message.receiver_id != user_id:
-        return jsonify({"error": "Not allowed"}), 403
+    # Only receiver can react to the message
+    if message.receiver_id != user_id:
+        return jsonify({"error": "You can only react to messages you received"}), 403
 
     # If same reaction clicked again, remove it
     if message.reaction == reaction:
@@ -1069,6 +1145,65 @@ def following_page(user_id):
         list_type='following'
     )
 
+def get_session_datetime(key):
+    value = session.get(key)
+
+    if not value:
+        return datetime.min
+
+    try:
+        return datetime.fromisoformat(value)
+    except ValueError:
+        return datetime.min
+
+@app.context_processor
+def inject_notification_counts():
+    current_user_id = session.get("user_id")
+
+    if not current_user_id:
+        return {
+            "message_badge_count": 0,
+            "notification_badge_count": 0
+        }
+
+    notifications_seen_at = get_session_datetime("notifications_seen_at")
+    messages_seen_at = get_session_datetime("messages_seen_at")
+
+    # Messages badge only counts unread messages received after opening messages page
+    message_badge_count = Message.query.filter(
+        Message.receiver_id == current_user_id,
+        Message.is_read.is_(False),
+        Message.created_at > messages_seen_at
+    ).count()
+
+    # Follow notifications only count follows after opening notifications page
+    new_follow_count = Follow.query.filter(
+        Follow.following_id == current_user_id,
+        Follow.created_at > notifications_seen_at
+    ).count()
+
+    # Like notifications only count likes after opening notifications page
+    new_like_count = db.session.query(Like).join(
+        Itinerary,
+        Like.itinerary_id == Itinerary.id
+    ).filter(
+        Itinerary.user_id == current_user_id,
+        Like.user_id != current_user_id,
+        Like.created_at > notifications_seen_at
+    ).count()
+
+    # DM notifications only count unread messages after opening notifications page
+    new_message_notification_count = Message.query.filter(
+        Message.receiver_id == current_user_id,
+        Message.is_read.is_(False),
+        Message.created_at > notifications_seen_at
+    ).count()
+
+    return {
+        "message_badge_count": message_badge_count,
+        "notification_badge_count": new_follow_count + new_like_count + new_message_notification_count
+    }
+
 @app.route('/notifications')
 def notifications():
     current_user_id = session.get("user_id")
@@ -1076,11 +1211,12 @@ def notifications():
     if not current_user_id:
         return redirect(url_for('login_page'))
 
+    notifications = []
+
+    # Follow notifications
     follower_records = Follow.query.filter_by(
         following_id=current_user_id
     ).order_by(Follow.created_at.desc()).all()
-
-    notifications = []
 
     for record in follower_records:
         follower = User.query.get(record.follower_id)
@@ -1092,9 +1228,70 @@ def notifications():
             ).first() is not None
 
             notifications.append({
-                "follower": follower,
+                "type": "follow",
+                "actor": follower,
+                "created_at": record.created_at,
                 "is_following_back": is_following_back
             })
+
+    # Like notifications
+    like_records = db.session.query(
+        Like,
+        Itinerary,
+        User
+    ).join(
+        Itinerary,
+        Like.itinerary_id == Itinerary.id
+    ).join(
+        User,
+        Like.user_id == User.id
+    ).filter(
+        Itinerary.user_id == current_user_id,
+        Like.user_id != current_user_id
+    ).order_by(
+        Like.created_at.desc()
+    ).all()
+
+    for like, itinerary, liker in like_records:
+        notifications.append({
+            "type": "like",
+            "actor": liker,
+            "itinerary": itinerary,
+            "created_at": like.created_at
+        })
+
+    # DM notifications for unread messages
+    unread_messages = Message.query.filter_by(
+        receiver_id=current_user_id,
+        is_read=False
+    ).order_by(
+        Message.created_at.desc()
+    ).all()
+
+    seen_senders = set()
+
+    for message in unread_messages:
+        if message.sender_id in seen_senders:
+            continue
+
+        sender = User.query.get(message.sender_id)
+
+        if sender:
+            notifications.append({
+                "type": "message",
+                "actor": sender,
+                "message": message,
+                "created_at": message.created_at
+            })
+
+            seen_senders.add(message.sender_id)
+
+    notifications.sort(
+        key=lambda notification: notification["created_at"],
+        reverse=True
+    )
+
+    session["notifications_seen_at"] = datetime.utcnow().isoformat()
 
     return render_template(
         'notifications.html',
