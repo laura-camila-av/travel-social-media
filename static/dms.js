@@ -104,10 +104,6 @@ const drafts = {};
         replyBox.textContent = msg.reply_to_text;
         msgEl.appendChild(replyBox);
       }
-
-      const textEl = document.createElement("div");
-      textEl.textContent = msg.text;
-      msgEl.appendChild(textEl);
       const itineraryPattern = /^\[ITINERARY:(\d+):(.+?)\]([\s\S]*)?$/;
 const match = msg.text.match(itineraryPattern);
 
