@@ -764,4 +764,5 @@
                 document.getElementById(`activity-json-day${dayNum}`).value = JSON.stringify(activityDetails);
                 document.getElementById(`dining-json-day${dayNum}`).value = JSON.stringify(diningDetails);
             });
+            localStorage.removeItem(STORAGE_KEY);
         });
