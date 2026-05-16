@@ -987,6 +987,22 @@ a:hover, a:active {
     transition: transform 0.25s ease;
 }
 /*Itinerary display styling START*/
+.creator-profile-link,
+.creator-profile-link:link,
+.creator-profile-link:visited {
+    color: #333;
+    font-weight: bold;
+    text-decoration: none;
+    border: none;
+    padding: 0;
+    display: inline;
+}
+
+.creator-profile-link:hover {
+    color: #8a002c;
+    background-color: transparent;
+}
+
 .page-wrapper {
     margin-left: 56px; /* same as nav width */
     display: flex;

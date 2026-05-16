@@ -470,6 +470,8 @@ def search():
 def itinerary_display(itinerary_id):
     user_id = session.get("user_id")
 
+    if not user_id:                       
+        return redirect(url_for('login_page'))
     itinerary = Itinerary.query.get_or_404(itinerary_id)
 
     like_count = Like.query.filter_by(itinerary_id=itinerary_id).count()
