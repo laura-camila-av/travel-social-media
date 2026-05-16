@@ -1566,14 +1566,13 @@ a:hover, a:active {
 
 .reply-box {
   border-left: 3px solid var(--primary);
-  background: rgba(255, 255, 255, 0.35);
+  background: #f1ede4; 
   padding: 6px 8px;
   margin-bottom: 6px;
   font-size: 12px;
-  color: #555;
+  color: #444;
   border-radius: 6px;
 }
-
 .reply-btn {
   border: none;
   background: transparent;

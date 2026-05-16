@@ -55,19 +55,19 @@ const drafts = {};
         messageInput.value = drafts[user.id] || ""; // restore draft for this user
         messageInput.focus();
 
-        await loadMessages();
+        await loadMessages(true);
       });
 
       userList.appendChild(userEl);
     });
   }
 
-  async function loadMessages() {
+  async function loadMessages(forceScrollBottom = false) {
     if (!selectedUserId) return;
 
     const response = await fetch(`/api/messages/${selectedUserId}`);
     const messages = await response.json();
-
+    const wasNearBottom = messagesDiv.scrollHeight - messagesDiv.scrollTop - messagesDiv.clientHeight < 100;
     messagesDiv.innerHTML = "";
 
     if (messages.length === 0) {
@@ -162,8 +162,9 @@ const drafts = {};
       messagesDiv.appendChild(wrapper);
 
     });
-
-    messagesDiv.scrollTop = messagesDiv.scrollHeight;
+    if (forceScrollBottom || wasNearBottom) {
+      messagesDiv.scrollTop = messagesDiv.scrollHeight;
+    }
   }
 
   messageForm.addEventListener("submit", async (e) => {
@@ -199,7 +200,7 @@ const drafts = {};
       replyToMessageText = null;
       document.getElementById("replyPreview").classList.add("hidden");
       document.getElementById("replyPreviewText").textContent = "";
-      await loadMessages();
+      await loadMessages(true);
     } else {
       alert("Message failed to send.");
     }
