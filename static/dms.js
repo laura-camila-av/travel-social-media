@@ -42,6 +42,11 @@ const drafts = {};
         }
         selectedUserId = user.id;
 
+        const unreadDot = userEl.querySelector(".unread-dot");
+        if (unreadDot) {
+          unreadDot.remove();
+        }
+
         document.querySelectorAll(".user").forEach(el => {
           el.classList.remove("active-user");
         });
@@ -104,10 +109,6 @@ const drafts = {};
         replyBox.textContent = msg.reply_to_text;
         msgEl.appendChild(replyBox);
       }
-
-      const textEl = document.createElement("div");
-      textEl.textContent = msg.text;
-      msgEl.appendChild(textEl);
       const itineraryPattern = /^\[ITINERARY:(\d+):(.+?)\]([\s\S]*)?$/;
 const match = msg.text.match(itineraryPattern);
 

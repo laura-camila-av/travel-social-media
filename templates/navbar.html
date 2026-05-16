@@ -1,9 +1,6 @@
 <!-- NAVBAR -->
 <div class="navigation-bar collapsed" id="navbar">
-
-    <button class="navbar-toggle" id="navbarToggle" title="Toggle menu">
-        <i class="fa-solid fa-bars"></i>
-    </button>
+    
     <ul>
         <li>
             <a href="{{ url_for('user_profile') }}">
@@ -18,12 +15,14 @@
             </a>
         </li>
         <li>
-            <a href="{{ url_for('dms') }}">
+            <a href="{{ url_for('dms') }}" class="nav-link-with-badge">
                 <i class="fa-solid fa-message"></i>
                 <span class="nav-label">Messages</span>
+
+                {% if message_badge_count and message_badge_count > 0 %}
+                <span class="nav-badge">{{ message_badge_count }}</span>
+                {% endif %}
             </a>
-        </li>
-        <li>
             <a href="{{ url_for('feed') }}">
                 <i class="fa-solid fa-compass"></i>
                 <span class="nav-label">Feed</span>
@@ -36,9 +35,13 @@
             </a>
         </li>
         <li>
-            <a href="{{ url_for('notifications') }}">
+            <a href="{{ url_for('notifications') }}" class="nav-link-with-badge">
                 <i class="fa-solid fa-bell"></i>
                 <span class="nav-label">Notifications</span>
+
+                {% if notification_badge_count and notification_badge_count > 0 %}
+                <span class="nav-badge">{{ notification_badge_count }}</span>
+                {% endif %}
             </a>
         </li>
         <li>
@@ -74,7 +77,6 @@ document.addEventListener("DOMContentLoaded", function () {
     const logoutLink = document.getElementById("logoutLink");
     const modal = document.getElementById("logoutModal");
     const navbar = document.getElementById("navbar");
-    const toggleBtn = document.getElementById("navbarToggle");
 
     // --- Logout ---
     if (logoutLink && modal) {
@@ -84,10 +86,6 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     }
 
-    // --- Navbar: click toggle to pin open/closed ---
-    toggleBtn.addEventListener("click", function () {
-        navbar.classList.toggle("pinned");
-    });
 
     // --- Navbar: hover to temporarily expand ---
     navbar.addEventListener("mouseenter", function () {
