@@ -20,15 +20,7 @@
                 <a href="{{ url_for('view_user_profile', user_id=itinerary.user.id) }}" class="creator-profile-link">@{{ itinerary.user.username }}</a>
             </div>
 
-            <div class="main-image">
-                {% if itinerary.days and itinerary.days[0].photos %}
-                    <img 
-                        src="{{ url_for('static', filename='uploads/' + itinerary.days[0].photos[0].filename) }}" 
-                        alt="Main itinerary image"
-                        style="width: 100%; height: 100%; object-fit: cover;"
-                    >
-                {% endif %}
-            </div>
+            
 
                         <div class="action-buttons">
                 <!-- LIKE COLUMN -->
@@ -93,8 +85,8 @@
                     style="width: 100%; height: 100%; object-fit: cover;"
                 >
                 {% endif %}
+                </div>
             </div>
-</div>
 
     <div class="trip-summary">
         <span class="trip-pill"><strong>Location: </strong> {{ itinerary.destination }}</span>
