@@ -65,7 +65,7 @@ const drafts = {};
         });
         userEl.classList.add("active-user");
 
-        chatHeader.innerHTML = `Chat with <a href="/user/${user.id}" class="chat-profile-link">${user.username || user.email}</a>`;
+        chatHeader.innerHTML = `Chat with&nbsp;<a href="/user/${user.id}" class="chat-profile-link">${user.username || user.email}</a>`;
         messageInput.value = ""; // clears unsent message when switching chat
         messageInput.disabled = false;
         sendButton.disabled = false;
