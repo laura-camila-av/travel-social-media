@@ -5039,3 +5039,22 @@ body {
     left: 0;
     transform: none;
 }
+/* Make Follow/Unfollow and Message buttons consistent */
+.profile-action-buttons .follow-button,
+.profile-action-buttons a.message-button,
+.profile-action-buttons a.message-button:link,
+.profile-action-buttons a.message-button:visited {
+    width: 130px !important;
+    height: 40px !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    font-size: 16px !important;
+    font-weight: 800 !important;
+    font-family: Helvetica, Arial, sans-serif !important;
+    line-height: 1 !important;
+    border-radius: 999px !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    box-sizing: border-box !important;
+}
