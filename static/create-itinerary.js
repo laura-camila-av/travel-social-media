@@ -380,6 +380,7 @@
             setupGuideModal();
             restoreDraft();
             setupAutoSaveForTripDetails();
+            updateClearDraftVisibility();
 
             document.getElementById("itinerary-form").addEventListener("keydown", function (e) {
                 const tag = e.target.tagName.toLowerCase();
@@ -423,10 +424,12 @@
                     field.addEventListener("input", function () {
                         saveDraft();
                         updateBudgetSummary();
+                        updateClearDraftVisibility();
                     });
                     field.addEventListener("change", function () {
                         saveDraft();
                         updateBudgetSummary();
+                        updateClearDraftVisibility();
                     });
                 }
             });
@@ -540,6 +543,7 @@
             currentDay = 1;
             totalDays = 0;
 
+            updateClearDraftVisibility();
             alert("Draft cleared.");
         }
 
@@ -644,6 +648,21 @@
                 });
             });
         }
+
+        function updateClearDraftVisibility() {
+            const wrapper = document.querySelector('.top-form-actions');
+            if (!wrapper) return;
+
+            const fieldIds = ["trip-title", "destination", "travel-style", "trip-budget", "start-date", "end-date"];
+            const hasTripDetails = fieldIds.some(id => {
+                const field = document.getElementById(id);
+                return field && field.value.trim() !== "";
+            });
+            const hasDays = document.querySelectorAll(".day-section").length > 0;
+
+            wrapper.classList.toggle("hidden", !hasTripDetails && !hasDays);
+        }
+
 
         function updateBudgetSummary() {
             const budgetInput = document.getElementById("trip-budget");
