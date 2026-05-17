@@ -13,8 +13,6 @@ function generateDays() {
     const endDateInput = document.getElementById("end-date").value;
     const daysContainer = document.getElementById("days-container");
 
-    daysContainer.innerHTML = "";
-
     if (!startDateInput || !endDateInput) {
         alert("Please enter both a start date and an end date.");
         return;
@@ -27,6 +25,8 @@ function generateDays() {
         alert("End date cannot be earlier than start date.");
         return;
     }
+
+    daysContainer.innerHTML = "";
 
     const dayCount = Math.floor((endDate - startDate) / (1000 * 60 * 60 * 24)) + 1;
 
@@ -315,6 +315,16 @@ function restoreDynamicList(dayNum, type, items) {
         box.innerHTML = `<p class="activity-detail-title">${item.title}</p><textarea rows="3">${item.text || ""}</textarea>`;
         grid.appendChild(box);
     });
+}
+
+function confirmRegenerateDays() {
+    const daysContainer = document.getElementById("days-container");
+    const hasExistingDays = daysContainer && daysContainer.querySelector(".day-section");
+    if (hasExistingDays) {
+        const confirmed = confirm("Regenerating days will clear any unsaved edits to your existing days. Continue?");
+        if (!confirmed) return;
+    }
+    generateDays();
 }
 
 function expandField(field, dayNum) {
