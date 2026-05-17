@@ -3445,3 +3445,129 @@ body {
 /* ============================================================
    Feed page UI V2 END
    ============================================================ */
+/* ============================================================
+   Search page UI V2 START
+   ============================================================ */
+
+.search-hero {
+    margin-bottom: 26px;
+}
+
+.search-panel {
+    max-width: 1080px;
+}
+
+.search-panel .search-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.search-section {
+    max-width: 1120px;
+    margin: 0 auto 38px;
+}
+
+.search-results-grid {
+    max-width: 980px;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.search-itinerary-card {
+    min-height: 230px;
+    background:
+            linear-gradient(135deg, rgba(165, 0, 52, 0.86), rgba(34, 34, 34, 0.92));
+}
+
+.search-itinerary-card .overlay-text {
+    font-size: 21px;
+    line-height: 1.15;
+}
+
+.user-search-results {
+    max-width: 760px;
+    margin: 18px auto 34px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+.user-result-card,
+.user-result-card:link,
+.user-result-card:visited {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    border: 1px solid var(--border-soft) !important;
+    border-radius: var(--radius-md);
+    padding: 14px 18px;
+    color: var(--text-main);
+    background-color: var(--surface);
+    box-shadow: var(--shadow-soft);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.user-result-card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-hover);
+    background-color: var(--surface);
+    color: var(--primary);
+}
+
+.user-result-avatar,
+.user-result-placeholder {
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    object-fit: cover;
+    flex-shrink: 0;
+}
+
+.user-result-placeholder {
+    background:
+            linear-gradient(135deg, var(--primary), var(--primary-dark));
+}
+
+.user-result-info {
+    display: flex;
+    flex-direction: column;
+    text-align: left;
+}
+
+.user-result-info strong {
+    color: var(--text-main);
+    font-size: 16px;
+}
+
+.user-result-info span {
+    color: var(--text-secondary);
+    font-size: 13px;
+    margin-top: 4px;
+}
+
+.search-empty {
+    max-width: 760px;
+    margin: 16px auto 32px;
+    padding: 28px;
+}
+
+.search-results-grid .empty-state {
+    grid-column: 1 / -1;
+}
+
+@media (max-width: 950px) {
+    .search-results-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 620px) {
+    .search-results-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* ============================================================
+   Search page UI V2 END
+   ============================================================ */
