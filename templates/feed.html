@@ -1,99 +1,163 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tripster - Feed</title>
+
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
-    <title>Feed</title>
 </head>
 
 <body>
-    {% include 'navbar.html' %}
+{% include 'navbar.html' %}
 
-    <div class="page-wrapper">
-        <div class="middle-column">
-            <h1>Feed</h1>
+<div class="page-wrapper">
+    <div class="middle-column">
 
-            <h2>From People You Follow</h2>
+        <section class="page-hero feed-hero">
+            <p class="eyebrow">Explore student travel ideas</p>
+            <h1>Your Curated Feed</h1>
+            <p class="hero-description">
+                Discover itineraries from people you follow, recommendations based on your searches,
+                and more trips from the Tripster community.
+            </p>
+        </section>
 
-            <div class="itinerary-container">
+        <section class="feed-section">
+            <div class="section-heading-row">
+                <div>
+                    <p class="eyebrow">Following</p>
+                    <h2>From People You Follow</h2>
+                </div>
+            </div>
+
+            <div class="itinerary-container feed-grid">
                 {% if following_itineraries %}
-                    {% for itinerary in following_itineraries %}
-                        <a class="card-link" href="{{ url_for('itinerary_display', itinerary_id=itinerary.id) }}">
-                            <div class="itinerary-card">
-                                {% if itinerary.thumbnail %}
-                                    <img
-                                        src="{{ url_for('static', filename='uploads/' + itinerary.thumbnail) }}"
-                                        class="itinerary-thumbnail"
-                                    >
-                                {% endif %}
-                                <div class="overlay-text">
-                                    {{ itinerary.title }}
-                                </div>
-                            </div>
-                        </a>
-                    {% endfor %}
-                {% else %}
-                    <div class="empty-state">
-                        <i class="fa-solid fa-user-plus"></i>
-                        <p>Follow users to see their itineraries here</p>
+                {% for itinerary in following_itineraries %}
+                <a class="card-link" href="{{ url_for('itinerary_display', itinerary_id=itinerary.id) }}">
+                    <div class="itinerary-card feed-card">
+                        {% if itinerary.thumbnail %}
+                        <img
+                                src="{{ url_for('static', filename='uploads/' + itinerary.thumbnail) }}"
+                                class="itinerary-thumbnail"
+                                alt="{{ itinerary.title }}"
+                        >
+                        {% else %}
+                        <div class="card-placeholder"></div>
+                        {% endif %}
+
+                        <div class="overlay-text">{{ itinerary.title }}</div>
                     </div>
+
+                    <div class="card-info">
+                        <p class="card-title">{{ itinerary.title }}</p>
+                        <p class="card-meta">
+                            <i class="fa-solid fa-user-plus"></i>
+                            From people you follow
+                        </p>
+                    </div>
+                </a>
+                {% endfor %}
+                {% else %}
+                <div class="empty-state">
+                    <i class="fa-solid fa-user-plus"></i>
+                    <p>Follow users to see their itineraries here</p>
+                </div>
                 {% endif %}
             </div>
+        </section>
 
-            <h2>Based on Your Searches</h2>
+        <section class="feed-section">
+            <div class="section-heading-row">
+                <div>
+                    <p class="eyebrow">Recommended</p>
+                    <h2>Based on Your Searches</h2>
+                </div>
+            </div>
 
-            <div class="itinerary-container">
+            <div class="itinerary-container feed-grid">
                 {% if recommended_itineraries %}
-                    {% for itinerary in recommended_itineraries %}
-                        <a class="card-link" href="{{ url_for('itinerary_display', itinerary_id=itinerary.id) }}">
-                            <div class="itinerary-card">
-                                {% if itinerary.thumbnail %}
-                                    <img
-                                        src="{{ url_for('static', filename='uploads/' + itinerary.thumbnail) }}"
-                                        class="itinerary-thumbnail"
-                                    >
-                                {% endif %}
-                                <div class="overlay-text">
-                                    {{ itinerary.title }}
-                                </div>
-                            </div>
-                        </a>
-                    {% endfor %}
-                {% else %}
-                    <div class="empty-state">
-                        <i class="fa-solid fa-magnifying-glass"></i>
-                        <p>Search for destinations or users to improve your recommendations</p>
+                {% for itinerary in recommended_itineraries %}
+                <a class="card-link" href="{{ url_for('itinerary_display', itinerary_id=itinerary.id) }}">
+                    <div class="itinerary-card feed-card">
+                        {% if itinerary.thumbnail %}
+                        <img
+                                src="{{ url_for('static', filename='uploads/' + itinerary.thumbnail) }}"
+                                class="itinerary-thumbnail"
+                                alt="{{ itinerary.title }}"
+                        >
+                        {% else %}
+                        <div class="card-placeholder"></div>
+                        {% endif %}
+
+                        <div class="overlay-text">{{ itinerary.title }}</div>
                     </div>
+
+                    <div class="card-info">
+                        <p class="card-title">{{ itinerary.title }}</p>
+                        <p class="card-meta">
+                            <i class="fa-solid fa-magnifying-glass"></i>
+                            Recommended for you
+                        </p>
+                    </div>
+                </a>
+                {% endfor %}
+                {% else %}
+                <div class="empty-state">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                    <p>Search for destinations or users to improve your recommendations</p>
+                </div>
                 {% endif %}
             </div>
+        </section>
 
-            <h2>Explore More</h2>
+        <section class="feed-section">
+            <div class="section-heading-row">
+                <div>
+                    <p class="eyebrow">Explore</p>
+                    <h2>Explore More</h2>
+                </div>
+            </div>
 
-            <div class="itinerary-container">
+            <div class="itinerary-container feed-grid">
                 {% if other_itineraries %}
-                    {% for itinerary in other_itineraries %}
-                        <a class="card-link" href="{{ url_for('itinerary_display', itinerary_id=itinerary.id) }}">
-                            <div class="itinerary-card">
-                                {% if itinerary.thumbnail %}
-                                    <img
-                                        src="{{ url_for('static', filename='uploads/' + itinerary.thumbnail) }}"
-                                        class="itinerary-thumbnail"
-                                    >
-                                {% endif %}
-                                <div class="overlay-text">
-                                    {{ itinerary.title }}
-                                </div>
-                            </div>
-                        </a>
-                    {% endfor %}
-                {% else %}
-                    <div class="empty-state">
-                        <i class="fa-solid fa-map"></i>
-                        <p>No itineraries available yet</p>
+                {% for itinerary in other_itineraries %}
+                <a class="card-link" href="{{ url_for('itinerary_display', itinerary_id=itinerary.id) }}">
+                    <div class="itinerary-card feed-card">
+                        {% if itinerary.thumbnail %}
+                        <img
+                                src="{{ url_for('static', filename='uploads/' + itinerary.thumbnail) }}"
+                                class="itinerary-thumbnail"
+                                alt="{{ itinerary.title }}"
+                        >
+                        {% else %}
+                        <div class="card-placeholder"></div>
+                        {% endif %}
+
+                        <div class="overlay-text">{{ itinerary.title }}</div>
                     </div>
+
+                    <div class="card-info">
+                        <p class="card-title">{{ itinerary.title }}</p>
+                        <p class="card-meta">
+                            <i class="fa-solid fa-compass"></i>
+                            Explore more trips
+                        </p>
+                    </div>
+                </a>
+                {% endfor %}
+                {% else %}
+                <div class="empty-state">
+                    <i class="fa-solid fa-map"></i>
+                    <p>No itineraries available yet</p>
+                </div>
                 {% endif %}
             </div>
-        </div>
+        </section>
+
     </div>
+</div>
 </body>
 </html>
