@@ -352,9 +352,37 @@ document.querySelectorAll('.day-card').forEach(card => {
 
         // update main image
         const img = this.querySelector('img');
-        const mainImage = document.querySelector('.main-image img');
-        if (mainImage && img) {
-            mainImage.src = img.src;
+        const mainImageContainer = document.querySelector('.main-image');
+        let mainImage = mainImageContainer ? mainImageContainer.querySelector('img') : null;
+
+        if (mainImageContainer) {
+            if (img) {
+                // Day has a photo — show it
+                if (mainImage) {
+                    mainImage.src = img.src;
+                    mainImage.style.display = '';
+                } else {
+                    // No <img> exists yet (e.g. day 1 had no photo on initial render) — create one
+                    mainImage = document.createElement('img');
+                    mainImage.src = img.src;
+                    mainImage.alt = 'Main itinerary image';
+                    mainImage.style.cssText = 'width: 100%; height: 100%; object-fit: cover;';
+                    mainImageContainer.innerHTML = '';
+                    mainImageContainer.appendChild(mainImage);
+                }
+                // Remove any "no photo" placeholder if it was shown previously
+                const placeholder = mainImageContainer.querySelector('.empty-main-image');
+                if (placeholder) placeholder.remove();
+            } else {
+                // Day has no photo — hide the image and show a placeholder message
+                if (mainImage) mainImage.style.display = 'none';
+                if (!mainImageContainer.querySelector('.empty-main-image')) {
+                    const placeholder = document.createElement('p');
+                    placeholder.className = 'empty-main-image';
+                    placeholder.textContent = 'No photo for this day';
+                    mainImageContainer.appendChild(placeholder);
+                }
+            }
         }
     });
 });
