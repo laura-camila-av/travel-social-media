@@ -5011,3 +5011,31 @@ body {
     transform: translateY(-1px);
     box-shadow: var(--shadow-soft);
 }
+/* Put profile bio inside the main profile card */
+.profile-section {
+    align-items: flex-start;
+}
+
+.profile-info .bio-wrapper {
+    width: 100%;
+    max-width: 620px;
+    margin: 14px 0 0 0;
+    display: block;
+}
+
+.profile-info .bio {
+    margin: 0 !important;
+    padding: 0;
+    background: transparent;
+    border: none;
+    box-shadow: none;
+    border-radius: 0;
+    color: var(--text-main);
+    text-align: left;
+    line-height: 1.6;
+}
+
+.profile-info .bio-wrapper .tooltip-text {
+    left: 0;
+    transform: none;
+}

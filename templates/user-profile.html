@@ -72,25 +72,24 @@
                     </a>
                 </div>
                 {% endif %}
+
+                <!-- Bio now inside profile card -->
+                <div class="bio-wrapper">
+                    <p class="bio" id="bio-text">
+                        {% if user.bio %}
+                        {{ user.bio }}
+                        {% elif is_own_profile %}
+                        Double-click to add a bio...
+                        {% else %}
+                        No bio yet.
+                        {% endif %}
+                    </p>
+
+                    {% if is_own_profile %}
+                    <span class="tooltip-text">Double-click to edit</span>
+                    {% endif %}
+                </div>
             </div>
-        </div>
-
-        <!-- Bio -->
-        <br>
-        <div class="bio-wrapper">
-            <p class="bio" id="bio-text">
-                {% if user.bio %}
-                {{ user.bio }}
-                {% elif is_own_profile %}
-                Double-click to add a bio...
-                {% else %}
-                No bio yet.
-                {% endif %}
-            </p>
-
-            {% if is_own_profile %}
-            <span class="tooltip-text">Double-click to edit</span>
-            {% endif %}
         </div>
 
         <!-- Profile Tabs -->
