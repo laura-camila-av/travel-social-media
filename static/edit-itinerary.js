@@ -570,9 +570,10 @@ document.getElementById("itinerary-form").addEventListener("submit", async funct
         });
 
         if (response.ok) {
-            // location.replace overwrites /edit in history with /profile
-            // (response.url is the final URL after the server's 302 redirect)
-            window.location.replace(response.url);
+            // Append ?updated=1 so the display page knows to show a confirmation toast
+            const url = new URL(response.url);
+            url.searchParams.set('updated', '1');
+            window.location.replace(url.toString());
         } else {
             alert("Failed to save changes. Please try again.");
         }
