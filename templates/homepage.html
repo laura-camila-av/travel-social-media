@@ -28,6 +28,7 @@
     </p>
 </section>
 
+<!-- UI IMPROVE  -->
 <section class="homepage-section">
     <div class="homepage-section-heading">
         <p class="eyebrow">Popular ideas</p>
@@ -72,7 +73,43 @@
         </a>
     </div>
 </section>
+<!-- ============= -->
+<div class="trending-itinerary-container">
+    {% if popular_itineraries %}
+        {% for itinerary in popular_itineraries %}
+            <a class="card-link" href="{{ url_for('itinerary_display', itinerary_id=itinerary.id) }}">
+                <div class="itinerary-card">
+                    {% if itinerary.thumbnail %}
+                        <img
+                            src="{{ url_for('static', filename='uploads/' + itinerary.thumbnail) }}"
+                            class="itinerary-thumbnail"
+                            alt="{{ itinerary.title }}"
+                        >
+                    {% endif %}
 
+                    <div class="overlay-text">{{ itinerary.title }}</div>
+                </div>
+
+                <div class="card-info">
+                    <p class="card-title">{{ itinerary.title }}</p>
+                    <p class="card-meta">
+                        {{ (itinerary.end_date - itinerary.start_date).days + 1 }} Days
+                    </p>
+                    <p class="card-meta">{{ itinerary.destination }}</p>
+                    <p class="card-meta">
+                        {{ itinerary.like_count }} {% if itinerary.like_count == 1 %}like{% else %}likes{% endif %}
+                    </p>
+                </div>
+            </a>
+        {% endfor %}
+    {% else %}
+        <div class="empty-state">
+            <i class="fa-solid fa-map"></i>
+            <p>No popular itineraries yet.</p>
+        </div>
+    {% endif %}
+</div>
+<!-- homepage itineraries change  -->
 <section class="homepage-section">
     <div class="homepage-section-heading">
         <p class="eyebrow">Why join</p>

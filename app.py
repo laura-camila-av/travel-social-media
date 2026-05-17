@@ -193,7 +193,28 @@ def save_interests():
 def homepage():
     if "user_id" in session:
         return redirect(url_for('feed'))
-    return render_template('homepage.html')
+
+    popular_itineraries = (
+        db.session.query(
+            Itinerary,
+            db.func.count(Like.id).label("like_count")
+        )
+        .outerjoin(Like, Like.itinerary_id == Itinerary.id)
+        .group_by(Itinerary.id)
+        .order_by(db.func.count(Like.id).desc())
+        .limit(5)
+        .all()
+    )
+
+    itineraries = []
+    for itinerary, like_count in popular_itineraries:
+        itinerary.like_count = like_count
+        itineraries.append(itinerary)
+
+    return render_template(
+        'homepage.html',
+        popular_itineraries=add_thumbnails(itineraries)
+    )
 
 
 @app.route('/profile')
