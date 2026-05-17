@@ -202,7 +202,7 @@ def homepage():
         .outerjoin(Like, Like.itinerary_id == Itinerary.id)
         .group_by(Itinerary.id)
         .order_by(db.func.count(Like.id).desc())
-        .limit(5)
+        .limit(6)
         .all()
     )
 
