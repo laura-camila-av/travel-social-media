@@ -624,6 +624,23 @@ def itinerary_edit_submit(itinerary_id):
     budget_raw = request.form.get('trip-budget', '').strip()
     itinerary.budget = float(budget_raw) if budget_raw else None
 
+    # Parse and validate dates
+    start_date_raw = request.form.get('start-date', '').strip()
+    end_date_raw = request.form.get('end-date', '').strip()
+    try:
+        new_start_date = datetime.strptime(start_date_raw, "%Y-%m-%d").date()
+        new_end_date = datetime.strptime(end_date_raw, "%Y-%m-%d").date()
+    except ValueError:
+        flash("Invalid date format.", "error")
+        return redirect(url_for('itinerary_edit', itinerary_id=itinerary_id))
+
+    if new_end_date < new_start_date:
+        flash("End date cannot be earlier than start date.", "error")
+        return redirect(url_for('itinerary_edit', itinerary_id=itinerary_id))
+
+    itinerary.start_date = new_start_date
+    itinerary.end_date = new_end_date
+
     # Delete photos the user marked for removal
     for photo_id in request.form.getlist('delete_photo_ids'):
         photo = ItineraryPhoto.query.get(int(photo_id))
@@ -633,16 +650,28 @@ def itinerary_edit_submit(itinerary_id):
             except OSError:
                 pass
             db.session.delete(photo)
-    db.session.flush()  # so day.photos reflects deletions before we count
+    db.session.flush()
 
-    for day in itinerary.days:
-        n = day.day_number
-        day.accommodation = request.form.get(f'accommodation-day{n}', '').strip() or None
-        day.transport_taken = request.form.get(f'transport-json-day{n}', '[]')
-        day.rented_items = request.form.get(f'rented-json-day{n}', '[]')
-        day.caption = request.form.get(f'caption-day{n}', '').strip() or None
-        day.activity_details = request.form.get(f'activity-json-day{n}', '[]')
-        day.dining_details = request.form.get(f'dining-json-day{n}', '[]')
+    total_days = (new_end_date - new_start_date).days + 1
+
+    # Map existing days by day_number so we can update or delete them
+    existing_days = {day.day_number: day for day in itinerary.days}
+
+    # Update existing days + create new days for the new range
+    for n in range(1, total_days + 1):
+        if n in existing_days:
+            day = existing_days[n]
+        else:
+            day = ItineraryDay(itinerary_id=itinerary.id, day_number=n)
+            db.session.add(day)
+            db.session.flush()  # so day.id is set before adding photos below
+
+        day.accommodation     = request.form.get(f'accommodation-day{n}', '').strip() or None
+        day.transport_taken   = request.form.get(f'transport-json-day{n}', '[]')
+        day.rented_items      = request.form.get(f'rented-json-day{n}', '[]')
+        day.caption           = request.form.get(f'caption-day{n}', '').strip() or None
+        day.activity_details  = request.form.get(f'activity-json-day{n}', '[]')
+        day.dining_details    = request.form.get(f'dining-json-day{n}', '[]')
         cost_raw = request.form.get(f'cost-day{n}', '').strip()
         day.total_cost = float(cost_raw) if cost_raw else None
 
@@ -653,6 +682,16 @@ def itinerary_edit_submit(itinerary_id):
                 filename = f"itinerary_{itinerary.id}_day{n}_{idx}.{ext}"
                 photo.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
                 db.session.add(ItineraryPhoto(itinerary_day_id=day.id, filename=filename))
+
+    # Delete any days that fall outside the new date range (trip was shortened)
+    for n, day in existing_days.items():
+        if n > total_days:
+            for photo in day.photos:
+                try:
+                    os.remove(os.path.join(app.config['UPLOAD_FOLDER'], photo.filename))
+                except OSError:
+                    pass
+            db.session.delete(day)
 
     db.session.commit()
     flash("Itinerary updated successfully.", "success")

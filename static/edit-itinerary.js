@@ -155,10 +155,11 @@ function generateDays() {
 
         daysContainer.appendChild(daySection);
 
-        selectedPhotosByDay[i] = [];
-        photoDataTransferByDay[i] = new DataTransfer();
+        if (!selectedPhotosByDay[i]) selectedPhotosByDay[i] = [];
+        if (!photoDataTransferByDay[i]) photoDataTransferByDay[i] = new DataTransfer();
 
         const fileInput = daySection.querySelector(`#photos-day${i}`);
+        fileInput.files = photoDataTransferByDay[i].files;
         fileInput.addEventListener("change", function () {
             Array.from(this.files).forEach(file => {
                 if (!selectedPhotosByDay[i].some(f => f.name === file.name)) {
@@ -320,11 +321,79 @@ function restoreDynamicList(dayNum, type, items) {
 function confirmRegenerateDays() {
     const daysContainer = document.getElementById("days-container");
     const hasExistingDays = daysContainer && daysContainer.querySelector(".day-section");
-    if (hasExistingDays) {
-        const confirmed = confirm("Regenerating days will clear any unsaved edits to your existing days. Continue?");
-        if (!confirmed) return;
+
+    if (!hasExistingDays) {
+        generateDays();
+        return;
     }
+
+    const confirmed = confirm("Regenerate the day sections? Days within the new date range will keep their data. Days removed from the trip will lose their data.");
+    if (!confirmed) return;
+
+    const snapshot = snapshotDays();
     generateDays();
+    restoreSnapshot(snapshot);
+}
+
+function snapshotDays() {
+    const snapshot = [];
+    document.querySelectorAll(".day-section").forEach((section, index) => {
+        const n = index + 1;
+        const get = id => document.getElementById(id);
+        snapshot.push({
+            day_number: n,
+            accommodation: get(`accommodation-day${n}`)?.value || "",
+            caption:       get(`caption-day${n}`)?.value || "",
+            total_cost:    get(`cost-day${n}`)?.value || "",
+            activity:  snapshotList(n, "activity"),
+            dining:    snapshotList(n, "dining"),
+            transport: snapshotList(n, "transport"),
+            rented:    snapshotList(n, "rented")
+        });
+    });
+    return snapshot;
+}
+
+function snapshotList(dayNum, type) {
+    const items = [];
+    document.querySelectorAll(`#${type}-details-day${dayNum} .activity-detail-box`).forEach(box => {
+        items.push({
+            title: box.querySelector(".activity-detail-title")?.textContent.trim() || "",
+            text:  box.querySelector("textarea")?.value || ""
+        });
+    });
+    return items;
+}
+
+function restoreSnapshot(snapshot) {
+    snapshot.forEach(day => {
+        const n = day.day_number;
+        const get = id => document.getElementById(id);
+        if (!get(`accommodation-day${n}`)) return;  // day removed from new range
+
+        get(`accommodation-day${n}`).value = day.accommodation;
+        if (get(`caption-day${n}`)) get(`caption-day${n}`).value = day.caption;
+        if (get(`cost-day${n}`))    get(`cost-day${n}`).value    = day.total_cost;
+
+        restoreDynamicList(n, "activity",  day.activity);
+        restoreDynamicList(n, "dining",    day.dining);
+        restoreDynamicList(n, "transport", day.transport);
+        restoreDynamicList(n, "rented",    day.rented);
+
+        // Re-render server-side photos for this day, minus any marked for deletion
+        const originalDay = ITINERARY_DATA.days.find(d => d.day_number === n);
+        if (originalDay) {
+            const deletedIds = Array.from(document.querySelectorAll('input[name="delete_photo_ids"]'))
+                .map(i => parseInt(i.value));
+            const remainingPhotos = (originalDay.photos || []).filter(p => !deletedIds.includes(p.id));
+            renderExistingPhotos(n, remainingPhotos);
+        }
+
+        ["activities","dining","transport","accommodation","cost","rented","photo"].forEach(field => {
+            updateTilePreview(field, n);
+        });
+    });
+    updateBudgetSummary();
 }
 
 function expandField(field, dayNum) {
