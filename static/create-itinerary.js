@@ -192,10 +192,10 @@
                     saveDraft();
                 });
 
-                setupActivityInput(i);
-                setupDiningInput(i);
-                setupListInput(i, "transport", "Type a transport and press Enter");
-                setupListInput(i, "rented", "Type a rented item and press Enter");
+                setupListInput(i, "activity");
+                setupListInput(i, "dining");
+                setupListInput(i, "transport");
+                setupListInput(i, "rented");
             }
 
             totalDays = dayCount;
@@ -219,83 +219,7 @@
             showDay(1);
         }
 
-        function setupActivityInput(dayNum) {
-            const input = document.getElementById(`activity-input-day${dayNum}`);
-            const list = document.getElementById(`activity-list-day${dayNum}`);
-            const grid = document.getElementById(`activity-details-day${dayNum}`);
-            let activityCount = list.children.length;
-
-            if (!input) return;
-
-            input.addEventListener("keydown", function(e) {
-                if (e.key === "Enter") {
-                    e.preventDefault();
-                    const value = this.value.trim();
-                    if (value === "") return;
-
-                    activityCount++;
-                    const id = `detail-day${dayNum}-act${activityCount}`;
-
-                    const li = document.createElement("li");
-                    li.innerHTML = `${value} <span class="remove-activity" onclick="removeActivity('${id}', this); saveDraft();">✕</span>`;
-                    list.appendChild(li);
-
-                    const box = document.createElement("div");
-                    box.classList.add("activity-detail-box");
-                    box.id = id;
-                    box.innerHTML = `
-                        <p class="activity-detail-title">${value}</p>
-                        <textarea id="${id}-textarea" placeholder="Enter details for ${value}..." rows="3"></textarea>
-                    `;
-                    grid.appendChild(box);
-
-                    box.querySelector("textarea").addEventListener("input", saveDraft);
-
-                    this.value = "";
-                    saveDraft();
-                }
-            });
-        }
-
-        function setupDiningInput(dayNum) {
-            const input = document.getElementById(`dining-input-day${dayNum}`);
-            const list = document.getElementById(`dining-list-day${dayNum}`);
-            const grid = document.getElementById(`dining-details-day${dayNum}`);
-            let diningCount = list.children.length;
-
-            if (!input) return;
-
-            input.addEventListener("keydown", function(e) {
-                if (e.key === "Enter") {
-                    e.preventDefault();
-                    const value = this.value.trim();
-                    if (value === "") return;
-
-                    diningCount++;
-                    const id = `dining-detail-day${dayNum}-item${diningCount}`;
-
-                    const li = document.createElement("li");
-                    li.innerHTML = `${value} <span class="remove-activity" onclick="removeActivity('${id}', this); saveDraft();">✕</span>`;
-                    list.appendChild(li);
-
-                    const box = document.createElement("div");
-                    box.classList.add("activity-detail-box");
-                    box.id = id;
-                    box.innerHTML = `
-                        <p class="activity-detail-title">${value}</p>
-                        <textarea id="${id}-textarea" placeholder="Enter details for ${value}..." rows="3"></textarea>
-                    `;
-                    grid.appendChild(box);
-
-                    box.querySelector("textarea").addEventListener("input", saveDraft);
-
-                    this.value = "";
-                    saveDraft();
-                }
-            });
-        }
-
-        function setupListInput(dayNum, type, placeholder) {
+        function setupListInput(dayNum, type) {
             const input = document.getElementById(`${type}-input-day${dayNum}`);
             const list  = document.getElementById(`${type}-list-day${dayNum}`);
             const grid  = document.getElementById(`${type}-details-day${dayNum}`);

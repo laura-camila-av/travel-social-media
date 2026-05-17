@@ -170,8 +170,8 @@ function generateDays() {
             renderNewPhotoList(i);
         });
 
-        setupActivityInput(i);
-        setupDiningInput(i);
+        setupListInput(i, "activity");
+        setupListInput(i, "dining");
         setupListInput(i, "transport");
         setupListInput(i, "rented");
     }
@@ -265,56 +265,6 @@ function markPhotoForDeletion(photoId, dayNum) {
 }
 
 // ── Shared helpers (same logic as create-itinerary.js) ───────────────────────
-
-function setupActivityInput(dayNum) {
-    const input = document.getElementById(`activity-input-day${dayNum}`);
-    const list  = document.getElementById(`activity-list-day${dayNum}`);
-    const grid  = document.getElementById(`activity-details-day${dayNum}`);
-    if (!input) return;
-    let count = 0;
-    input.addEventListener("keydown", function(e) {
-        if (e.key !== "Enter") return;
-        e.preventDefault();
-        const value = this.value.trim();
-        if (!value) return;
-        count++;
-        const id = `detail-day${dayNum}-act${count}`;
-        const li = document.createElement("li");
-        li.innerHTML = `${value} <span class="remove-activity" onclick="removeActivity('${id}', this);">✕</span>`;
-        list.appendChild(li);
-        const box = document.createElement("div");
-        box.classList.add("activity-detail-box");
-        box.id = id;
-        box.innerHTML = `<p class="activity-detail-title">${value}</p><textarea id="${id}-textarea" placeholder="Enter details for ${value}..." rows="3"></textarea>`;
-        grid.appendChild(box);
-        this.value = "";
-    });
-}
-
-function setupDiningInput(dayNum) {
-    const input = document.getElementById(`dining-input-day${dayNum}`);
-    const list  = document.getElementById(`dining-list-day${dayNum}`);
-    const grid  = document.getElementById(`dining-details-day${dayNum}`);
-    if (!input) return;
-    let count = 0;
-    input.addEventListener("keydown", function(e) {
-        if (e.key !== "Enter") return;
-        e.preventDefault();
-        const value = this.value.trim();
-        if (!value) return;
-        count++;
-        const id = `dining-detail-day${dayNum}-item${count}`;
-        const li = document.createElement("li");
-        li.innerHTML = `${value} <span class="remove-activity" onclick="removeActivity('${id}', this);">✕</span>`;
-        list.appendChild(li);
-        const box = document.createElement("div");
-        box.classList.add("activity-detail-box");
-        box.id = id;
-        box.innerHTML = `<p class="activity-detail-title">${value}</p><textarea id="${id}-textarea" placeholder="Enter details for ${value}..." rows="3"></textarea>`;
-        grid.appendChild(box);
-        this.value = "";
-    });
-}
 
 function setupListInput(dayNum, type) {
     const input = document.getElementById(`${type}-input-day${dayNum}`);
