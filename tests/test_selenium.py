@@ -215,3 +215,92 @@ def test_notifications_page_shows_follower(browser, live_server, app):
     )
 
     assert "followed you" in browser.find_element(By.TAG_NAME, "body").text
+
+def test_register_tab_shows_register_form(browser, live_server):
+    browser.get(f"{live_server}/login")
+
+    browser.find_element(
+        By.CSS_SELECTOR,
+        ".login-page-tabs .login-page-tab-btn:nth-child(2)"
+    ).click()
+
+    assert browser.find_element(By.ID, "registerForm").is_displayed()
+    assert browser.find_element(By.ID, "registerEmail").is_displayed()
+    assert browser.find_element(By.ID, "registerPhone").is_displayed()
+    assert browser.find_element(By.ID, "registerPassword").is_displayed()
+    assert browser.find_element(By.ID, "confirmPassword").is_displayed()
+
+
+def test_forgot_password_form_opens(browser, live_server):
+    browser.get(f"{live_server}/login")
+
+    browser.find_element(
+        By.XPATH,
+        "//button[contains(text(), 'Forgot Password')]"
+    ).click()
+
+    assert browser.find_element(By.ID, "forgotForm").is_displayed()
+    assert browser.find_element(By.ID, "forgotEmail").is_displayed()
+    assert browser.find_element(By.ID, "newPassword").is_displayed()
+    assert browser.find_element(By.ID, "confirmNewPassword").is_displayed()
+
+
+def test_homepage_signup_button_goes_to_register(browser, live_server):
+    browser.get(f"{live_server}/")
+
+    browser.find_element(By.LINK_TEXT, "Sign up").click()
+
+    WebDriverWait(browser, 5).until(
+        lambda driver: "/login?form=register" in driver.current_url
+    )
+
+    assert browser.find_element(By.ID, "registerForm").is_displayed()
+
+
+def test_feed_page_shows_main_sections_after_login(browser, live_server, app):
+    with app.app_context():
+        create_user("feeduser@example.com", "feeduser")
+
+    login(browser, live_server, "feeduser@example.com", "password123")
+
+    browser.get(f"{live_server}/feed")
+
+    WebDriverWait(browser, 5).until(
+        EC.text_to_be_present_in_element((By.TAG_NAME, "body"), "Your Curated Feed")
+    )
+
+    assert "From People You Follow" in browser.find_element(By.TAG_NAME, "body").text
+    assert "Based on Your Searches" in browser.find_element(By.TAG_NAME, "body").text
+    assert "Explore More" in browser.find_element(By.TAG_NAME, "body").text
+
+
+def test_notifications_page_loads_after_login(browser, live_server, app):
+    with app.app_context():
+        create_user("notifyuser@example.com", "notifyuser")
+
+    login(browser, live_server, "notifyuser@example.com", "password123")
+
+    browser.get(f"{live_server}/notifications")
+
+    WebDriverWait(browser, 5).until(
+        EC.text_to_be_present_in_element((By.TAG_NAME, "body"), "Notifications")
+    )
+
+    assert "See new follows, likes, and messages here." in browser.find_element(By.TAG_NAME, "body").text
+
+
+def test_messages_page_loads_after_login(browser, live_server, app):
+    with app.app_context():
+        create_user("messageuser@example.com", "messageuser")
+
+    login(browser, live_server, "messageuser@example.com", "password123")
+
+    browser.get(f"{live_server}/messages")
+
+    WebDriverWait(browser, 5).until(
+        EC.presence_of_element_located((By.ID, "userList"))
+    )
+
+    assert browser.find_element(By.ID, "chatHeader").is_displayed()
+    assert browser.find_element(By.ID, "messages").is_displayed()
+    assert browser.find_element(By.ID, "messageInput").is_displayed()
