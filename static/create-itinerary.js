@@ -247,6 +247,16 @@
             });
         }
 
+        function confirmRegenerateDays() {
+            const daysContainer = document.getElementById("days-container");
+            const hasExistingDays = daysContainer && daysContainer.querySelector(".day-section");
+            if (hasExistingDays) {
+                const confirmed = confirm("Regenerating days will clear any unsaved edits to your existing days. Continue?");
+                if (!confirmed) return;
+            }
+            generateDays();
+}
+
         function removeActivity(boxId, span) {
             const box = document.getElementById(boxId);
             if (box) box.remove();
@@ -503,6 +513,9 @@
         }
 
         function clearDraft() {
+            const confirmed = confirm("Clear your entire draft? This will erase all trip details and day plans, and cannot be undone.");
+            if (!confirmed) return;
+
             localStorage.removeItem(STORAGE_KEY);
 
             const form = document.getElementById("itinerary-form");
