@@ -11,8 +11,12 @@
 
             daysContainer.innerHTML = "";
 
-            if (!startDateInput || !endDateInput) {
-                alert("Please enter both a start date and an end date.");
+            const tripTitle = document.getElementById("trip-title").value.trim();
+            const destination = document.getElementById("destination").value.trim();
+            const travelStyle = document.getElementById("travel-style").value;
+
+            if (!tripTitle || !destination || !travelStyle || !startDateInput || !endDateInput) {
+                alert("Please fill in title, destination, travel style, and both dates before generating days.");
                 return;
             }
 
@@ -323,52 +327,52 @@
             saveDraft();
         }
 
-        function updateTilePreview(field, dayNum) {
-    const preview = document.getElementById(`preview-${field}-day${dayNum}`);
-    const hint = document.getElementById(`hint-${field}-day${dayNum}`);
+                    function updateTilePreview(field, dayNum) {
+                const preview = document.getElementById(`preview-${field}-day${dayNum}`);
+                const hint = document.getElementById(`hint-${field}-day${dayNum}`);
 
-    preview.innerHTML = "";
+                preview.innerHTML = "";
 
-    if (field === "activities") {
-        document.querySelectorAll(`#activity-list-day${dayNum} li`).forEach(item => {
-            const p = document.createElement("p");
-            p.textContent = item.textContent.replace("✕", "").trim();
-            preview.appendChild(p);
-        });
-    } else if (field === "dining") {
-        document.querySelectorAll(`#dining-list-day${dayNum} li`).forEach(item => {
-            const p = document.createElement("p");
-            p.textContent = item.textContent.replace("✕", "").trim();
-            preview.appendChild(p);
-        });
-    } else if (field === "transport") {
-        document.querySelectorAll(`#transport-list-day${dayNum} li`).forEach(item => {
-            const p = document.createElement("p");
-            p.textContent = item.textContent.replace("✕", "").trim();
-            preview.appendChild(p);
-        });
-    } else if (field === "accommodation") {
-        const val = document.getElementById(`accommodation-day${dayNum}`)?.value.trim();
-        if (val) preview.innerHTML = `<p>${val}</p>`;
-    } else if (field === "cost") {
-        const val = document.getElementById(`cost-day${dayNum}`)?.value.trim();
-        if (val) preview.innerHTML = `<p>$${val}</p>`;
-    } else if (field === "rented") {
-        document.querySelectorAll(`#rented-list-day${dayNum} li`).forEach(item => {
-            const p = document.createElement("p");
-            p.textContent = item.textContent.replace("✕", "").trim();
-            preview.appendChild(p);
-        });
-    } else if (field === "photo") {
-        const files = selectedPhotosByDay[dayNum] || [];
-        files.forEach(file => {
-            const p = document.createElement("p");
-            p.textContent = file.name;
-            preview.appendChild(p);
-        });
-    }
-    if (hint) {
-        hint.style.display = preview.innerHTML.trim() !== "" ? "none" : "block";
+                if (field === "activities") {
+                    document.querySelectorAll(`#activity-list-day${dayNum} li`).forEach(item => {
+                        const p = document.createElement("p");
+                        p.textContent = item.textContent.replace("✕", "").trim();
+                        preview.appendChild(p);
+                    });
+                } else if (field === "dining") {
+                    document.querySelectorAll(`#dining-list-day${dayNum} li`).forEach(item => {
+                        const p = document.createElement("p");
+                        p.textContent = item.textContent.replace("✕", "").trim();
+                        preview.appendChild(p);
+                    });
+                } else if (field === "transport") {
+                    document.querySelectorAll(`#transport-list-day${dayNum} li`).forEach(item => {
+                        const p = document.createElement("p");
+                        p.textContent = item.textContent.replace("✕", "").trim();
+                        preview.appendChild(p);
+                    });
+                } else if (field === "accommodation") {
+                    const val = document.getElementById(`accommodation-day${dayNum}`)?.value.trim();
+                    if (val) preview.innerHTML = `<p>${val}</p>`;
+                } else if (field === "cost") {
+                    const val = document.getElementById(`cost-day${dayNum}`)?.value.trim();
+                    if (val) preview.innerHTML = `<p>$${val}</p>`;
+                } else if (field === "rented") {
+                    document.querySelectorAll(`#rented-list-day${dayNum} li`).forEach(item => {
+                        const p = document.createElement("p");
+                        p.textContent = item.textContent.replace("✕", "").trim();
+                        preview.appendChild(p);
+                    });
+                } else if (field === "photo") {
+                    const files = selectedPhotosByDay[dayNum] || [];
+                    files.forEach(file => {
+                        const p = document.createElement("p");
+                        p.textContent = file.name;
+                        preview.appendChild(p);
+                    });
+                }
+                if (hint) {
+                    hint.style.display = preview.innerHTML.trim() !== "" ? "none" : "block";
     }
 }
 
