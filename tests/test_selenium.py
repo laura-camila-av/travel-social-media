@@ -164,10 +164,12 @@ def test_create_itinerary_page_generates_day_sections(browser, live_server, app)
     browser.execute_script("document.getElementById('start-date').value = '2026-01-01';")
     browser.execute_script("document.getElementById('end-date').value = '2026-01-02';")
 
-    browser.find_element(
-        By.XPATH,
-        "//button[contains(text(), 'Generate Itinerary Days')]"
-    ).click()
+    generate_button = browser.find_element(By.CSS_SELECTOR, ".btn-generate")
+    browser.execute_script(
+        "arguments[0].scrollIntoView({block: 'center'});",
+        generate_button
+    )
+    generate_button.click()
 
     WebDriverWait(browser, 5).until(
         EC.presence_of_element_located((By.ID, "day-nav-bar"))

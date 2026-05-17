@@ -1,28 +1,79 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <link rel="stylesheet" href="../static/styles.css">
-     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-    
-</head>
-<style>
-    body {text-align: center;}   
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tripster</title>
 
-<body>
-    
-<div class="homepage-header">
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+
+<body class="homepage-body">
+
+<header class="homepage-header">
     <h1><strong>Tripster</strong></h1>
+
     <div class="account-buttons">
         <a href="/login?form=register">Sign up</a>
         <a href="/login?form=login">Log in</a>
     </div>
-</div>
+</header>
 
-     <h1><strong>Real trips. Real students. Real advice.</strong> </h1>
+<section class="homepage-hero">
+    <p class="eyebrow">Student travel made easier</p>
+    <h1>Real trips. Real students. Real advice.</h1>
+    <p class="homepage-hero-text">
+        Discover itineraries shared by students, save ideas for your next trip, and share your own travel experience with the community.
+    </p>
+</section>
 
-<h2>Trending Itineraries</h2>
+<!-- UI IMPROVE  -->
+<section class="homepage-section">
+    <div class="homepage-section-heading">
+        <p class="eyebrow">Popular ideas</p>
+        <h2>Trending Itineraries</h2>
+    </div>
 
+    <div class="trending-itinerary-container homepage-card-grid">
+        <a class="card-link" href="{{ url_for('itinerary_display', itinerary_id=1) }}">
+            <div class="itinerary-card homepage-travel-card">
+                <div class="card-placeholder"></div>
+                <div class="overlay-text">Tokyo Budget Trip</div>
+            </div>
+            <div class="card-info">
+                <p class="card-title">Tokyo Budget Trip</p>
+                <p class="card-meta"><i class="fa-regular fa-calendar"></i> 7 Days</p>
+                <p class="card-meta"><i class="fa-solid fa-location-dot"></i> Tokyo, Japan</p>
+            </div>
+        </a>
+
+        <a class="card-link" href="{{ url_for('itinerary_display', itinerary_id=2) }}">
+            <div class="itinerary-card homepage-travel-card">
+                <div class="card-placeholder"></div>
+                <div class="overlay-text">Kyoto Cultural Journey</div>
+            </div>
+            <div class="card-info">
+                <p class="card-title">Kyoto Cultural Journey</p>
+                <p class="card-meta"><i class="fa-regular fa-calendar"></i> 5 Days</p>
+                <p class="card-meta"><i class="fa-solid fa-location-dot"></i> Kyoto, Japan</p>
+            </div>
+        </a>
+
+        <a class="card-link" href="{{ url_for('itinerary_display', itinerary_id=3) }}">
+            <div class="itinerary-card homepage-travel-card">
+                <div class="card-placeholder"></div>
+                <div class="overlay-text">Seoul Food Adventure</div>
+            </div>
+            <div class="card-info">
+                <p class="card-title">Seoul Food Adventure</p>
+                <p class="card-meta"><i class="fa-regular fa-calendar"></i> 5 Days</p>
+                <p class="card-meta"><i class="fa-solid fa-location-dot"></i> Seoul, South Korea</p>
+            </div>
+        </a>
+    </div>
+</section>
+<!-- ============= -->
 <div class="trending-itinerary-container">
     {% if popular_itineraries %}
         {% for itinerary in popular_itineraries %}
@@ -58,98 +109,76 @@
         </div>
     {% endif %}
 </div>
+<!-- homepage itineraries change  -->
+<section class="homepage-section">
+    <div class="homepage-section-heading">
+        <p class="eyebrow">Why join</p>
+        <h2>What you get when you join for free</h2>
+    </div>
 
-<h2>What you get when you join for free</h2>
-
-<div class="trending-itinerary-container">
-    <div class="feature-detail-box">
-        <div class="detail-icon-panel">
-            <i class="fa-solid fa-calendar-days"></i>
-        </div>
-        <div class="detail-content">
-            <div class="activities-content">
-                <div class="activities-collapsed">
-                    <p style="font-size: 20px; margin: 2px 0;">Save ready-made itineraries for your next holiday</p>
-                </div>
-                <div class="activities-expanded" style="display: none;">
-                    <p class="activity-name" style="font-size: 20px; margin: 0;"></p>
-                    <p class="activity-desc" style="font-size: 15px; margin: 5px 0;"></p>
-                </div>
+    <div class="feature-container homepage-feature-grid">
+        <div class="feature-detail-box">
+            <div class="detail-icon-panel">
+                <i class="fa-solid fa-calendar-days"></i>
+            </div>
+            <div class="detail-content">
+                <p>Save ready-made itineraries for your next holiday</p>
             </div>
         </div>
-    </div>
 
         <div class="feature-detail-box">
             <div class="detail-icon-panel">
                 <i class="fa-solid fa-person-circle-plus"></i>
             </div>
-        <div class="detail-content">
-            <div class="activities-content">
-                <div class="activities-collapsed">
-                    <p style="font-size: 20px; margin: 2px 0;">Connect with your travel buddies</p>
-                </div>
-                <div class="activities-expanded" style="display: none;">
-                    <p class="activity-name" style="font-size: 20px; margin: 0;"></p>
-                    <p class="activity-desc" style="font-size: 15px; margin: 5px 0;"></p>
-                </div>
+            <div class="detail-content">
+                <p>Connect with your travel buddies</p>
+            </div>
+        </div>
+
+        <div class="feature-detail-box">
+            <div class="detail-icon-panel">
+                <i class="fa-solid fa-paper-plane"></i>
+            </div>
+            <div class="detail-content">
+                <p>Share trip ideas with others</p>
+            </div>
+        </div>
+
+        <div class="feature-detail-box">
+            <div class="detail-icon-panel">
+                <i class="fa-solid fa-file-pen"></i>
+            </div>
+            <div class="detail-content">
+                <p>Contribute by sharing your own itineraries</p>
             </div>
         </div>
     </div>
+</section>
 
-           <div class="feature-detail-box">
-        <div class="detail-icon-panel">
-             <i class="fa-solid fa-paper-plane"></i>
-        </div>
-        <div class="detail-content">
-            <div class="activities-content">
-                <div class="activities-collapsed">
-                    <p style="font-size: 20px; margin: 2px 0;">Share trip ideas with others</p>
-                </div>
-                <div class="activities-expanded" style="display: none;">
-                    <p class="activity-name" style="font-size: 20px; margin: 0;"></p>
-                    <p class="activity-desc" style="font-size: 15px; margin: 5px 0;"></p>
-                </div>
-            </div>
-        </div>
+<section class="about-section homepage-about-card">
+    <p class="eyebrow">About Tripster</p>
+    <h2>Built by students, for students</h2>
+
+    <p class="about-text">
+        Tripster is a community built for students who want practical and honest travel ideas.
+        Planning a trip during semester can take too much time, so this platform helps travellers share real experiences and help others skip the research spiral.
+    </p>
+
+    <p class="about-text">
+        Whether you're a seasoned backpacker or planning your first solo trip, you can explore detailed itineraries from people just like you.
+    </p>
+
+    <p class="about-text">
+        Join the community, share your adventures, and help another student find their next destination.
+    </p>
+</section>
+
+<section class="how-it-works homepage-section">
+    <div class="homepage-section-heading">
+        <p class="eyebrow">Simple process</p>
+        <h2>How it works</h2>
     </div>
 
-           <div class="feature-detail-box">
-        <div class="detail-icon-panel">
-            <i class="fa-solid fa-file-pen"></i>
-        </div>
-        <div class="detail-content">
-            <div class="activities-content">
-                <div class="activities-collapsed">
-                    <p style="font-size: 20px; margin: 2px 0;">Contribute by sharing your own itineraries</p>
-                </div>
-                <div class="activities-expanded" style="display: none;">
-                    <p class="activity-name" style="font-size: 20px; margin: 0;"></p>
-                    <p class="activity-desc" style="font-size: 15px; margin: 5px 0;"></p>
-                </div>
-            </div>
-        </div>
-    </div>
-
-</div>
-
-<div class="about-section">
-    <h2>About Trampled</h2>
-    <p class="about-text">
-        This is a community built by students, for students. We know that planning a trip takes 
-        time you don't have during semester, so we built a place where travellers can share their real experiences 
-        and help the next person skip the research spiral.
-    </p>
-    <p class="about-text">
-        Whether you're a seasoned backpacker or planning your first solo trip, we give you 
-        access to honest, detailed itineraries from people just like you. No sponsored content, 
-        no travel agencies — just real students sharing what actually worked.
-    </p>
-    <p class="about-text">
-        Join the community, share your adventures, and help a fellow student find their next destination.
-    </p>
-</div>
-<div class="how-it-works">
-    <h2>How it works</h2>
     <div class="steps-container">
         <div class="step">
             <i class="fa-solid fa-magnifying-glass"></i>
@@ -157,18 +186,22 @@
             <p class="step-title">Browse</p>
             <p class="step-desc">Find real itineraries shared by students who've actually been there.</p>
         </div>
+
         <div class="step-arrow">
             <i class="fa-solid fa-arrow-right"></i>
         </div>
+
         <div class="step">
             <i class="fa-solid fa-bookmark"></i>
             <p class="step-number">2</p>
             <p class="step-title">Save</p>
             <p class="step-desc">Bookmark the trips that inspire you and build your travel wishlist.</p>
         </div>
+
         <div class="step-arrow">
             <i class="fa-solid fa-arrow-right"></i>
         </div>
+
         <div class="step">
             <i class="fa-solid fa-paper-plane"></i>
             <p class="step-number">3</p>
@@ -176,8 +209,7 @@
             <p class="step-desc">Post your own itinerary when you're back and help the next traveller.</p>
         </div>
     </div>
-</div>
+</section>
 
 </body>
-
 </html>

@@ -9,25 +9,26 @@
 </head>
 
 <body>
-
-<!--Navigation bar-->
 {% include 'navbar.html' %}
 
 <div class="page-wrapper">
     <div class="middle-column">
 
-        <h1>Tripster</h1>
-        <h2>Search Itineraries</h2>
-        <p>Find trips by city, country, budget, duration, travel style, or username.</p>
+        <section class="page-hero search-hero">
+            <p class="eyebrow">Find your next trip</p>
+            <h1>Search Itineraries</h1>
+            <p class="hero-description">
+                Search by username, city, country, itinerary title, budget, duration, or travel style.
+            </p>
+        </section>
 
-        <!-- Search bar -->
-       <form method="GET" action="{{ url_for('search') }}" class="search-controls">
+        <form method="GET" action="{{ url_for('search') }}" class="search-controls search-panel">
             <input
-                type="text"
-                name="q"
-                value="{{ q or '' }}"
-                class="search-input"
-                placeholder="Search by username, city, country, or itinerary title"
+                    type="text"
+                    name="q"
+                    value="{{ q or '' }}"
+                    class="search-input"
+                    placeholder="Search by username, city, country, or itinerary title"
             >
 
             <select class="search-select" name="duration">
@@ -53,69 +54,98 @@
                 <option value="High" {% if budget_level == "High" %}selected{% endif %}>High</option>
             </select>
 
-            <button class="btn search-btn" type="submit">Search</button>
+            <button class="btn search-btn" type="submit">
+                <i class="fa-solid fa-magnifying-glass"></i>
+                Search
+            </button>
         </form>
 
-        <!-- User search results -->
         {% if q %}
-        <h2>User Results</h2>
+        <section class="search-section">
+            <div class="section-heading-row">
+                <div>
+                    <p class="eyebrow">People</p>
+                    <h2>User Results</h2>
+                </div>
+            </div>
 
-        {% if users %}
-        <div class="user-search-results">
-            {% for u in users %}
-            <a class="user-result-card" href="{{ url_for('view_user_profile', user_id=u.id) }}">
-                {% if u.avatar_url %}
-                <img src="{{ url_for('static', filename='uploads/' + u.avatar_url) }}" class="user-result-avatar">
-                {% else %}
-                <div class="user-result-placeholder"></div>
-                {% endif %}
+            {% if users %}
+            <div class="user-search-results">
+                {% for u in users %}
+                <a class="user-result-card" href="{{ url_for('view_user_profile', user_id=u.id) }}">
+                    {% if u.avatar_url %}
+                    <img src="{{ url_for('static', filename='uploads/' + u.avatar_url) }}" class="user-result-avatar">
+                    {% else %}
+                    <div class="user-result-placeholder"></div>
+                    {% endif %}
 
-                <span>@{{ u.username }}</span>
-            </a>
-            {% endfor %}
-        </div>
-        {% else %}
-        <p>No users found.</p>
-        {% endif %}
-        {% endif %}
-
-        <!-- Search results -->
-        <h2>Itinerary Results</h2>
-        <div class="itinerary-container">
-            {% if itineraries %}
-                {% for itinerary in itineraries %}
-                    <a class="card-link" href="{{ url_for('itinerary_display', itinerary_id=itinerary.id) }}">
-                        <div class="itinerary-card">
-                            {% if itinerary.thumbnail %}
-                                <img 
-                                    src="{{ url_for('static', filename='uploads/' + itinerary.thumbnail) }}" 
-                                    class="itinerary-thumbnail"
-                                    alt="{{ itinerary.title }}"
-                                >
-                            {% endif %}
-                            {% if first_photo %}
-                                <img 
-                                    src="{{ url_for('static', filename='uploads/' + first_photo.filename) }}" 
-                                    class="itinerary-thumbnail"
-                                    alt="{{ itinerary.title }}"
-                                >
-                            {% endif %}
-
-                            <div class="overlay-text">
-                                {{ itinerary.title }}<br>
-                                {{ itinerary.destination }}<br>
-                                {{ itinerary.travel_style }}
-                            </div>
-                        </div>
-                    </a>
+                    <div class="user-result-info">
+                        <strong>@{{ u.username }}</strong>
+                        <span>View profile</span>
+                    </div>
+                </a>
                 {% endfor %}
+            </div>
             {% else %}
+            <div class="empty-state search-empty">
+                <i class="fa-solid fa-user"></i>
+                <p>No users found.</p>
+            </div>
+            {% endif %}
+        </section>
+        {% endif %}
+
+        <section class="search-section">
+            <div class="section-heading-row">
+                <div>
+                    <p class="eyebrow">Trips</p>
+                    <h2>Itinerary Results</h2>
+                </div>
+            </div>
+
+            <div class="itinerary-container search-results-grid">
+                {% if itineraries %}
+                {% for itinerary in itineraries %}
+                {% set first_photo = itinerary.days[0].photos[0] if itinerary.days and itinerary.days[0].photos else None %}
+
+                <a class="card-link" href="{{ url_for('itinerary_display', itinerary_id=itinerary.id) }}">
+                    <div class="itinerary-card search-itinerary-card">
+                        {% if first_photo %}
+                        <img
+                                src="{{ url_for('static', filename='uploads/' + first_photo.filename) }}"
+                                class="itinerary-thumbnail"
+                                alt="{{ itinerary.title }}"
+                        >
+                        {% else %}
+                        <div class="card-placeholder"></div>
+                        {% endif %}
+
+                        <div class="overlay-text">
+                            {{ itinerary.title }}
+                        </div>
+                    </div>
+
+                    <div class="card-info">
+                        <p class="card-title">{{ itinerary.title }}</p>
+                        <p class="card-meta">
+                            <i class="fa-solid fa-location-dot"></i>
+                            {{ itinerary.destination }}
+                        </p>
+                        <p class="card-meta">
+                            <i class="fa-solid fa-suitcase"></i>
+                            {{ itinerary.travel_style or 'Not specified' }}
+                        </p>
+                    </div>
+                </a>
+                {% endfor %}
+                {% else %}
                 <div class="empty-state">
                     <i class="fa-solid fa-map"></i>
                     <p>No itineraries found.</p>
                 </div>
-            {% endif %}
-        </div>
+                {% endif %}
+            </div>
+        </section>
 
     </div>
 </div>
