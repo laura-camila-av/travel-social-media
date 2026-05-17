@@ -28,7 +28,6 @@
     </p>
 </section>
 
-<!-- UI IMPROVE  -->
 <section class="homepage-section">
     <div class="homepage-section-heading">
         <p class="eyebrow">Popular ideas</p>
@@ -36,80 +35,58 @@
     </div>
 
     <div class="trending-itinerary-container homepage-card-grid">
-        <a class="card-link" href="{{ url_for('itinerary_display', itinerary_id=1) }}">
-            <div class="itinerary-card homepage-travel-card">
-                <div class="card-placeholder"></div>
-                <div class="overlay-text">Tokyo Budget Trip</div>
-            </div>
-            <div class="card-info">
-                <p class="card-title">Tokyo Budget Trip</p>
-                <p class="card-meta"><i class="fa-regular fa-calendar"></i> 7 Days</p>
-                <p class="card-meta"><i class="fa-solid fa-location-dot"></i> Tokyo, Japan</p>
-            </div>
-        </a>
+        {% if popular_itineraries %}
+            {% for itinerary in popular_itineraries %}
+                <a class="card-link" href="{{ url_for('itinerary_display', itinerary_id=itinerary.id) }}">
 
-        <a class="card-link" href="{{ url_for('itinerary_display', itinerary_id=2) }}">
-            <div class="itinerary-card homepage-travel-card">
-                <div class="card-placeholder"></div>
-                <div class="overlay-text">Kyoto Cultural Journey</div>
-            </div>
-            <div class="card-info">
-                <p class="card-title">Kyoto Cultural Journey</p>
-                <p class="card-meta"><i class="fa-regular fa-calendar"></i> 5 Days</p>
-                <p class="card-meta"><i class="fa-solid fa-location-dot"></i> Kyoto, Japan</p>
-            </div>
-        </a>
+                    <div class="itinerary-card homepage-travel-card">
 
-        <a class="card-link" href="{{ url_for('itinerary_display', itinerary_id=3) }}">
-            <div class="itinerary-card homepage-travel-card">
-                <div class="card-placeholder"></div>
-                <div class="overlay-text">Seoul Food Adventure</div>
+                        {% if itinerary.thumbnail %}
+                            <img
+                                src="{{ url_for('static', filename='uploads/' + itinerary.thumbnail) }}"
+                                class="itinerary-thumbnail"
+                                alt="{{ itinerary.title }}"
+                            >
+                        {% else %}
+                            <div class="card-placeholder"></div>
+                        {% endif %}
+
+                        <div class="overlay-text">
+                            {{ itinerary.title }}
+                        </div>
+                    </div>
+
+                    <div class="card-info">
+                        <p class="card-title">{{ itinerary.title }}</p>
+                        <p class="card-meta">
+                            <i class="fa-regular fa-calendar"></i>
+                            {{ (itinerary.end_date - itinerary.start_date).days + 1 }} Days
+                        </p>
+                        <p class="card-meta">
+                            <i class="fa-solid fa-location-dot"></i>
+                            {{ itinerary.destination }}
+                        </p>
+                        <p class="card-meta">
+                            <i class="fa-solid fa-heart"></i>
+                            {{ itinerary.like_count }}
+                            {% if itinerary.like_count == 1 %}
+                                like
+                            {% else %}
+                                likes
+                            {% endif %}
+                        </p>
+                    </div>
+                </a>
+            {% endfor %}
+        {% else %}
+            <div class="empty-state">
+                <i class="fa-solid fa-map"></i>
+                <p>No popular itineraries yet.</p>
             </div>
-            <div class="card-info">
-                <p class="card-title">Seoul Food Adventure</p>
-                <p class="card-meta"><i class="fa-regular fa-calendar"></i> 5 Days</p>
-                <p class="card-meta"><i class="fa-solid fa-location-dot"></i> Seoul, South Korea</p>
-            </div>
-        </a>
+        {% endif %}
     </div>
 </section>
-<!-- ============= -->
-<div class="trending-itinerary-container">
-    {% if popular_itineraries %}
-        {% for itinerary in popular_itineraries %}
-            <a class="card-link" href="{{ url_for('itinerary_display', itinerary_id=itinerary.id) }}">
-                <div class="itinerary-card">
-                    {% if itinerary.thumbnail %}
-                        <img
-                            src="{{ url_for('static', filename='uploads/' + itinerary.thumbnail) }}"
-                            class="itinerary-thumbnail"
-                            alt="{{ itinerary.title }}"
-                        >
-                    {% endif %}
 
-                    <div class="overlay-text">{{ itinerary.title }}</div>
-                </div>
-
-                <div class="card-info">
-                    <p class="card-title">{{ itinerary.title }}</p>
-                    <p class="card-meta">
-                        {{ (itinerary.end_date - itinerary.start_date).days + 1 }} Days
-                    </p>
-                    <p class="card-meta">{{ itinerary.destination }}</p>
-                    <p class="card-meta">
-                        {{ itinerary.like_count }} {% if itinerary.like_count == 1 %}like{% else %}likes{% endif %}
-                    </p>
-                </div>
-            </a>
-        {% endfor %}
-    {% else %}
-        <div class="empty-state">
-            <i class="fa-solid fa-map"></i>
-            <p>No popular itineraries yet.</p>
-        </div>
-    {% endif %}
-</div>
-<!-- homepage itineraries change  -->
 <section class="homepage-section">
     <div class="homepage-section-heading">
         <p class="eyebrow">Why join</p>
