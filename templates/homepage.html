@@ -24,60 +24,40 @@
 <h2>Trending Itineraries</h2>
 
 <div class="trending-itinerary-container">
-    <a class="card-link" href="{{ url_for('itinerary_display', itinerary_id=1) }}">
-        <div class="itinerary-card">
-            <div class="overlay-text">Tokyo Budget Trip</div>
-        </div>
-        <div class="card-info">
-            <p class="card-title">Tokyo Budget Trip</p>
-            <p class="card-meta">7 Days</p>
-            <p class="card-meta">Tokyo, Japan</p>
-        </div>
-    </a>
-    <a class="card-link" href="{{ url_for('itinerary_display', itinerary_id=2) }}">
-        <div class="itinerary-card">
-            <div class="overlay-text">Kyoto Cultural Journey</div>
-        </div>
-        <div class="card-info">
-            <p class="card-title">Kyoto Cultural Journey</p>
-            <p class="card-meta">5 Days</p>
-            <p class="card-meta">Kyoto, Japan</p>
-        </div>
-    </a>
-    <a class="card-link" href="{{ url_for('itinerary_display', itinerary_id=3) }}">
-        <div class="itinerary-card">
-            <div class="overlay-text">Seoul Food Adventure</div>
-        </div>
-        <div class="card-info">
-            <p class="card-title">Seoul Food Adventure</p>
-            <p class="card-meta">5 Days</p>
-            <p class="card-meta">Seoul, South Korea</p>
-        </div>
-    </a>
+    {% if popular_itineraries %}
+        {% for itinerary in popular_itineraries %}
+            <a class="card-link" href="{{ url_for('itinerary_display', itinerary_id=itinerary.id) }}">
+                <div class="itinerary-card">
+                    {% if itinerary.thumbnail %}
+                        <img
+                            src="{{ url_for('static', filename='uploads/' + itinerary.thumbnail) }}"
+                            class="itinerary-thumbnail"
+                            alt="{{ itinerary.title }}"
+                        >
+                    {% endif %}
 
-     <a class="card-link" href="{{ url_for('itinerary_display', itinerary_id=3) }}">
-        <div class="itinerary-card">
-            <div class="overlay-text">Seoul Food Adventure</div>
-        </div>
-        <div class="card-info">
-            <p class="card-title">Seoul Food Adventure</p>
-            <p class="card-meta">5 Days</p>
-            <p class="card-meta">Seoul, South Korea</p>
-        </div>
-    </a>
+                    <div class="overlay-text">{{ itinerary.title }}</div>
+                </div>
 
-     <a class="card-link" href="{{ url_for('itinerary_display', itinerary_id=3) }}">
-        <div class="itinerary-card">
-            <div class="overlay-text">Seoul Food Adventure</div>
+                <div class="card-info">
+                    <p class="card-title">{{ itinerary.title }}</p>
+                    <p class="card-meta">
+                        {{ (itinerary.end_date - itinerary.start_date).days + 1 }} Days
+                    </p>
+                    <p class="card-meta">{{ itinerary.destination }}</p>
+                    <p class="card-meta">
+                        {{ itinerary.like_count }} {% if itinerary.like_count == 1 %}like{% else %}likes{% endif %}
+                    </p>
+                </div>
+            </a>
+        {% endfor %}
+    {% else %}
+        <div class="empty-state">
+            <i class="fa-solid fa-map"></i>
+            <p>No popular itineraries yet.</p>
         </div>
-        <div class="card-info">
-            <p class="card-title">Seoul Food Adventure</p>
-            <p class="card-meta">5 Days</p>
-            <p class="card-meta">Seoul, South Korea</p>
-        </div>
-    </a>
-
-    </div>
+    {% endif %}
+</div>
 
 <h2>What you get when you join for free</h2>
 
