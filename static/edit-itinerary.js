@@ -544,7 +544,10 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 });
 
-document.getElementById("itinerary-form").addEventListener("submit", function () {
+document.getElementById("itinerary-form").addEventListener("submit", async function (e) {
+    e.preventDefault();
+
+    // Existing logic: pack list fields into hidden JSON inputs
     document.querySelectorAll(".day-section").forEach((section, index) => {
         const dayNum = index + 1;
         ["activity", "dining", "transport", "rented"].forEach(type => {
@@ -558,4 +561,22 @@ document.getElementById("itinerary-form").addEventListener("submit", function ()
             document.getElementById(`${type}-json-day${dayNum}`).value = JSON.stringify(items);
         });
     });
+
+    // Submit via fetch so we can control history afterwards
+    try {
+        const response = await fetch(this.action, {
+            method: 'POST',
+            body: new FormData(this)
+        });
+
+        if (response.ok) {
+            // location.replace overwrites /edit in history with /profile
+            // (response.url is the final URL after the server's 302 redirect)
+            window.location.replace(response.url);
+        } else {
+            alert("Failed to save changes. Please try again.");
+        }
+    } catch (err) {
+        alert("Network error while saving. Please try again.");
+    }
 });
