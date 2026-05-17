@@ -345,3 +345,78 @@ def test_remove_follower_api_removes_follow_record(client, app):
         ).first()
 
         assert follow_record is None
+
+def test_register_rejects_duplicate_email(client, app):
+    with app.app_context():
+        create_user("duplicate@example.com", "existinguser")
+
+    response = client.post(
+        "/register",
+        data={
+            "email": "duplicate@example.com",
+            "phone": "0412345678",
+            "password": "password123",
+            "confirm_password": "password123",
+        },
+        follow_redirects=True
+    )
+
+    assert response.status_code == 200
+    assert b"Another account already exists with this email." in response.data
+
+
+def test_login_with_username_success_redirects_to_feed(client, app):
+    with app.app_context():
+        create_user("username-login@example.com", "usernamelogin", password="password123")
+
+    response = client.post(
+        "/login",
+        data={
+            "identifier": "usernamelogin",
+            "password": "password123",
+        },
+        follow_redirects=False
+    )
+
+    assert response.status_code == 302
+    assert "/feed" in response.headers["Location"]
+
+
+def test_follow_self_is_rejected(client, app):
+    with app.app_context():
+        alice_id = create_user("self-follow@example.com", "selffollow")
+
+    login_as(client, alice_id)
+
+    response = client.post(f"/api/follow/{alice_id}")
+    data = response.get_json()
+
+    assert response.status_code == 400
+    assert data["error"] == "You cannot follow yourself"
+
+
+def test_message_requires_login(client):
+    response = client.post(
+        "/api/messages",
+        json={
+            "receiver_id": 1,
+            "text": "Hello"
+        }
+    )
+
+    assert response.status_code == 401
+    assert response.get_json()["error"] == "Not logged in"
+
+
+def test_search_redirects_when_not_logged_in(client):
+    response = client.get("/search", follow_redirects=False)
+
+    assert response.status_code == 302
+    assert "/login" in response.headers["Location"]
+
+
+def test_create_itinerary_redirects_when_not_logged_in(client):
+    response = client.get("/create", follow_redirects=False)
+
+    assert response.status_code == 302
+    assert "/login" in response.headers["Location"]
