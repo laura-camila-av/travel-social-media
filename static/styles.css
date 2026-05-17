@@ -4974,3 +4974,40 @@ body {
 /* ============================================================
    Homepage UI V2 END
    ============================================================ */
+/* Fix shared itinerary link contrast inside DMs */
+.dms-message a[href^="/itinerary/"],
+.dms-message a[href^="/itinerary/"]:link,
+.dms-message a[href^="/itinerary/"]:visited {
+    display: block;
+    width: fit-content;
+    max-width: 100%;
+    margin-bottom: 6px;
+    padding: 8px 12px;
+    border-radius: 10px;
+    text-decoration: none;
+    font-weight: 800;
+    box-sizing: border-box;
+}
+
+/* Own sent itinerary preview */
+.dms-mine a[href^="/itinerary/"],
+.dms-mine a[href^="/itinerary/"]:link,
+.dms-mine a[href^="/itinerary/"]:visited {
+    color: #ffffff !important;
+    border: 1px solid rgba(255, 255, 255, 0.38) !important;
+    background: rgba(255, 255, 255, 0.12) !important;
+}
+
+/* Received itinerary preview */
+.dms-theirs a[href^="/itinerary/"],
+.dms-theirs a[href^="/itinerary/"]:link,
+.dms-theirs a[href^="/itinerary/"]:visited {
+    color: var(--primary) !important;
+    border: 1px solid var(--border-soft) !important;
+    background: var(--primary-soft) !important;
+}
+
+.dms-message a[href^="/itinerary/"]:hover {
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-soft);
+}
