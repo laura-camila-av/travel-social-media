@@ -133,6 +133,23 @@ function updateDots(containerId, total, activeIndex) {
     }
 }
 
+(function showUpdateToastIfNeeded() {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('updated') !== '1') return;
+
+    const toast = document.getElementById('updateToast');
+    if (toast) {
+        toast.classList.remove('hidden');
+        setTimeout(() => toast.classList.add('hidden'), 3000);
+    }
+
+    // Strip ?updated=1 so refreshing the page doesn't re-show the toast
+    params.delete('updated');
+    const cleanQuery = params.toString();
+    const newUrl = window.location.pathname + (cleanQuery ? '?' + cleanQuery : '') + window.location.hash;
+    history.replaceState(null, '', newUrl);
+})();
+
 
     const likeButton = document.getElementById("likeButton");
     const likeIcon = document.getElementById("likeIcon");

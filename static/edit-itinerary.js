@@ -13,8 +13,6 @@ function generateDays() {
     const endDateInput = document.getElementById("end-date").value;
     const daysContainer = document.getElementById("days-container");
 
-    daysContainer.innerHTML = "";
-
     if (!startDateInput || !endDateInput) {
         alert("Please enter both a start date and an end date.");
         return;
@@ -27,6 +25,8 @@ function generateDays() {
         alert("End date cannot be earlier than start date.");
         return;
     }
+
+    daysContainer.innerHTML = "";
 
     const dayCount = Math.floor((endDate - startDate) / (1000 * 60 * 60 * 24)) + 1;
 
@@ -118,7 +118,11 @@ function generateDays() {
                     <div class="activity-details-grid" id="dining-details-day${i}"></div>
                 </div>
                 <div id="form-transport-day${i}">
-                    <input type="text" id="transport-day${i}" name="transport-day${i}" placeholder="Enter transport used">
+                    <div class="activity-input-area" id="transport-input-area-day${i}">
+                        <ul class="activity-list" id="transport-list-day${i}"></ul>
+                        <input type="text" class="activity-input" id="transport-input-day${i}" placeholder="Type a transport and press Enter">
+                    </div>
+                    <div class="activity-details-grid" id="transport-details-day${i}"></div>
                 </div>
                 <div id="form-accommodation-day${i}">
                     <input type="text" id="accommodation-day${i}" name="accommodation-day${i}" placeholder="Enter accommodation name and address">
@@ -127,7 +131,11 @@ function generateDays() {
                     <input type="number" id="cost-day${i}" name="cost-day${i}" min="0" step="0.01" placeholder="Enter total cost for the day">
                 </div>
                 <div id="form-rented-day${i}">
-                    <input type="text" id="rented-items-day${i}" name="rented-items-day${i}" placeholder="Enter any rented items">
+                    <div class="activity-input-area" id="rented-input-area-day${i}">
+                        <ul class="activity-list" id="rented-list-day${i}"></ul>
+                        <input type="text" class="activity-input" id="rented-input-day${i}" placeholder="Type a rented item and press Enter">
+                    </div>
+                    <div class="activity-details-grid" id="rented-details-day${i}"></div>
                 </div>
                 <div id="form-photo-day${i}">
                     <div id="existing-photos-day${i}"></div>
@@ -140,15 +148,18 @@ function generateDays() {
                 </div>
                 <input type="hidden" id="activity-json-day${i}" name="activity-json-day${i}">
                 <input type="hidden" id="dining-json-day${i}" name="dining-json-day${i}">
+                <input type="hidden" id="transport-json-day${i}" name="transport-json-day${i}">
+                <input type="hidden" id="rented-json-day${i}" name="rented-json-day${i}">
             </div>
         `;
 
         daysContainer.appendChild(daySection);
 
-        selectedPhotosByDay[i] = [];
-        photoDataTransferByDay[i] = new DataTransfer();
+        if (!selectedPhotosByDay[i]) selectedPhotosByDay[i] = [];
+        if (!photoDataTransferByDay[i]) photoDataTransferByDay[i] = new DataTransfer();
 
         const fileInput = daySection.querySelector(`#photos-day${i}`);
+        fileInput.files = photoDataTransferByDay[i].files;
         fileInput.addEventListener("change", function () {
             Array.from(this.files).forEach(file => {
                 if (!selectedPhotosByDay[i].some(f => f.name === file.name)) {
@@ -160,8 +171,10 @@ function generateDays() {
             renderNewPhotoList(i);
         });
 
-        setupActivityInput(i);
-        setupDiningInput(i);
+        setupListInput(i, "activity");
+        setupListInput(i, "dining");
+        setupListInput(i, "transport");
+        setupListInput(i, "rented");
     }
 
     totalDays = dayCount;
@@ -199,14 +212,14 @@ function initEditForm() {
         const n = day.day_number;
 
         const get = id => document.getElementById(id);
-        if (get(`transport-day${n}`))       get(`transport-day${n}`).value       = day.transport || "";
         if (get(`accommodation-day${n}`))   get(`accommodation-day${n}`).value   = day.accommodation || "";
-        if (get(`rented-items-day${n}`))    get(`rented-items-day${n}`).value    = day.rented_items || "";
         if (get(`caption-day${n}`))         get(`caption-day${n}`).value         = day.caption || "";
         if (get(`cost-day${n}`))            get(`cost-day${n}`).value            = day.total_cost !== null ? day.total_cost : "";
 
-        restoreDynamicList(n, "activity", day.activity_details || []);
-        restoreDynamicList(n, "dining",   day.dining_details   || []);
+        restoreDynamicList(n, "activity",  day.activity_details || []);
+        restoreDynamicList(n, "dining",    day.dining_details   || []);
+        restoreDynamicList(n, "transport", day.transport        || []);
+        restoreDynamicList(n, "rented",    day.rented_items     || []);
         renderExistingPhotos(n, day.photos || []);
 
         ["activities","dining","transport","accommodation","cost","rented","photo"].forEach(field => {
@@ -254,44 +267,20 @@ function markPhotoForDeletion(photoId, dayNum) {
 
 // ── Shared helpers (same logic as create-itinerary.js) ───────────────────────
 
-function setupActivityInput(dayNum) {
-    const input = document.getElementById(`activity-input-day${dayNum}`);
-    const list  = document.getElementById(`activity-list-day${dayNum}`);
-    const grid  = document.getElementById(`activity-details-day${dayNum}`);
+function setupListInput(dayNum, type) {
+    const input = document.getElementById(`${type}-input-day${dayNum}`);
+    const list  = document.getElementById(`${type}-list-day${dayNum}`);
+    const grid  = document.getElementById(`${type}-details-day${dayNum}`);
     if (!input) return;
-    let count = 0;
-    input.addEventListener("keydown", function(e) {
-        if (e.key !== "Enter") return;
-        e.preventDefault();
-        const value = this.value.trim();
-        if (!value) return;
-        count++;
-        const id = `detail-day${dayNum}-act${count}`;
-        const li = document.createElement("li");
-        li.innerHTML = `${value} <span class="remove-activity" onclick="removeActivity('${id}', this);">✕</span>`;
-        list.appendChild(li);
-        const box = document.createElement("div");
-        box.classList.add("activity-detail-box");
-        box.id = id;
-        box.innerHTML = `<p class="activity-detail-title">${value}</p><textarea id="${id}-textarea" placeholder="Enter details for ${value}..." rows="3"></textarea>`;
-        grid.appendChild(box);
-        this.value = "";
-    });
-}
+    let count = list.children.length;
 
-function setupDiningInput(dayNum) {
-    const input = document.getElementById(`dining-input-day${dayNum}`);
-    const list  = document.getElementById(`dining-list-day${dayNum}`);
-    const grid  = document.getElementById(`dining-details-day${dayNum}`);
-    if (!input) return;
-    let count = 0;
     input.addEventListener("keydown", function(e) {
         if (e.key !== "Enter") return;
         e.preventDefault();
         const value = this.value.trim();
         if (!value) return;
         count++;
-        const id = `dining-detail-day${dayNum}-item${count}`;
+        const id = `${type}-detail-day${dayNum}-item${count}`;
         const li = document.createElement("li");
         li.innerHTML = `${value} <span class="remove-activity" onclick="removeActivity('${id}', this);">✕</span>`;
         list.appendChild(li);
@@ -327,6 +316,84 @@ function restoreDynamicList(dayNum, type, items) {
         box.innerHTML = `<p class="activity-detail-title">${item.title}</p><textarea rows="3">${item.text || ""}</textarea>`;
         grid.appendChild(box);
     });
+}
+
+function confirmRegenerateDays() {
+    const daysContainer = document.getElementById("days-container");
+    const hasExistingDays = daysContainer && daysContainer.querySelector(".day-section");
+
+    if (!hasExistingDays) {
+        generateDays();
+        return;
+    }
+
+    const confirmed = confirm("Regenerate the day sections? Days within the new date range will keep their data. Days removed from the trip will lose their data.");
+    if (!confirmed) return;
+
+    const snapshot = snapshotDays();
+    generateDays();
+    restoreSnapshot(snapshot);
+}
+
+function snapshotDays() {
+    const snapshot = [];
+    document.querySelectorAll(".day-section").forEach((section, index) => {
+        const n = index + 1;
+        const get = id => document.getElementById(id);
+        snapshot.push({
+            day_number: n,
+            accommodation: get(`accommodation-day${n}`)?.value || "",
+            caption:       get(`caption-day${n}`)?.value || "",
+            total_cost:    get(`cost-day${n}`)?.value || "",
+            activity:  snapshotList(n, "activity"),
+            dining:    snapshotList(n, "dining"),
+            transport: snapshotList(n, "transport"),
+            rented:    snapshotList(n, "rented")
+        });
+    });
+    return snapshot;
+}
+
+function snapshotList(dayNum, type) {
+    const items = [];
+    document.querySelectorAll(`#${type}-details-day${dayNum} .activity-detail-box`).forEach(box => {
+        items.push({
+            title: box.querySelector(".activity-detail-title")?.textContent.trim() || "",
+            text:  box.querySelector("textarea")?.value || ""
+        });
+    });
+    return items;
+}
+
+function restoreSnapshot(snapshot) {
+    snapshot.forEach(day => {
+        const n = day.day_number;
+        const get = id => document.getElementById(id);
+        if (!get(`accommodation-day${n}`)) return;  // day removed from new range
+
+        get(`accommodation-day${n}`).value = day.accommodation;
+        if (get(`caption-day${n}`)) get(`caption-day${n}`).value = day.caption;
+        if (get(`cost-day${n}`))    get(`cost-day${n}`).value    = day.total_cost;
+
+        restoreDynamicList(n, "activity",  day.activity);
+        restoreDynamicList(n, "dining",    day.dining);
+        restoreDynamicList(n, "transport", day.transport);
+        restoreDynamicList(n, "rented",    day.rented);
+
+        // Re-render server-side photos for this day, minus any marked for deletion
+        const originalDay = ITINERARY_DATA.days.find(d => d.day_number === n);
+        if (originalDay) {
+            const deletedIds = Array.from(document.querySelectorAll('input[name="delete_photo_ids"]'))
+                .map(i => parseInt(i.value));
+            const remainingPhotos = (originalDay.photos || []).filter(p => !deletedIds.includes(p.id));
+            renderExistingPhotos(n, remainingPhotos);
+        }
+
+        ["activities","dining","transport","accommodation","cost","rented","photo"].forEach(field => {
+            updateTilePreview(field, n);
+        });
+    });
+    updateBudgetSummary();
 }
 
 function expandField(field, dayNum) {
@@ -377,8 +444,11 @@ function updateTilePreview(field, dayNum) {
             preview.appendChild(p);
         });
     } else if (field === "transport") {
-        const val = document.getElementById(`transport-day${dayNum}`)?.value.trim();
-        if (val) preview.innerHTML = `<p>${val}</p>`;
+        document.querySelectorAll(`#transport-list-day${dayNum} li`).forEach(item => {
+            const p = document.createElement("p");
+            p.textContent = item.textContent.replace("✕", "").trim();
+            preview.appendChild(p);
+        });
     } else if (field === "accommodation") {
         const val = document.getElementById(`accommodation-day${dayNum}`)?.value.trim();
         if (val) preview.innerHTML = `<p>${val}</p>`;
@@ -386,8 +456,11 @@ function updateTilePreview(field, dayNum) {
         const val = document.getElementById(`cost-day${dayNum}`)?.value.trim();
         if (val) preview.innerHTML = `<p>$${val}</p>`;
     } else if (field === "rented") {
-        const val = document.getElementById(`rented-items-day${dayNum}`)?.value.trim();
-        if (val) preview.innerHTML = `<p>${val}</p>`;
+        document.querySelectorAll(`#rented-list-day${dayNum} li`).forEach(item => {
+            const p = document.createElement("p");
+            p.textContent = item.textContent.replace("✕", "").trim();
+            preview.appendChild(p);
+        });
     } else if (field === "photo") {
         const existingRows = document.querySelectorAll(`#existing-photos-day${dayNum} .file-row`).length;
         const newFiles     = (selectedPhotosByDay[dayNum] || []).length;
@@ -471,18 +544,40 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 });
 
-document.getElementById("itinerary-form").addEventListener("submit", function () {
+document.getElementById("itinerary-form").addEventListener("submit", async function (e) {
+    e.preventDefault();
+
+    // Existing logic: pack list fields into hidden JSON inputs
     document.querySelectorAll(".day-section").forEach((section, index) => {
         const dayNum = index + 1;
-        const activityDetails = [];
-        document.querySelectorAll(`#activity-details-day${dayNum} .activity-detail-box`).forEach(box => {
-            activityDetails.push({ title: box.querySelector(".activity-detail-title")?.textContent.trim() || "", text: box.querySelector("textarea")?.value || "" });
+        ["activity", "dining", "transport", "rented"].forEach(type => {
+            const items = [];
+            document.querySelectorAll(`#${type}-details-day${dayNum} .activity-detail-box`).forEach(box => {
+                items.push({
+                    title: box.querySelector(".activity-detail-title")?.textContent.trim() || "",
+                    text: box.querySelector("textarea")?.value || ""
+                });
+            });
+            document.getElementById(`${type}-json-day${dayNum}`).value = JSON.stringify(items);
         });
-        const diningDetails = [];
-        document.querySelectorAll(`#dining-details-day${dayNum} .activity-detail-box`).forEach(box => {
-            diningDetails.push({ title: box.querySelector(".activity-detail-title")?.textContent.trim() || "", text: box.querySelector("textarea")?.value || "" });
-        });
-        document.getElementById(`activity-json-day${dayNum}`).value = JSON.stringify(activityDetails);
-        document.getElementById(`dining-json-day${dayNum}`).value   = JSON.stringify(diningDetails);
     });
+
+    // Submit via fetch so we can control history afterwards
+    try {
+        const response = await fetch(this.action, {
+            method: 'POST',
+            body: new FormData(this)
+        });
+
+        if (response.ok) {
+            // Append ?updated=1 so the display page knows to show a confirmation toast
+            const url = new URL(response.url);
+            url.searchParams.set('updated', '1');
+            window.location.replace(url.toString());
+        } else {
+            alert("Failed to save changes. Please try again.");
+        }
+    } catch (err) {
+        alert("Network error while saving. Please try again.");
+    }
 });

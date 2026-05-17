@@ -11,8 +11,12 @@
 
             daysContainer.innerHTML = "";
 
-            if (!startDateInput || !endDateInput) {
-                alert("Please enter both a start date and an end date.");
+            const tripTitle = document.getElementById("trip-title").value.trim();
+            const destination = document.getElementById("destination").value.trim();
+            const travelStyle = document.getElementById("travel-style").value;
+
+            if (!tripTitle || !destination || !travelStyle || !startDateInput || !endDateInput) {
+                alert("Please fill in title, destination, travel style, and both dates before generating days.");
                 return;
             }
 
@@ -129,7 +133,11 @@
                         </div>
 
                         <div id="form-transport-day${i}">
-                            <input type="text" id="transport-day${i}" name="transport-day${i}" placeholder="Enter transport used, e.g. Train, Taxi, Bus">
+                            <div class="activity-input-area" id="transport-input-area-day${i}">
+                                <ul class="activity-list" id="transport-list-day${i}"></ul>
+                                <input type="text" class="activity-input" id="transport-input-day${i}" placeholder="Type a transport and press Enter">
+                            </div>
+                            <div class="activity-details-grid" id="transport-details-day${i}"></div>
                         </div>
 
                         <div id="form-accommodation-day${i}">
@@ -141,7 +149,11 @@
                         </div>
 
                         <div id="form-rented-day${i}">
-                            <input type="text" id="rented-items-day${i}" name="rented-items-day${i}" placeholder="Enter any rented items">
+                            <div class="activity-input-area" id="rented-input-area-day${i}">
+                                <ul class="activity-list" id="rented-list-day${i}"></ul>
+                                <input type="text" class="activity-input" id="rented-input-day${i}" placeholder="Type a rented item and press Enter">
+                            </div>
+                            <div class="activity-details-grid" id="rented-details-day${i}"></div>
                         </div>
 
                         <div id="form-photo-day${i}">
@@ -155,6 +167,8 @@
 
                         <input type="hidden" id="activity-json-day${i}" name="activity-json-day${i}">
                         <input type="hidden" id="dining-json-day${i}" name="dining-json-day${i}">
+                        <input type="hidden" id="transport-json-day${i}" name="transport-json-day${i}">
+                        <input type="hidden" id="rented-json-day${i}" name="rented-json-day${i}">
                     </div>
                 `;
 
@@ -182,8 +196,10 @@
                     saveDraft();
                 });
 
-                setupActivityInput(i);
-                setupDiningInput(i);
+                setupListInput(i, "activity");
+                setupListInput(i, "dining");
+                setupListInput(i, "transport");
+                setupListInput(i, "rented");
             }
 
             totalDays = dayCount;
@@ -207,81 +223,43 @@
             showDay(1);
         }
 
-        function setupActivityInput(dayNum) {
-            const input = document.getElementById(`activity-input-day${dayNum}`);
-            const list = document.getElementById(`activity-list-day${dayNum}`);
-            const grid = document.getElementById(`activity-details-day${dayNum}`);
-            let activityCount = list.children.length;
-
+        function setupListInput(dayNum, type) {
+            const input = document.getElementById(`${type}-input-day${dayNum}`);
+            const list  = document.getElementById(`${type}-list-day${dayNum}`);
+            const grid  = document.getElementById(`${type}-details-day${dayNum}`);
             if (!input) return;
+            let count = list.children.length;
 
             input.addEventListener("keydown", function(e) {
-                if (e.key === "Enter") {
-                    e.preventDefault();
-                    const value = this.value.trim();
-                    if (value === "") return;
-
-                    activityCount++;
-                    const id = `detail-day${dayNum}-act${activityCount}`;
-
-                    const li = document.createElement("li");
-                    li.innerHTML = `${value} <span class="remove-activity" onclick="removeActivity('${id}', this); saveDraft();">✕</span>`;
-                    list.appendChild(li);
-
-                    const box = document.createElement("div");
-                    box.classList.add("activity-detail-box");
-                    box.id = id;
-                    box.innerHTML = `
-                        <p class="activity-detail-title">${value}</p>
-                        <textarea id="${id}-textarea" placeholder="Enter details for ${value}..." rows="3"></textarea>
-                    `;
-                    grid.appendChild(box);
-
-                    box.querySelector("textarea").addEventListener("input", saveDraft);
-
-                    this.value = "";
-                    saveDraft();
-                }
+                if (e.key !== "Enter") return;
+                e.preventDefault();
+                const value = this.value.trim();
+                if (!value) return;
+                count++;
+                const id = `${type}-detail-day${dayNum}-item${count}`;
+                const li = document.createElement("li");
+                li.innerHTML = `${value} <span class="remove-activity" onclick="removeActivity('${id}', this); saveDraft();">✕</span>`;
+                list.appendChild(li);
+                const box = document.createElement("div");
+                box.classList.add("activity-detail-box");
+                box.id = id;
+                box.innerHTML = `<p class="activity-detail-title">${value}</p><textarea id="${id}-textarea" placeholder="Enter details for ${value}..." rows="3"></textarea>`;
+                grid.appendChild(box);
+                box.querySelector("textarea").addEventListener("input", saveDraft);
+                this.value = "";
+                saveDraft();
             });
         }
 
-        function setupDiningInput(dayNum) {
-            const input = document.getElementById(`dining-input-day${dayNum}`);
-            const list = document.getElementById(`dining-list-day${dayNum}`);
-            const grid = document.getElementById(`dining-details-day${dayNum}`);
-            let diningCount = list.children.length;
-
-            if (!input) return;
-
-            input.addEventListener("keydown", function(e) {
-                if (e.key === "Enter") {
-                    e.preventDefault();
-                    const value = this.value.trim();
-                    if (value === "") return;
-
-                    diningCount++;
-                    const id = `dining-detail-day${dayNum}-item${diningCount}`;
-
-                    const li = document.createElement("li");
-                    li.innerHTML = `${value} <span class="remove-activity" onclick="removeActivity('${id}', this); saveDraft();">✕</span>`;
-                    list.appendChild(li);
-
-                    const box = document.createElement("div");
-                    box.classList.add("activity-detail-box");
-                    box.id = id;
-                    box.innerHTML = `
-                        <p class="activity-detail-title">${value}</p>
-                        <textarea id="${id}-textarea" placeholder="Enter details for ${value}..." rows="3"></textarea>
-                    `;
-                    grid.appendChild(box);
-
-                    box.querySelector("textarea").addEventListener("input", saveDraft);
-
-                    this.value = "";
-                    saveDraft();
-                }
-            });
-        }
+        function confirmRegenerateDays() {
+            const daysContainer = document.getElementById("days-container");
+            const hasExistingDays = daysContainer && daysContainer.querySelector(".day-section");
+            if (hasExistingDays) {
+                const confirmed = confirm("Regenerating days will clear any unsaved edits to your existing days. Continue?");
+                if (!confirmed) return;
+            }
+            generateDays();
+}
 
         function removeActivity(boxId, span) {
             const box = document.getElementById(boxId);
@@ -349,46 +327,52 @@
             saveDraft();
         }
 
-        function updateTilePreview(field, dayNum) {
-    const preview = document.getElementById(`preview-${field}-day${dayNum}`);
-    const hint = document.getElementById(`hint-${field}-day${dayNum}`);
+                    function updateTilePreview(field, dayNum) {
+                const preview = document.getElementById(`preview-${field}-day${dayNum}`);
+                const hint = document.getElementById(`hint-${field}-day${dayNum}`);
 
-    preview.innerHTML = "";
+                preview.innerHTML = "";
 
-    if (field === "activities") {
-        document.querySelectorAll(`#activity-list-day${dayNum} li`).forEach(item => {
-            const p = document.createElement("p");
-            p.textContent = item.textContent.replace("✕", "").trim();
-            preview.appendChild(p);
-        });
-    } else if (field === "dining") {
-        document.querySelectorAll(`#dining-list-day${dayNum} li`).forEach(item => {
-            const p = document.createElement("p");
-            p.textContent = item.textContent.replace("✕", "").trim();
-            preview.appendChild(p);
-        });
-    } else if (field === "transport") {
-        const val = document.getElementById(`transport-day${dayNum}`)?.value.trim();
-        if (val) preview.innerHTML = `<p>${val}</p>`;
-    } else if (field === "accommodation") {
-        const val = document.getElementById(`accommodation-day${dayNum}`)?.value.trim();
-        if (val) preview.innerHTML = `<p>${val}</p>`;
-    } else if (field === "cost") {
-        const val = document.getElementById(`cost-day${dayNum}`)?.value.trim();
-        if (val) preview.innerHTML = `<p>$${val}</p>`;
-    } else if (field === "rented") {
-        const val = document.getElementById(`rented-items-day${dayNum}`)?.value.trim();
-        if (val) preview.innerHTML = `<p>${val}</p>`;
-    } else if (field === "photo") {
-        const files = selectedPhotosByDay[dayNum] || [];
-        files.forEach(file => {
-            const p = document.createElement("p");
-            p.textContent = file.name;
-            preview.appendChild(p);
-        });
-    }
-    if (hint) {
-        hint.style.display = preview.innerHTML.trim() !== "" ? "none" : "block";
+                if (field === "activities") {
+                    document.querySelectorAll(`#activity-list-day${dayNum} li`).forEach(item => {
+                        const p = document.createElement("p");
+                        p.textContent = item.textContent.replace("✕", "").trim();
+                        preview.appendChild(p);
+                    });
+                } else if (field === "dining") {
+                    document.querySelectorAll(`#dining-list-day${dayNum} li`).forEach(item => {
+                        const p = document.createElement("p");
+                        p.textContent = item.textContent.replace("✕", "").trim();
+                        preview.appendChild(p);
+                    });
+                } else if (field === "transport") {
+                    document.querySelectorAll(`#transport-list-day${dayNum} li`).forEach(item => {
+                        const p = document.createElement("p");
+                        p.textContent = item.textContent.replace("✕", "").trim();
+                        preview.appendChild(p);
+                    });
+                } else if (field === "accommodation") {
+                    const val = document.getElementById(`accommodation-day${dayNum}`)?.value.trim();
+                    if (val) preview.innerHTML = `<p>${val}</p>`;
+                } else if (field === "cost") {
+                    const val = document.getElementById(`cost-day${dayNum}`)?.value.trim();
+                    if (val) preview.innerHTML = `<p>$${val}</p>`;
+                } else if (field === "rented") {
+                    document.querySelectorAll(`#rented-list-day${dayNum} li`).forEach(item => {
+                        const p = document.createElement("p");
+                        p.textContent = item.textContent.replace("✕", "").trim();
+                        preview.appendChild(p);
+                    });
+                } else if (field === "photo") {
+                    const files = selectedPhotosByDay[dayNum] || [];
+                    files.forEach(file => {
+                        const p = document.createElement("p");
+                        p.textContent = file.name;
+                        preview.appendChild(p);
+                    });
+                }
+                if (hint) {
+                    hint.style.display = preview.innerHTML.trim() !== "" ? "none" : "block";
     }
 }
 
@@ -396,6 +380,7 @@
             setupGuideModal();
             restoreDraft();
             setupAutoSaveForTripDetails();
+            updateClearDraftVisibility();
 
             document.getElementById("itinerary-form").addEventListener("keydown", function (e) {
                 const tag = e.target.tagName.toLowerCase();
@@ -439,10 +424,12 @@
                     field.addEventListener("input", function () {
                         saveDraft();
                         updateBudgetSummary();
+                        updateClearDraftVisibility();
                     });
                     field.addEventListener("change", function () {
                         saveDraft();
                         updateBudgetSummary();
+                        updateClearDraftVisibility();
                     });
                 }
             });
@@ -478,15 +465,30 @@
                     diningDetails.push({ title, text: textarea ? textarea.value : "" });
                 });
 
+                const transportDetails = [];
+                document.querySelectorAll(`#transport-details-day${dayNum} .activity-detail-box`).forEach(box => {
+                    transportDetails.push({
+                        title: box.querySelector(".activity-detail-title")?.textContent.trim() || "",
+                        text: box.querySelector("textarea")?.value || ""
+                    });
+                });
+                const rentedDetails = [];
+                document.querySelectorAll(`#rented-details-day${dayNum} .activity-detail-box`).forEach(box => {
+                    rentedDetails.push({
+                        title: box.querySelector(".activity-detail-title")?.textContent.trim() || "",
+                        text: box.querySelector("textarea")?.value || ""
+                    });
+                });
+
                 draft.days.push({
                     cost: document.getElementById(`cost-day${dayNum}`)?.value || "",
-                    rentedItems: document.getElementById(`rented-items-day${dayNum}`)?.value || "",
                     accommodation: document.getElementById(`accommodation-day${dayNum}`)?.value || "",
                     caption: document.getElementById(`caption-day${dayNum}`)?.value || "",
                     fileNames: (selectedPhotosByDay[dayNum] || []).map(file => file.name),
-                    transport: document.getElementById(`transport-day${dayNum}`)?.value || "",
                     activityDetails,
-                    diningDetails
+                    diningDetails,
+                    transportDetails,
+                    rentedDetails
                 });
             });
 
@@ -518,6 +520,9 @@
         }
 
         function clearDraft() {
+            const confirmed = confirm("Clear your entire draft? This will erase all trip details and day plans, and cannot be undone.");
+            if (!confirmed) return;
+
             localStorage.removeItem(STORAGE_KEY);
 
             const form = document.getElementById("itinerary-form");
@@ -538,6 +543,7 @@
             currentDay = 1;
             totalDays = 0;
 
+            updateClearDraftVisibility();
             alert("Draft cleared.");
         }
 
@@ -571,10 +577,8 @@
                     const transportField = document.getElementById(`transport-day${dayNum}`);
 
                     if (costField) costField.value = day.cost || "";
-                    if (rentedField) rentedField.value = day.rentedItems || "";
                     if (accommodationField) accommodationField.value = day.accommodation || "";
                     if (captionField) captionField.value = day.caption || "";
-                    if (transportField) transportField.value = day.transport || "";
                     selectedPhotosByDay[dayNum] = [];
 
                     if (day.fileNames && day.fileNames.length > 0) {
@@ -587,6 +591,8 @@
 
                     restoreDynamicList(dayNum, "activity", day.activityDetails || []);
                     restoreDynamicList(dayNum, "dining", day.diningDetails || []);
+                    restoreDynamicList(dayNum, "transport", day.transportDetails || []);
+                    restoreDynamicList(dayNum, "rented",    day.rentedDetails    || []);
 
                     updateTilePreview("activities", dayNum);
                     updateTilePreview("dining", dayNum);
@@ -642,6 +648,21 @@
                 });
             });
         }
+
+        function updateClearDraftVisibility() {
+            const wrapper = document.querySelector('.top-form-actions');
+            if (!wrapper) return;
+
+            const fieldIds = ["trip-title", "destination", "travel-style", "trip-budget", "start-date", "end-date"];
+            const hasTripDetails = fieldIds.some(id => {
+                const field = document.getElementById(id);
+                return field && field.value.trim() !== "";
+            });
+            const hasDays = document.querySelectorAll(".day-section").length > 0;
+
+            wrapper.classList.toggle("hidden", !hasTripDetails && !hasDays);
+        }
+
 
         function updateBudgetSummary() {
             const budgetInput = document.getElementById("trip-budget");
@@ -745,24 +766,16 @@
             document.querySelectorAll(".day-section").forEach((section, index) => {
                 const dayNum = index + 1;
 
-                const activityDetails = [];
-                document.querySelectorAll(`#activity-details-day${dayNum} .activity-detail-box`).forEach(box => {
-                    activityDetails.push({
-                        title: box.querySelector(".activity-detail-title")?.textContent.trim() || "",
-                        text: box.querySelector("textarea")?.value || ""
+                ["activity", "dining", "transport", "rented"].forEach(type => {
+                    const items = [];
+                    document.querySelectorAll(`#${type}-details-day${dayNum} .activity-detail-box`).forEach(box => {
+                        items.push({
+                            title: box.querySelector(".activity-detail-title")?.textContent.trim() || "",
+                            text: box.querySelector("textarea")?.value || ""
+                        });
                     });
+                    document.getElementById(`${type}-json-day${dayNum}`).value = JSON.stringify(items);
                 });
-
-                const diningDetails = [];
-                document.querySelectorAll(`#dining-details-day${dayNum} .activity-detail-box`).forEach(box => {
-                    diningDetails.push({
-                        title: box.querySelector(".activity-detail-title")?.textContent.trim() || "",
-                        text: box.querySelector("textarea")?.value || ""
-                    });
-                });
-
-                document.getElementById(`activity-json-day${dayNum}`).value = JSON.stringify(activityDetails);
-                document.getElementById(`dining-json-day${dayNum}`).value = JSON.stringify(diningDetails);
             });
             localStorage.removeItem(STORAGE_KEY);
         });
